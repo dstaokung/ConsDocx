@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>2. คำสั่ง — แต่งตั้งคณะกรรมการจัดทำแบบรูปรายการงานก่อสร้าง (แบบ template)</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: "TH Sarabun New", "Sarabun", sans-serif;
+    background: #f2f4f7;
+    margin: 0;
+    padding: 24px;
+    color: #1f2937;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: #6b7280; margin: 0 0 20px; font-size: 15px; }
+  .layout {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 18px;
+  }
+  .card h2 { font-size: 16px; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+  .card h3 { font-size: 14px; margin: 18px 0 6px; color: #2563eb; }
+  label { display: block; font-size: 14px; font-weight: 600; margin: 12px 0 4px; }
+  label .hint { font-weight: 400; color: #9ca3af; font-size: 12px; }
+  input[type=text], input[type=file] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 15px;
+  }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  button#gen {
+    margin-top: 18px;
+    width: 100%;
+    padding: 12px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button#gen:hover { background: #1d4ed8; }
+  button#gen:disabled { background: #93c5fd; cursor: default; }
+  .status { margin-top: 10px; font-size: 13px; color: #16a34a; min-height: 18px; }
+  .status.err { color: #dc2626; }
+  .template-box {
+    background: #eff6ff;
+    border: 1px dashed #93c5fd;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px;
+    color: #1e40af;
+    margin-bottom: 16px;
+  }
+  .fixed-note {
+    background: #fefce8;
+    border: 1px dashed #eab308;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px;
+    color: #854d0e;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+
+<a href="../main.html" id="backLink" style="display:inline-block; margin-bottom:14px; font-size:14px; color:#2563eb; text-decoration:none;">&larr; กลับไปหน้าแรก</a>
+
+<h1>2. คำสั่ง — แต่งตั้งคณะกรรมการจัดทำแบบรูปรายการงานก่อสร้าง</h1>
+<p class="sub">เวอร์ชัน <b>template + แทนที่คำ</b> — ใช้ไฟล์ต้นฉบับจริงเป็นต้นแบบ คงจำนวนกรรมการไว้ที่ 3 คนตามที่ทำเครื่องหมายไว้</p>
+
+<div class="layout">
+  <div class="card">
+    <h2>1. ข้อมูลที่เปลี่ยนได้</h2>
+
+    <div class="fixed-note">
+      เลขที่คำสั่ง วันที่สั่ง และชื่อนายกผู้ลงนาม <b>ยังคงที่ตามไฟล์ต้นฉบับ</b>
+      เพราะยังไม่ได้ทำเครื่องหมายสีแดงไว้ — จำนวนกรรมการคงที่ 3 คน (ทำสีแดงไว้แค่ 3 คนนี้)
+      ถ้าต้องการแก้ไขจุดเหล่านี้ได้ด้วย หรือปรับจำนวนกรรมการ ให้กลับไปทำสีแดงเพิ่ม/ลดในไฟล์ต้นฉบับ
+    </div>
+
+    <form id="form">
+      <label>ชื่อโครงการ <span class="hint">(แทนที่ทั้ง 3 จุดในเอกสารพร้อมกัน)</span></label>
+      <input type="text" id="projectName" placeholder="ก่อสร้างถนน คสล.ซอยบ้านเจ๊จิตร หมู่ที่ 8">
+
+      <h3>คณะกรรมการ 3 คน</h3>
+
+      <label>1. ชื่อ-สกุล (ประธานกรรมการ)</label>
+      <input type="text" id="name1" placeholder="ว่าที่ ร.ต. คมสรร  เครือศรี">
+      <label>1. ตำแหน่ง</label>
+      <input type="text" id="pos1" placeholder="ผู้อำนวยการกองช่าง">
+
+      <label>2. ชื่อ-สกุล (กรรมการ)</label>
+      <input type="text" id="name2" placeholder="นายถิรพงศ์  พระใหญ่">
+      <label>2. ตำแหน่ง</label>
+      <input type="text" id="pos2" placeholder="วิศวกรโยธาปฏิบัติการ">
+
+      <label>3. ชื่อ-สกุล (กรรมการ)</label>
+      <input type="text" id="name3" placeholder="นายวิเชษฐ์  สุพัฒศร">
+      <label>3. ตำแหน่ง</label>
+      <input type="text" id="pos3" placeholder="นายช่างโยธาปฏิบัติงาน">
+
+      <button type="button" id="gen">สร้างไฟล์ Word (.docx)</button>
+      <div class="status" id="status"></div>
+    </form>
+  </div>
+</div>
+
+<script src="../../shared/jszip.lib.js"></script>
+<script src="./template-data.js"></script>
+<script>
+function val(id) { return document.getElementById(id).value.trim(); }
+
+// ---- จำข้อมูลที่กรอกไว้ในฟอร์มนี้ (เก็บใน localStorage ของหน้านี้เอง) กันหายตอนกด
+// "กลับไปหน้าแรก" แล้วย้อนกลับเข้ามาใหม่ ----
+const AUTOSAVE_KEY = "consdocx_autosave_2_คำสั่งแต่งตั้งคณะกรรมการ";
+const AUTOSAVE_FIELDS = ["projectName","name1","pos1","name2","pos2","name3","pos3"];
+function saveAutosave() {
+  const data = {};
+  AUTOSAVE_FIELDS.forEach(id => { data[id] = document.getElementById(id).value; });
+  try { localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(data)); } catch (e) {}
+}
+function restoreAutosave() {
+  try {
+    const raw = localStorage.getItem(AUTOSAVE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    AUTOSAVE_FIELDS.forEach(id => {
+      if (data[id]) document.getElementById(id).value = data[id];
+    });
+  } catch (e) {}
+}
+restoreAutosave();
+AUTOSAVE_FIELDS.forEach(id => document.getElementById(id).addEventListener("input", saveAutosave));
+
+// รับค่าที่ส่งมาจากหน้า main.html ผ่าน query string เช่น ?projectName=... (ยังแก้ไขในฟอร์มนี้ได้ตามปกติ)
+// ทำหลัง restoreAutosave เพราะค่าจาก main ถือว่าใหม่กว่า ให้ทับค่าที่จำไว้เดิมได้
+(function prefillFromMain() {
+  const params = new URLSearchParams(location.search);
+  const projectName = params.get("projectName");
+  if (projectName) document.getElementById("projectName").value = projectName;
+})();
+saveAutosave();
+
+// เวลากด "กลับไปหน้าแรก" ให้พาชื่อโครงการที่กรอกไว้กลับไปด้วย ไม่ให้ข้อมูลหายตอนกลับไป main
+function updateBackLink() {
+  const projectName = val("projectName");
+  const q = projectName ? ("?projectName=" + encodeURIComponent(projectName)) : "";
+  document.getElementById("backLink").href = "../main.html" + q;
+}
+document.getElementById("projectName").addEventListener("input", updateBackLink);
+updateBackLink();
+
+// ---- ตอบข้อมูลฟอร์มปัจจุบันกลับไปให้หน้า main.html เวลาถูกเรียกผ่าน iframe ซ่อน
+// (ใช้ตอนกดปุ่ม "สร้างไฟล์ทั้งหมด" ที่ main เพื่อเอาข้อมูลจริงในฟอร์มนี้ไปใส่ในไฟล์ที่สร้าง) ----
+window.addEventListener("message", (event) => {
+  if (!event.data) return;
+  if (event.data.type === "consdocx:getFormData") {
+    const data = {};
+    AUTOSAVE_FIELDS.forEach(id => { data[id] = document.getElementById(id).value; });
+    event.source.postMessage({ type: "consdocx:formData", docId: "doc2", data }, "*");
+  } else if (event.data.type === "consdocx:clearFormData") {
+    try { localStorage.removeItem(AUTOSAVE_KEY); } catch (e) {}
+    AUTOSAVE_FIELDS.forEach(id => { document.getElementById(id).value = ""; });
+  }
+});
+
+function base64ToArrayBuffer(b64) {
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
+}
+
+function xmlEscape(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// รองรับ placeholder ที่ปรากฏซ้ำหลายจุดในเอกสาร (เช่น [ชื่อโครงการ] x3)
+function replacePlaceholder(xml, placeholder, value) {
+  const escapedPh = placeholder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const runRegex = new RegExp(`<w:r[^>]*>((?:(?!</w:r>)[\\s\\S])*?)<w:t([^>]*)>([^<]*${escapedPh}[^<]*)</w:t></w:r>`, "g");
+  let match;
+  let lastIndex = 0;
+  let result = "";
+  while ((match = runRegex.exec(xml)) !== null) {
+    const [fullMatch, preRunXml, , textContent] = match;
+    result += xml.slice(lastIndex, match.index);
+    const rPrMatch = preRunXml.match(/<w:rPr>[\s\S]*?<\/w:rPr>/);
+    const rPr = rPrMatch ? rPrMatch[0] : "";
+    const idx = textContent.indexOf(placeholder);
+    const prefix = textContent.slice(0, idx);
+    const suffix = textContent.slice(idx + placeholder.length);
+    const lines = String(value).split(/\n+/);
+    let replacement;
+    if (lines.length <= 1) {
+      replacement = `<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(prefix + value + suffix)}</w:t></w:r>`;
+    } else {
+      const parts = [];
+      parts.push(`<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(prefix + lines[0])}</w:t></w:r>`);
+      for (let i = 1; i < lines.length - 1; i++) {
+        parts.push(`<w:r>${rPr}<w:br/><w:t xml:space="preserve">${xmlEscape(lines[i])}</w:t></w:r>`);
+      }
+      parts.push(`<w:r>${rPr}<w:br/><w:t xml:space="preserve">${xmlEscape(lines[lines.length - 1] + suffix)}</w:t></w:r>`);
+      replacement = parts.join("");
+    }
+    result += replacement;
+    lastIndex = match.index + fullMatch.length;
+    runRegex.lastIndex = lastIndex;
+  }
+  result += xml.slice(lastIndex);
+  return result;
+}
+
+async function buildDocx() {
+  const templateBuffer = base64ToArrayBuffer(window.TEMPLATE_DOCX_BASE64);
+  const zip = await JSZip.loadAsync(templateBuffer);
+  let xml = await zip.file("word/document.xml").async("string");
+
+  const fields = {
+    "[ชื่อโครงการ]": val("projectName"),
+    "[ชื่อกรรมการ1]": val("name1"),
+    "[ตำแหน่งกรรมการ1]": val("pos1"),
+    "[ชื่อกรรมการ2]": val("name2"),
+    "[ตำแหน่งกรรมการ2]": val("pos2"),
+    "[ชื่อกรรมการ3]": val("name3"),
+    "[ตำแหน่งกรรมการ3]": val("pos3"),
+  };
+  for (const [ph, value] of Object.entries(fields)) {
+    xml = replacePlaceholder(xml, ph, value);
+  }
+
+  zip.file("word/document.xml", xml);
+  return await zip.generateAsync({ type: "blob" });
+}
+
+document.getElementById("gen").addEventListener("click", async () => {
+  const btn = document.getElementById("gen");
+  const statusEl = document.getElementById("status");
+  statusEl.className = "status";
+  btn.disabled = true;
+  statusEl.textContent = "กำลังสร้างไฟล์...";
+  try {
+    const blob = await buildDocx();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const nameSafe = (val("projectName") || "คำสั่ง").replace(/[\\/:*?"<>|]/g, "-").slice(0, 40);
+    a.href = url;
+    a.download = `คำสั่งแต่งตั้งคณะกรรมการ_${nameSafe}.docx`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    statusEl.textContent = "สร้างไฟล์สำเร็จ — ไฟล์ถูกดาวน์โหลดแล้ว";
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "เกิดข้อผิดพลาด: " + err.message;
+    statusEl.className = "status err";
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>

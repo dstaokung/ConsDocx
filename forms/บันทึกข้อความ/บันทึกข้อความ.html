@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>โปรแกรมทำเอกสารโครงการก่อสร้าง — บันทึกข้อความ (แบบ template)</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: "TH Sarabun New", "Sarabun", sans-serif;
+    background: #f2f4f7;
+    margin: 0;
+    padding: 24px;
+    color: #1f2937;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: #6b7280; margin: 0 0 20px; font-size: 15px; }
+  .layout {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 18px;
+  }
+  .card h2 { font-size: 16px; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+  label { display: block; font-size: 14px; font-weight: 600; margin: 12px 0 4px; }
+  label .hint { font-weight: 400; color: #9ca3af; font-size: 12px; }
+  input[type=text], input[type=date], textarea, input[type=file] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 15px;
+  }
+  textarea { resize: vertical; min-height: 60px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  button#gen {
+    margin-top: 18px;
+    width: 100%;
+    padding: 12px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button#gen:hover { background: #1d4ed8; }
+  button#gen:disabled { background: #93c5fd; cursor: default; }
+  .status { margin-top: 10px; font-size: 13px; color: #16a34a; min-height: 18px; }
+  .status.err { color: #dc2626; }
+  .template-box {
+    background: #eff6ff;
+    border: 1px dashed #93c5fd;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px;
+    color: #1e40af;
+    margin-bottom: 16px;
+  }
+  .template-box a { color: #1d4ed8; }
+
+  /* preview */
+  .paper {
+    background: #fff;
+    width: 100%;
+    aspect-ratio: 210 / 297;
+    padding: 8% 7%;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    font-size: 13px;
+    line-height: 1.55;
+    overflow: hidden;
+    position: relative;
+  }
+  .crest {
+    position: absolute;
+    top: 6%;
+    left: 7%;
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #9ca3af;
+  }
+  .p-title { text-align: center; font-weight: 700; font-size: 20px; margin-bottom: 10px; }
+  .p-line { font-weight: 700; margin: 2px 0; }
+  .p-line .val { font-weight: 400; }
+  .p-to { margin: 10px 0 6px; }
+  .p-body { text-indent: 2em; margin: 6px 0; white-space: pre-wrap; }
+  .p-sign { text-align: center; margin-top: 30px; }
+  .muted { color: #b0b6c0; }
+</style>
+</head>
+<body>
+
+<a href="../main.html" style="display:inline-block; margin-bottom:14px; font-size:14px; color:#2563eb; text-decoration:none;">&larr; กลับไปหน้าแรก</a>
+
+<h1>โปรแกรมทำเอกสารโครงการก่อสร้าง</h1>
+<p class="sub">บันทึกข้อความ — เวอร์ชันนี้ใช้วิธี <b>template + แทนที่คำ</b>: กรอกข้อมูล → โปรแกรมเปิด <code>template.docx</code> แทนที่ตัวแปรในวงเล็บเหลี่ยม เช่น [ส่วนราชการ] แล้วบันทึกเป็นไฟล์ใหม่ ไม่แก้ template เดิม</p>
+
+<div class="layout">
+
+  <div class="card">
+    <h2>1. ข้อมูลบันทึกข้อความ</h2>
+
+    <div class="template-box">
+      ใช้ไฟล์ <b>บันทึกข้อความ_template.docx</b> ที่เก็บไว้ที่ <code>../../templates/</code> เป็นต้นแบบ
+      (ระยะ/ฟอนต์/ตราครุฑมาจากไฟล์นี้ทั้งหมด) — ถ้าแก้ template เพิ่มเอง บอกให้ช่วย regenerate
+      ไฟล์นี้ใหม่ได้เลย
+    </div>
+
+    <form id="form">
+
+      <label>ส่วนราชการ <span class="hint">(หน่วยงาน / กอง / โทร.)</span></label>
+      <input type="text" id="dept" placeholder="กองช่าง เทศบาลตำบล... โทร. 0-0000-0000">
+
+      <div class="row2">
+        <div>
+          <label>ที่</label>
+          <input type="text" id="refNo" placeholder="ทต.๐๐๐๐/๑๒๓">
+        </div>
+        <div>
+          <label>วันที่</label>
+          <input type="date" id="docDate">
+        </div>
+      </div>
+
+      <label>เรื่อง</label>
+      <input type="text" id="subject" placeholder="ขออนุมัติดำเนินโครงการก่อสร้าง...">
+
+      <label>เรียน</label>
+      <input type="text" id="toWhom" placeholder="นายกเทศมนตรีตำบล...">
+
+      <label>สิ่งที่ส่งมาด้วย <span class="hint">(ถ้ามี ไม่บังคับ)</span></label>
+      <input type="text" id="enclosure" placeholder="แบบแปลน จำนวน 1 ชุด">
+
+      <label>ภาคเหตุ <span class="hint">(เหตุผล/ที่มา — ขึ้นบรรทัดใหม่ได้)</span></label>
+      <textarea id="bodyReason" placeholder="ด้วย...."></textarea>
+
+      <label>ภาคความประสงค์ <span class="hint">(ขอ/เสนอ/แจ้ง)</span></label>
+      <textarea id="bodyPurpose" placeholder="จึงเรียนมาเพื่อ...."></textarea>
+
+      <label>ภาคสรุป <span class="hint">(ถ้ามี ไม่บังคับ)</span></label>
+      <textarea id="bodyConclusion" placeholder="จึงเรียนมาเพื่อโปรดพิจารณา"></textarea>
+
+      <label>ผู้ลงชื่อ</label>
+      <input type="text" id="signerName" placeholder="นายทดสอบ ทดสอบดี">
+
+      <label>ตำแหน่ง</label>
+      <input type="text" id="signerPosition" placeholder="นายช่างโยธาชำนาญงาน">
+
+      <button type="button" id="gen">สร้างไฟล์ Word (.docx)</button>
+      <div class="status" id="status"></div>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>2. ตัวอย่างเอกสาร (ภาพร่างคร่าวๆ)</h2>
+    <div class="paper" id="paper">
+      <div class="crest">ครุฑ<br>(จาก template.docx)</div>
+      <div class="p-title">บันทึกข้อความ</div>
+      <div class="p-line">ส่วนราชการ <span class="val" id="pv-dept">-</span></div>
+      <div class="p-line">ที่ <span class="val" id="pv-refNo">-</span>&nbsp;&nbsp;&nbsp;&nbsp;วันที่ <span class="val" id="pv-docDate">-</span></div>
+      <div class="p-line">เรื่อง <span class="val" id="pv-subject">-</span></div>
+      <div class="p-to">เรียน <span id="pv-toWhom" class="muted">-</span></div>
+      <div class="p-line" id="pv-enclosureWrap" style="display:none">สิ่งที่ส่งมาด้วย <span class="val" id="pv-enclosure"></span></div>
+      <div class="p-body" id="pv-bodyReason"></div>
+      <div class="p-body" id="pv-bodyPurpose"></div>
+      <div class="p-body" id="pv-bodyConclusion"></div>
+      <div class="p-sign">
+        <div>(<span id="pv-signerName">-</span>)</div>
+        <div id="pv-signerPosition">-</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="../../shared/jszip.lib.js"></script>
+<script src="./template-data.js"></script>
+<script>
+const ids = ["dept","refNo","docDate","subject","toWhom","enclosure","bodyReason","bodyPurpose","bodyConclusion","signerName","signerPosition"];
+
+const THAI_MONTHS = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+
+function toThaiDate(isoStr) {
+  if (!isoStr) return "";
+  const d = new Date(isoStr + "T00:00:00");
+  const day = d.getDate();
+  const month = THAI_MONTHS[d.getMonth()];
+  const year = d.getFullYear() + 543;
+  return `${day}  ${month}  ${year}`;
+}
+
+function val(id) { return document.getElementById(id).value.trim(); }
+
+function updatePreview() {
+  document.getElementById("pv-dept").textContent = val("dept") || "-";
+  document.getElementById("pv-refNo").textContent = val("refNo") || "-";
+  document.getElementById("pv-docDate").textContent = toThaiDate(val("docDate")) || "-";
+  document.getElementById("pv-subject").textContent = val("subject") || "-";
+  const to = val("toWhom");
+  const toEl = document.getElementById("pv-toWhom");
+  toEl.textContent = to || "-";
+  toEl.className = to ? "" : "muted";
+  const enc = val("enclosure");
+  document.getElementById("pv-enclosureWrap").style.display = enc ? "block" : "none";
+  document.getElementById("pv-enclosure").textContent = enc;
+  document.getElementById("pv-bodyReason").textContent = val("bodyReason");
+  document.getElementById("pv-bodyPurpose").textContent = val("bodyPurpose");
+  document.getElementById("pv-bodyConclusion").textContent = val("bodyConclusion");
+  document.getElementById("pv-signerName").textContent = val("signerName") || "-";
+  document.getElementById("pv-signerPosition").textContent = val("signerPosition") || "-";
+}
+ids.forEach(id => document.getElementById(id).addEventListener("input", updatePreview));
+
+// ---- จำข้อมูลที่กรอกไว้ในฟอร์มนี้ (เก็บใน localStorage ของหน้านี้เอง) กันหายตอนกด
+// "กลับไปหน้าแรก" แล้วย้อนกลับเข้ามาใหม่ ----
+const AUTOSAVE_KEY = "consdocx_autosave_บันทึกข้อความ";
+function saveAutosave() {
+  const data = {};
+  ids.forEach(id => { data[id] = document.getElementById(id).value; });
+  try { localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(data)); } catch (e) {}
+}
+function restoreAutosave() {
+  try {
+    const raw = localStorage.getItem(AUTOSAVE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    ids.forEach(id => {
+      if (data[id]) document.getElementById(id).value = data[id];
+    });
+  } catch (e) {}
+}
+restoreAutosave();
+ids.forEach(id => document.getElementById(id).addEventListener("input", saveAutosave));
+
+updatePreview();
+
+// ---- รับคำสั่งล้างข้อมูล เวลาถูกเรียกผ่าน iframe ซ่อนจากหน้า main.html ตอนเปิด main.html ใหม่ ----
+window.addEventListener("message", (event) => {
+  if (!event.data || event.data.type !== "consdocx:clearFormData") return;
+  try { localStorage.removeItem(AUTOSAVE_KEY); } catch (e) {}
+  ids.forEach(id => { document.getElementById(id).value = ""; });
+});
+
+// ---- แปลง base64 -> ArrayBuffer ----
+function base64ToArrayBuffer(b64) {
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
+}
+
+// ---- แทนที่ placeholder ใน document.xml โดยคงรูปแบบ (rPr) ของ run เดิม ----
+function xmlEscape(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function replacePlaceholder(xml, placeholder, value) {
+  // จับ run ที่มี placeholder อยู่ "ภายใน" ข้อความ (อาจมีคำอื่นนำหน้า/ตามหลังในรันเดียวกัน เช่น "ที่  [ที่]")
+  const escapedPh = placeholder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const runRegex = new RegExp(`<w:r[^>]*>((?:(?!</w:r>)[\\s\\S])*?)<w:t([^>]*)>([^<]*${escapedPh}[^<]*)</w:t></w:r>`);
+  const match = xml.match(runRegex);
+  if (!match) {
+    // placeholder อาจไม่พบ (เช่น ไม่ได้อยู่ใน template ที่ผู้ใช้แก้เอง) — ข้ามไปเงียบๆ
+    return xml;
+  }
+  const [fullMatch, preRunXml, , textContent] = match;
+  const rPrMatch = preRunXml.match(/<w:rPr>[\s\S]*?<\/w:rPr>/);
+  const rPr = rPrMatch ? rPrMatch[0] : "";
+  const idx = textContent.indexOf(placeholder);
+  const prefix = textContent.slice(0, idx);
+  const suffix = textContent.slice(idx + placeholder.length);
+  const lines = String(value).split(/\n+/);
+  let replacement;
+  if (lines.length <= 1) {
+    replacement = `<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(prefix + value + suffix)}</w:t></w:r>`;
+  } else {
+    const parts = [];
+    parts.push(`<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(prefix + lines[0])}</w:t></w:r>`);
+    for (let i = 1; i < lines.length - 1; i++) {
+      parts.push(`<w:r>${rPr}<w:br/><w:t xml:space="preserve">${xmlEscape(lines[i])}</w:t></w:r>`);
+    }
+    parts.push(`<w:r>${rPr}<w:br/><w:t xml:space="preserve">${xmlEscape(lines[lines.length - 1] + suffix)}</w:t></w:r>`);
+    replacement = parts.join("");
+  }
+  return xml.replace(fullMatch, replacement);
+}
+
+async function buildDocx() {
+  const templateBuffer = base64ToArrayBuffer(window.TEMPLATE_DOCX_BASE64);
+  const zip = await JSZip.loadAsync(templateBuffer);
+  let xml = await zip.file("word/document.xml").async("string");
+
+  const fields = {
+    "[ส่วนราชการ]": val("dept"),
+    "[ที่]": val("refNo"),
+    "[วันที่]": toThaiDate(val("docDate")),
+    "[เรื่อง]": val("subject"),
+    "[เรียน]": val("toWhom"),
+    "[สิ่งที่ส่งมาด้วย]": val("enclosure"),
+    "[ภาคเหตุ]": val("bodyReason"),
+    "[ภาคความประสงค์]": val("bodyPurpose"),
+    "[ภาคสรุป]": val("bodyConclusion"),
+    "[ผู้ลงชื่อ]": val("signerName"),
+    "[ตำแหน่ง]": val("signerPosition"),
+  };
+
+  for (const [ph, value] of Object.entries(fields)) {
+    xml = replacePlaceholder(xml, ph, value);
+  }
+
+  zip.file("word/document.xml", xml);
+  return await zip.generateAsync({ type: "blob" });
+}
+
+document.getElementById("gen").addEventListener("click", async () => {
+  const btn = document.getElementById("gen");
+  const statusEl = document.getElementById("status");
+  statusEl.className = "status";
+  btn.disabled = true;
+  statusEl.textContent = "กำลังสร้างไฟล์...";
+  try {
+    const blob = await buildDocx();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const refNoSafe = (val("refNo") || "บันทึกข้อความ").replace(/[\\/:*?"<>|]/g, "-");
+    a.href = url;
+    a.download = `บันทึกข้อความ_${refNoSafe || "เอกสาร"}.docx`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    statusEl.textContent = "สร้างไฟล์สำเร็จ — ไฟล์ถูกดาวน์โหลดแล้ว";
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "เกิดข้อผิดพลาด: " + err.message;
+    statusEl.className = "status err";
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>

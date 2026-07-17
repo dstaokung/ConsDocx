@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>โปรแกรมทำเอกสารโครงการก่อสร้าง — เมนูหลัก</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: "TH Sarabun New", "Sarabun", sans-serif;
+    background: #f2f4f7;
+    margin: 0;
+    padding: 24px;
+    color: #1f2937;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  .sub { color: #6b7280; margin: 0 0 24px; font-size: 15px; }
+  .card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .card h2 { font-size: 16px; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+  label { display: block; font-size: 14px; font-weight: 600; margin: 10px 0 4px; }
+  label .hint { font-weight: 400; color: #9ca3af; font-size: 12px; }
+  input[type=text] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 16px;
+  }
+  .note {
+    background: #eff6ff;
+    border: 1px dashed #93c5fd;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: #1e40af;
+    margin-top: 12px;
+  }
+  ul.doclist { list-style: none; margin: 0; padding: 0; }
+  ul.doclist li { margin-bottom: 10px; }
+  a.doclink {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #1f2937;
+    background: #fafafa;
+    transition: background .15s, border-color .15s;
+  }
+  a.doclink:hover { background: #eff6ff; border-color: #93c5fd; }
+  a.doclink .title { font-weight: 600; font-size: 16px; }
+  a.doclink .badge {
+    font-size: 12px;
+    color: #6b7280;
+    white-space: nowrap;
+  }
+  a.doclink.linked .badge { color: #2563eb; font-weight: 600; }
+  button#genAll {
+    width: 100%;
+    padding: 14px;
+    background: #16a34a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  button#genAll:hover { background: #15803d; }
+  button#genAll:disabled { background: #86efac; cursor: default; }
+  .status { margin-top: 10px; font-size: 13px; color: #16a34a; min-height: 18px; }
+  .status.err { color: #dc2626; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>โปรแกรมทำเอกสารโครงการก่อสร้าง</h1>
+  <p class="sub">เมนูหลัก — เลือกเอกสารที่จะสร้าง (ทำตามลำดับเลขได้เลย)</p>
+
+  <div class="card">
+    <h2>ข้อมูลร่วม (กรอกครั้งเดียว ส่งต่อให้ทุกเอกสารที่ใช้ฟิลด์นี้)</h2>
+    <label>ชื่อโครงการ <span class="hint">(ใช้ในเอกสาร 1 และ 2)</span></label>
+    <input type="text" id="projectName" placeholder="ก่อสร้างถนน คสล.ซอยบ้านเจ๊จิตร หมู่ที่ 8">
+    <div class="note">
+      พิมพ์แล้วลิงก์ด้านล่างจะพาไปเปิดเอกสารพร้อมชื่อโครงการกรอกไว้ให้แล้วอัตโนมัติ (แก้ไขต่อในหน้านั้นได้ตามปกติ)
+      ฟิลด์อื่น ๆ ที่เฉพาะเอกสารนั้น ๆ (เช่น รายชื่อกรรมการ อ้างอิงแผนพัฒนาท้องถิ่น) ยังต้องไปกรอกในหน้าของเอกสารนั้นโดยตรง
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>รายการเอกสาร</h2>
+    <ul class="doclist">
+      <li>
+        <a class="doclink linked" id="link-1" href="./1. ขออนุมัติโครงการก่อสร้าง/1. ขออนุมัติโครงการก่อสร้าง.html">
+          <span class="title">1. ขออนุมัติจัดทำโครงการก่อสร้าง</span>
+          <span class="badge">รับชื่อโครงการอัตโนมัติ →</span>
+        </a>
+      </li>
+      <li>
+        <a class="doclink linked" id="link-2" href="./2. คำสั่งแต่งตั้งคณะกรรมการ/2. คำสั่งแต่งตั้งคณะกรรมการ.html">
+          <span class="title">2. คำสั่งแต่งตั้งคณะกรรมการจัดทำแบบรูปรายการ</span>
+          <span class="badge">รับชื่อโครงการอัตโนมัติ →</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>สร้างไฟล์ทั้งหมดพร้อมกัน</h2>
+    <button id="genAll">สร้างไฟล์ทั้งหมด (.zip)</button>
+    <div class="status" id="status"></div>
+    <div class="note">
+      สร้างเอกสาร 1 และ 2 พร้อมกัน โดยดึงข้อมูลที่กรอกไว้จริงในแต่ละหน้าเอกสาร (ชื่อโครงการ,
+      อ้างอิงแผนพัฒนาท้องถิ่น, รายชื่อกรรมการ ฯลฯ) มาใส่ให้ครบอัตโนมัติ แล้วรวมเป็นไฟล์ .zip เดียว —
+      ต้องเคยเปิดกรอกข้อมูลในหน้าเอกสารนั้นอย่างน้อยครั้งหนึ่งก่อน (ข้อมูลจะถูกจำไว้ในเครื่อง)
+      ถ้าฟิลด์ไหนยังไม่เคยกรอกจะปล่อยว่างไว้ในไฟล์ที่ได้
+    </div>
+  </div>
+
+</div>
+
+<script src="../shared/jszip.lib.js"></script>
+<script src="./main-template-data.js"></script>
+<script>
+const DOC1_PATH = "./1. ขออนุมัติโครงการก่อสร้าง/1. ขออนุมัติโครงการก่อสร้าง.html";
+const DOC2_PATH = "./2. คำสั่งแต่งตั้งคณะกรรมการ/2. คำสั่งแต่งตั้งคณะกรรมการ.html";
+const MEMO_PATH = "./บันทึกข้อความ/บันทึกข้อความ.html";
+
+function val(id) { return document.getElementById(id).value.trim(); }
+
+function updateLinks() {
+  const projectName = val("projectName");
+  const q = projectName ? ("?projectName=" + encodeURIComponent(projectName)) : "";
+
+  document.getElementById("link-1").href = DOC1_PATH + q;
+  document.getElementById("link-2").href = DOC2_PATH + q;
+}
+document.getElementById("projectName").addEventListener("input", updateLinks);
+
+// รับชื่อโครงการกลับมาจากหน้าเอกสาร (เวลากด "กลับไปหน้าแรก") ไม่ให้ข้อมูลหายตอนกลับมา
+const paramsOnLoad = new URLSearchParams(location.search);
+const cameBackFromDoc = paramsOnLoad.has("projectName");
+if (cameBackFromDoc) {
+  document.getElementById("projectName").value = paramsOnLoad.get("projectName");
+} else {
+  // เปิดไฟล์ main.html ตรงๆ (ไม่ได้กด "กลับไปหน้าแรก" มา) ถือว่าเริ่มโครงการใหม่ —
+  // ล้างข้อมูลเก่าที่จำไว้ในทุกเอกสารย่อยทิ้งให้หมด
+  document.getElementById("projectName").value = "";
+  clearAllDocsData();
+}
+
+updateLinks();
+
+// ส่งคำสั่งล้างข้อมูล (localStorage) ไปให้ทุกเอกสารย่อยผ่าน iframe ซ่อน
+function clearAllDocsData() {
+  [DOC1_PATH, DOC2_PATH, MEMO_PATH].forEach((src) => {
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.addEventListener("load", () => {
+      iframe.contentWindow.postMessage({ type: "consdocx:clearFormData" }, "*");
+      setTimeout(() => iframe.remove(), 300);
+    });
+    iframe.src = src;
+    document.body.appendChild(iframe);
+  });
+}
+
+function base64ToArrayBuffer(b64) {
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
+}
+
+function xmlEscape(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function replacePlaceholder(xml, placeholder, value) {
+  const escapedPh = placeholder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const runRegex = new RegExp(`<w:r[^>]*>((?:(?!</w:r>)[\\s\\S])*?)<w:t([^>]*)>([^<]*${escapedPh}[^<]*)</w:t></w:r>`, "g");
+  let match;
+  let lastIndex = 0;
+  let result = "";
+  while ((match = runRegex.exec(xml)) !== null) {
+    const [fullMatch, preRunXml, , textContent] = match;
+    result += xml.slice(lastIndex, match.index);
+    const rPrMatch = preRunXml.match(/<w:rPr>[\s\S]*?<\/w:rPr>/);
+    const rPr = rPrMatch ? rPrMatch[0] : "";
+    const idx = textContent.indexOf(placeholder);
+    const prefix = textContent.slice(0, idx);
+    const suffix = textContent.slice(idx + placeholder.length);
+    const lines = String(value).split(/\n+/);
+    let replacement;
+    if (lines.length <= 1) {
+      replacement = `<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(prefix + value + suffix)}</w:t></w:r>`;
+    } else {
+      const parts = [];
+      parts.push(`<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(prefix + lines[0])}</w:t></w:r>`);
+      for (let i = 1; i < lines.length - 1; i++) {
+        parts.push(`<w:r>${rPr}<w:br/><w:t xml:space="preserve">${xmlEscape(lines[i])}</w:t></w:r>`);
+      }
+      parts.push(`<w:r>${rPr}<w:br/><w:t xml:space="preserve">${xmlEscape(lines[lines.length - 1] + suffix)}</w:t></w:r>`);
+      replacement = parts.join("");
+    }
+    result += replacement;
+    lastIndex = match.index + fullMatch.length;
+    runRegex.lastIndex = lastIndex;
+  }
+  result += xml.slice(lastIndex);
+  return result;
+}
+
+async function buildOneDocx(base64, fieldsMap) {
+  const buf = base64ToArrayBuffer(base64);
+  const zip = await JSZip.loadAsync(buf);
+  let xml = await zip.file("word/document.xml").async("string");
+  for (const [ph, value] of Object.entries(fieldsMap)) {
+    xml = replacePlaceholder(xml, ph, value || "");
+  }
+  zip.file("word/document.xml", xml);
+  return await zip.generateAsync({ type: "uint8array" });
+}
+
+// เปิดไฟล์เอกสารในหน้าที่ซ่อนไว้ (iframe) เพื่อไปดึงข้อมูลจริงที่กรอกไว้ในฟอร์มนั้น
+// (แต่ละหน้าจะโหลดค่าที่จำไว้ใน localStorage ของตัวเองก่อน แล้วส่งกลับมาให้ผ่าน postMessage)
+function fetchFormDataFromDoc(src, docId, timeoutMs = 4000) {
+  return new Promise((resolve) => {
+    let done = false;
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+
+    function cleanup() {
+      window.removeEventListener("message", onMessage);
+      iframe.remove();
+    }
+    function onMessage(event) {
+      if (event.data && event.data.type === "consdocx:formData" && event.data.docId === docId) {
+        done = true;
+        cleanup();
+        resolve(event.data.data);
+      }
+    }
+    window.addEventListener("message", onMessage);
+
+    iframe.addEventListener("load", () => {
+      iframe.contentWindow.postMessage({ type: "consdocx:getFormData" }, "*");
+    });
+    iframe.src = src;
+    document.body.appendChild(iframe);
+
+    setTimeout(() => {
+      if (!done) { cleanup(); resolve(null); }
+    }, timeoutMs);
+  });
+}
+
+document.getElementById("genAll").addEventListener("click", async () => {
+  const btn = document.getElementById("genAll");
+  const statusEl = document.getElementById("status");
+  statusEl.className = "status";
+  btn.disabled = true;
+  try {
+    statusEl.textContent = "กำลังดึงข้อมูลจากแต่ละเอกสาร...";
+    const [data1, data2] = await Promise.all([
+      fetchFormDataFromDoc(DOC1_PATH, "doc1"),
+      fetchFormDataFromDoc(DOC2_PATH, "doc2"),
+    ]);
+
+    if (!data1 || !data2) {
+      statusEl.textContent = "ดึงข้อมูลจากบางเอกสารไม่สำเร็จ — จะใส่เท่าที่มีให้ (ฟิลด์ที่เหลือจะว่าง)";
+    }
+
+    const projectName = (data1 && data1.projectName) || (data2 && data2.projectName) || val("projectName") || "โครงการ";
+    const nameSafe = projectName.replace(/[\\/:*?"<>|]/g, "-").slice(0, 40);
+
+    statusEl.textContent = "กำลังสร้างไฟล์...";
+    const doc1 = await buildOneDocx(window.TEMPLATE_1_BASE64, {
+      "[ชื่อโครงการ]": projectName,
+      "[อ้างอิงแผนพัฒนาท้องถิ่น]": (data1 && data1.planRef) || "",
+    });
+    const doc2 = await buildOneDocx(window.TEMPLATE_2_BASE64, {
+      "[ชื่อโครงการ]": projectName,
+      "[ชื่อกรรมการ1]": (data2 && data2.name1) || "",
+      "[ตำแหน่งกรรมการ1]": (data2 && data2.pos1) || "",
+      "[ชื่อกรรมการ2]": (data2 && data2.name2) || "",
+      "[ตำแหน่งกรรมการ2]": (data2 && data2.pos2) || "",
+      "[ชื่อกรรมการ3]": (data2 && data2.name3) || "",
+      "[ตำแหน่งกรรมการ3]": (data2 && data2.pos3) || "",
+    });
+
+    const outerZip = new JSZip();
+    outerZip.file(`1. ขออนุมัติโครงการก่อสร้าง_${nameSafe}.docx`, doc1);
+    outerZip.file(`2. คำสั่งแต่งตั้งคณะกรรมการ_${nameSafe}.docx`, doc2);
+
+    const blob = await outerZip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `เอกสารโครงการ_${nameSafe}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    statusEl.textContent = "สร้างไฟล์สำเร็จ — ดาวน์โหลด .zip แล้ว (ใช้ข้อมูลจริงจากแต่ละเอกสาร)";
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "เกิดข้อผิดพลาด: " + err.message;
+    statusEl.className = "status err";
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>
