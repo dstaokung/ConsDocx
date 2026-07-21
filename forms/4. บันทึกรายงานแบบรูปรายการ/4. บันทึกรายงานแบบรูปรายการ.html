@@ -47,7 +47,7 @@
   .card h3 { font-size: 14px; margin: 18px 0 6px; color: var(--accent); }
   label { display: block; font-size: 14px; font-weight: 600; margin: 12px 0 4px; }
   label .hint { font-weight: 400; color: var(--text-faint); font-size: 12px; }
-  input[type=text] {
+  input[type=text], select {
     width: 100%;
     padding: 8px 10px;
     border: 1px solid var(--input-border);
@@ -97,14 +97,20 @@
     <h2>1. ข้อมูลที่เปลี่ยนได้</h2>
 
     <div class="fixed-note">
-      เลขที่หนังสือ วันที่ และชื่อปลัด/นายกผู้ลงนามท้ายเอกสาร <b>ยังคงที่ตามไฟล์ต้นฉบับ</b>
-      เพราะยังไม่ได้ทำเครื่องหมายสีแดงไว้ — ถ้าต้องการแก้ไขจุดเหล่านี้ได้ด้วย
-      ให้กลับไปทำสีแดงเพิ่มในไฟล์ต้นฉบับแล้วส่งมาแปลงใหม่
+      เลขที่หนังสือและชื่อปลัด/นายกผู้ลงนามท้ายเอกสาร <b>ยังคงที่ตามไฟล์ต้นฉบับ</b>
+      เพราะยังไม่ได้ทำเครื่องหมายสีแดงไว้ — เดือน/ปีแก้ไขได้แล้วที่ช่องด้านล่าง
+      ถ้าต้องการแก้ไขจุดอื่นเพิ่มเติม ให้กลับไปทำสีแดงเพิ่มในไฟล์ต้นฉบับแล้วส่งมาแปลงใหม่
     </div>
 
     <form id="form">
       <label>ชื่อโครงการ <span class="hint">(ไม่ต้องพิมพ์คำว่า "โครงการ" นำหน้า — แทนที่ทั้ง 2 จุดพร้อมกัน)</span></label>
       <input type="text" id="projectName" placeholder="ก่อสร้างถนน คสล.ซอยบ้านเจ๊จิตร หมู่ที่ 8">
+
+      <label>เดือน/ปี ในบรรทัดวันที่ <span class="hint">(กรอกที่หน้าแรกแล้วกด "บันทึกข้อมูลร่วมลงทุกเอกสาร" จะมาเติมให้อัตโนมัติ)</span></label>
+      <div class="row2">
+        <select id="docMonth"></select>
+        <select id="docYear"></select>
+      </div>
 
       <h3>ประมาณราคาค่าก่อสร้างเบื้องต้น</h3>
       <div class="row2">
@@ -142,6 +148,7 @@
 </div>
 
 <script src="../../shared/jszip.lib.js"></script>
+<script src="../../shared/monthyear.js"></script>
 <script src="./template-data.js"></script>
 <script>
 function val(id) { return document.getElementById(id).value.trim(); }
@@ -201,7 +208,11 @@ function updateMoneyText() {
 
 // ---- จำข้อมูลที่กรอกไว้ในฟอร์มนี้ (localStorage ของหน้านี้เอง) ----
 const AUTOSAVE_KEY = "consdocx_autosave_4_บันทึกรายงานแบบรูปรายการ";
-const AUTOSAVE_FIELDS = ["projectName","moneyNum","moneyText","name1","pos1","name2","pos2","name3","pos3"];
+const AUTOSAVE_FIELDS = ["projectName","docMonth","docYear","moneyNum","moneyText","name1","pos1","name2","pos2","name3","pos3"];
+if (window.ConsDocxMonthYear) {
+  ConsDocxMonthYear.populateMonthSelect(document.getElementById("docMonth"));
+  ConsDocxMonthYear.populateYearSelect(document.getElementById("docYear"));
+}
 function saveAutosave() {
   const data = {};
   AUTOSAVE_FIELDS.forEach(id => { data[id] = document.getElementById(id).value; });
@@ -341,6 +352,8 @@ async function buildDocx() {
     "[ตำแหน่งกรรมการ2]": val("pos2"),
     "[ชื่อกรรมการ3]": val("name3"),
     "[ตำแหน่งกรรมการ3]": val("pos3"),
+    "[เดือน]": val("docMonth"),
+    "[ปี]": val("docYear"),
   };
   for (const [ph, value] of Object.entries(fields)) {
     xml = replacePlaceholder(xml, ph, value);

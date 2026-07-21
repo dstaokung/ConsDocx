@@ -46,7 +46,8 @@
   .card h2 { font-size: 16px; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
   label { display: block; font-size: 14px; font-weight: 600; margin: 12px 0 4px; }
   label .hint { font-weight: 400; color: var(--text-faint); font-size: 12px; }
-  input[type=text], textarea, input[type=file] {
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  input[type=text], textarea, input[type=file], select {
     width: 100%;
     padding: 8px 10px;
     border: 1px solid var(--input-border);
@@ -114,6 +115,12 @@
       <label>ชื่อโครงการ <span class="hint">(แทนที่ [ชื่อโครงการ] ในบรรทัด "เรื่อง")</span></label>
       <input type="text" id="projectName" placeholder="ถนน คสล.ซอยบ้านเจ๊จิตร หมู่ที่ 8 ตำบลคลองด่าน">
 
+      <label>เดือน/ปี ในบรรทัดวันที่ <span class="hint">(กรอกที่หน้าแรกแล้วกด "บันทึกข้อมูลร่วมลงทุกเอกสาร" จะมาเติมให้อัตโนมัติ)</span></label>
+      <div class="row2">
+        <select id="docMonth"></select>
+        <select id="docYear"></select>
+      </div>
+
       <label>อ้างอิงแผนพัฒนาท้องถิ่น <span class="hint">(แทนที่ข้อความอ้างอิงแผนในย่อหน้าเรื่องเดิม)</span></label>
       <textarea id="planRef" placeholder="แผนพัฒนาท้องถิ่น (พ.ศ. ๒๕๖๖-๒๕๗๐) ฉบับทบทวน ครั้งที่ 1/2567 หน้า 90 ลำดับที่ 50 (กองช่าง)"></textarea>
 
@@ -130,6 +137,7 @@
 </div>
 
 <script src="../../shared/jszip.lib.js"></script>
+<script src="../../shared/monthyear.js"></script>
 <script src="./template-data.js"></script>
 <script>
 function val(id) { return document.getElementById(id).value.trim(); }
@@ -137,7 +145,11 @@ function val(id) { return document.getElementById(id).value.trim(); }
 // ---- จำข้อมูลที่กรอกไว้ในฟอร์มนี้ (เก็บใน localStorage ของหน้านี้เอง) กันหายตอนกด
 // "กลับไปหน้าแรก" แล้วย้อนกลับเข้ามาใหม่ ----
 const AUTOSAVE_KEY = "consdocx_autosave_1_ขออนุมัติโครงการก่อสร้าง";
-const AUTOSAVE_FIELDS = ["projectName", "planRef", "moneyNum"];
+const AUTOSAVE_FIELDS = ["projectName", "docMonth", "docYear", "planRef", "moneyNum"];
+if (window.ConsDocxMonthYear) {
+  ConsDocxMonthYear.populateMonthSelect(document.getElementById("docMonth"));
+  ConsDocxMonthYear.populateYearSelect(document.getElementById("docYear"));
+}
 function saveAutosave() {
   const data = {};
   AUTOSAVE_FIELDS.forEach(id => { data[id] = document.getElementById(id).value; });
@@ -321,6 +333,8 @@ async function buildDocx() {
     "[อ้างอิงแผนพัฒนาท้องถิ่น]": val("planRef"),
     "[จำนวนเงินตัวเลข]": formatComma(val("moneyNum")),
     "[จำนวนเงินตัวอักษร]": bahtText(val("moneyNum")),
+    "[เดือน]": val("docMonth"),
+    "[ปี]": val("docYear"),
   };
   for (const [ph, value] of Object.entries(fields)) {
     xml = replacePlaceholder(xml, ph, value);

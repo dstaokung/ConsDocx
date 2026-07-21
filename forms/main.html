@@ -55,7 +55,7 @@
   .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   label { display: block; font-size: 16px; font-weight: 600; margin: 10px 0 4px; }
   .hint { font-weight: 400; color: var(--text-faint); font-size: 14px; }
-  input[type=text] {
+  input[type=text], select {
     width: 100%;
     padding: 10px 12px;
     border: 1px solid var(--input-border);
@@ -201,6 +201,14 @@
 
     <label>ชื่อโครงการ <span class="hint">(ใช้ในเอกสารทุกฉบับ)</span></label>
     <input type="text" id="projectName" placeholder="ก่อสร้างถนน คสล.ซอยบ้านเจ๊จิตร หมู่ที่ 8">
+
+    <h3>เดือน/ปี ที่ใช้ในเอกสาร <span class="hint">(แทนที่คำว่า "กรกฎาคม" เดิมในทุกเอกสารที่มี)</span></h3>
+    <div class="row2">
+      <div><label>เดือน</label>
+        <select id="g_month"></select></div>
+      <div><label>ปี (พ.ศ.)</label>
+        <select id="g_year"></select></div>
+    </div>
 
     <h3>ราคาค่าก่อสร้างเบื้องต้น (งบประมาณ) <span class="hint">(ใช้ในเอกสาร 3, 4 และ 5)</span></h3>
     <div class="row2">
@@ -354,6 +362,7 @@
 <p style="text-align:center; color:var(--text-faint); font-size:12px; margin-top:24px;">อัปเดตล่าสุด: 21 กรกฎาคม 2569</p>
 
 <script src="../shared/jszip.lib.js"></script>
+<script src="../shared/monthyear.js"></script>
 <script src="./main-template-data.js"></script>
 <script>
 const DOC1_PATH = "./1. ขออนุมัติโครงการก่อสร้าง/1. ขออนุมัติโครงการก่อสร้าง.html";
@@ -401,7 +410,7 @@ function clearAllDocsData() {
 // "บันทึกข้อมูลร่วมลงทุกเอกสาร" ค่าที่พิมพ์ไว้ในหน้า main จะหายเพราะไม่เคยถูกจำที่ไหนเลย ตอนนี้จำเองไว้ด้วย
 const AUTOSAVE_KEY = "consdocx_autosave_main";
 const AUTOSAVE_FIELDS = [
-  "projectName", "g_moneyNum", "g_planRef",
+  "projectName", "g_month", "g_year", "g_moneyNum", "g_planRef",
   "g_name1", "g_pos1", "g_name2", "g_pos2", "g_name3", "g_pos3",
   "g_rc1name", "g_rc1pos", "g_rc2name", "g_rc2pos", "g_rc3name", "g_rc3pos",
   "g_ic1name", "g_ic1pos", "g_ic2name", "g_ic2pos", "g_ic3name", "g_ic3pos",
@@ -421,6 +430,12 @@ function restoreAutosave() {
       if (data[id]) document.getElementById(id).value = data[id];
     });
   } catch (e) {}
+}
+
+// เติมตัวเลือกเดือน/ปี ก่อน restoreAutosave() จะได้ set ค่าที่เคยเลือกไว้ทับค่าเริ่มต้น (เดือน/ปีปัจจุบัน) ได้
+if (window.ConsDocxMonthYear) {
+  ConsDocxMonthYear.populateMonthSelect(document.getElementById("g_month"));
+  ConsDocxMonthYear.populateYearSelect(document.getElementById("g_year"));
 }
 
 // เปิดหน้า main ตรงๆ หรือกลับมาจากเอกสารย่อย: คืนค่าที่เคยกรอกไว้เสมอ (ไม่ล้างข้อมูลอัตโนมัติแล้ว)
@@ -644,18 +659,24 @@ document.getElementById("pushShared").addEventListener("click", async () => {
     const projectNameVal = val("projectName");
     const moneyVal = val("g_moneyNum");
     const planRefVal = val("g_planRef");
+    const monthVal = val("g_month");
+    const yearVal = val("g_year");
 
     // เอกสาร 1: ยังไม่มีคณะกรรมการ มีแค่ชื่อโครงการ + อ้างอิงแผนพัฒนาท้องถิ่น
     const data1 = {};
     if (projectNameVal) data1.projectName = projectNameVal;
     if (planRefVal) data1.planRef = planRefVal;
     if (moneyVal) data1.moneyNum = moneyVal;
+    if (monthVal) data1.docMonth = monthVal;
+    if (yearVal) data1.docYear = yearVal;
 
     // เอกสาร 2 และ 3: ใช้คณะกรรมการแบบรูปรายการตรงๆ (ชื่อในตารางต้องมียศนำหน้าถ้ามี เช่น "ว่าที่ ร.ต.")
     const dataCommittee = collectShared(SHARED_MAP_234, true);
     const data2 = { ...dataCommittee };
     const data3 = { ...dataCommittee };
     if (moneyVal) data3.moneyNum = moneyVal;
+    if (monthVal) { data2.docMonth = monthVal; data3.docMonth = monthVal; }
+    if (yearVal) { data2.docYear = yearVal; data3.docYear = yearVal; }
 
     // เอกสาร 4: คณะกรรมการชุดเดียวกัน แต่บรรทัดลงชื่อมีคำว่า "ว่าที่ ร.ต." เป็นข้อความคงที่อยู่แล้ว
     // ต้องตัดยศออกจากชื่อก่อนส่ง ไม่งั้นจะซ้ำกัน 2 ที่
@@ -664,11 +685,15 @@ document.getElementById("pushShared").addEventListener("click", async () => {
       data4[fid] = fid.startsWith("name") ? stripActingRank(v) : v;
     }
     if (moneyVal) data4.moneyNum = moneyVal;
+    if (monthVal) data4.docMonth = monthVal;
+    if (yearVal) data4.docYear = yearVal;
 
     // เอกสาร 5: คณะกรรมการอีก 3 ชุด + งบประมาณ + อ้างอิงแผนพัฒนาท้องถิ่น
     const data5 = collectShared(SHARED_MAP_5, true);
     if (moneyVal) data5.moneyNum = moneyVal;
     if (planRefVal) data5.planRef = planRefVal;
+    if (monthVal) data5.docMonth = monthVal;
+    if (yearVal) data5.docYear = yearVal;
 
     const results = await Promise.all([
       pushDataToDoc(DOC1_PATH, "doc1", data1),
@@ -747,6 +772,8 @@ document.getElementById("genAll").addEventListener("click", async () => {
 
     const projectName = (data1 && data1.projectName) || (data2 && data2.projectName) || (data3 && data3.projectName) || (data4 && data4.projectName) || (data5 && data5.projectName) || val("projectName") || "โครงการ";
     const nameSafe = projectName.replace(/[\\/:*?"<>|]/g, "-").slice(0, 40);
+    const monthG = val("g_month");
+    const yearG = val("g_year");
 
     statusEl.textContent = "กำลังสร้างไฟล์...";
     const money1 = val("g_moneyNum") || (data1 && data1.moneyNum) || "";
@@ -755,6 +782,8 @@ document.getElementById("genAll").addEventListener("click", async () => {
       "[อ้างอิงแผนพัฒนาท้องถิ่น]": val("g_planRef") || (data1 && data1.planRef) || "",
       "[จำนวนเงินตัวเลข]": formatComma(money1),
       "[จำนวนเงินตัวอักษร]": bahtText(money1),
+      "[เดือน]": monthG || (data1 && data1.docMonth) || "",
+      "[ปี]": yearG || (data1 && data1.docYear) || "",
     });
     const doc2 = await buildOneDocx(window.TEMPLATE_2_BASE64, {
       "[ชื่อโครงการ]": projectName,
@@ -764,6 +793,8 @@ document.getElementById("genAll").addEventListener("click", async () => {
       "[ตำแหน่งกรรมการ2]": val("g_pos2") || (data2 && data2.pos2) || "",
       "[ชื่อกรรมการ3]": val("g_name3") || (data2 && data2.name3) || "",
       "[ตำแหน่งกรรมการ3]": val("g_pos3") || (data2 && data2.pos3) || "",
+      "[เดือน]": monthG || (data2 && data2.docMonth) || "",
+      "[ปี]": yearG || (data2 && data2.docYear) || "",
     });
     const money3 = val("g_moneyNum") || (data3 && data3.moneyNum) || "";
     const chair3Name = val("g_name1") || (data3 && data3.name1) || "";
@@ -784,6 +815,8 @@ document.getElementById("genAll").addEventListener("click", async () => {
       // เพราะบรรทัดลงชื่อในเอกสารมีคำนี้เป็นข้อความคงที่อยู่แล้ว)
       "[ชื่อผู้ตรวจรายงานการประชุม]": stripActingRank(chair3Name),
       "[ตำแหน่งผู้ตรวจรายงานการประชุม]": chair3Pos,
+      "[เดือน]": monthG || (data3 && data3.docMonth) || "",
+      "[ปี]": yearG || (data3 && data3.docYear) || "",
     });
     const money4 = val("g_moneyNum") || (data4 && data4.moneyNum) || "";
     const doc4 = await buildOneDocx(window.TEMPLATE_4_BASE64, {
@@ -796,6 +829,8 @@ document.getElementById("genAll").addEventListener("click", async () => {
       "[ตำแหน่งกรรมการ2]": val("g_pos2") || (data4 && data4.pos2) || "",
       "[ชื่อกรรมการ3]": stripActingRank(val("g_name3") || (data4 && data4.name3) || ""),
       "[ตำแหน่งกรรมการ3]": val("g_pos3") || (data4 && data4.pos3) || "",
+      "[เดือน]": monthG || (data4 && data4.docMonth) || "",
+      "[ปี]": yearG || (data4 && data4.docYear) || "",
     });
     const money5 = val("g_moneyNum") || (data5 && data5.moneyNum) || "";
     const doc5 = await buildOneDocx(window.TEMPLATE_5_BASE64, {
@@ -824,6 +859,8 @@ document.getElementById("genAll").addEventListener("click", async () => {
       "[ตำแหน่งผู้ควบคุมงาน1]": val("g_sv1pos") || (data5 && data5.sv1pos) || "",
       "[ชื่อผู้ควบคุมงาน2]": val("g_sv2name") || (data5 && data5.sv2name) || "",
       "[ตำแหน่งผู้ควบคุมงาน2]": val("g_sv2pos") || (data5 && data5.sv2pos) || "",
+      "[เดือน]": monthG || (data5 && data5.docMonth) || "",
+      "[ปี]": yearG || (data5 && data5.docYear) || "",
     });
 
     const outerZip = new JSZip();

@@ -47,7 +47,7 @@
   .card h3 { font-size: 14px; margin: 18px 0 6px; color: var(--accent); }
   label { display: block; font-size: 14px; font-weight: 600; margin: 12px 0 4px; }
   label .hint { font-weight: 400; color: var(--text-faint); font-size: 12px; }
-  input[type=text] {
+  input[type=text], select {
     width: 100%;
     padding: 8px 10px;
     border: 1px solid var(--input-border);
@@ -97,14 +97,21 @@
     <h2>1. ข้อมูลที่เปลี่ยนได้</h2>
 
     <div class="fixed-note">
-      วันที่/เวลา/สถานที่ประชุม เลขที่คำสั่ง รายละเอียดขนาดถนนในข้อ ๑) และเวลาเลิกประชุม
-      <b>ยังคงที่ตามไฟล์ต้นฉบับ</b> เพราะยังไม่ได้ทำเครื่องหมายสีแดงไว้ —
-      ถ้าต้องการแก้ไขจุดเหล่านี้ได้ด้วย ให้กลับไปทำสีแดงเพิ่มในไฟล์ต้นฉบับแล้วส่งมาแปลงใหม่
+      เวลา/สถานที่ประชุม เลขที่คำสั่ง รายละเอียดขนาดถนนในข้อ ๑) และเวลาเลิกประชุม
+      <b>ยังคงที่ตามไฟล์ต้นฉบับ</b> เพราะยังไม่ได้ทำเครื่องหมายสีแดงไว้ — เดือน/ปีที่ประชุมและเดือน/ปีของคำสั่ง
+      แก้ไขได้แล้วที่ช่องด้านล่าง (ใช้ค่าเดียวกันทั้งสองจุด)
+      ถ้าต้องการแก้ไขจุดอื่นเพิ่มเติม ให้กลับไปทำสีแดงเพิ่มในไฟล์ต้นฉบับแล้วส่งมาแปลงใหม่
     </div>
 
     <form id="form">
       <label>ชื่อโครงการ <span class="hint">(แทนที่ทั้ง 3 จุดในเอกสารพร้อมกัน)</span></label>
       <input type="text" id="projectName" placeholder="ก่อสร้างถนน คสล.ซอยบ้านเจ๊จิตร หมู่ที่ 8">
+
+      <label>เดือน/ปี ประชุม/คำสั่ง <span class="hint">(กรอกที่หน้าแรกแล้วกด "บันทึกข้อมูลร่วมลงทุกเอกสาร" จะมาเติมให้อัตโนมัติ)</span></label>
+      <div class="row2">
+        <select id="docMonth"></select>
+        <select id="docYear"></select>
+      </div>
 
       <h3>ราคาค่าก่อสร้างเบื้องต้น (ในมติที่ประชุม)</h3>
       <div class="row2">
@@ -154,6 +161,7 @@
 </div>
 
 <script src="../../shared/jszip.lib.js"></script>
+<script src="../../shared/monthyear.js"></script>
 <script src="./template-data.js"></script>
 <script>
 function val(id) { return document.getElementById(id).value.trim(); }
@@ -224,7 +232,11 @@ function stripActingRank(name) {
 // ---- จำข้อมูลที่กรอกไว้ในฟอร์มนี้ (เก็บใน localStorage ของหน้านี้เอง) กันหายตอนกด
 // "กลับไปหน้าแรก" แล้วย้อนกลับเข้ามาใหม่ ----
 const AUTOSAVE_KEY = "consdocx_autosave_3_รายงานการประชุมแบบรูปรายการ";
-const AUTOSAVE_FIELDS = ["projectName","moneyNum","moneyText","name1","pos1","name2","pos2","name3","pos3","recName","recPos"];
+const AUTOSAVE_FIELDS = ["projectName","docMonth","docYear","moneyNum","moneyText","name1","pos1","name2","pos2","name3","pos3","recName","recPos"];
+if (window.ConsDocxMonthYear) {
+  ConsDocxMonthYear.populateMonthSelect(document.getElementById("docMonth"));
+  ConsDocxMonthYear.populateYearSelect(document.getElementById("docYear"));
+}
 function saveAutosave() {
   const data = {};
   AUTOSAVE_FIELDS.forEach(id => { data[id] = document.getElementById(id).value; });
@@ -372,6 +384,8 @@ async function buildDocx() {
     // ผู้ตรวจรายงานการประชุมคือประธานคณะกรรมการ (คนที่ 1) เสมอ ไม่ต้องกรอกซ้ำ
     "[ชื่อผู้ตรวจรายงานการประชุม]": stripActingRank(val("name1")),
     "[ตำแหน่งผู้ตรวจรายงานการประชุม]": val("pos1"),
+    "[เดือน]": val("docMonth"),
+    "[ปี]": val("docYear"),
   };
   for (const [ph, value] of Object.entries(fields)) {
     xml = replacePlaceholder(xml, ph, value);
