@@ -142,8 +142,8 @@
 
     <h3>คณะกรรมการจัดทำแบบรูปรายการงานก่อสร้าง <span class="hint">(ใช้ในเอกสาร 2, 3 และ 4)</span></h3>
     <div class="row2">
-      <div><label>1. ชื่อ-สกุล (ประธานกรรมการ) <span class="hint">(ไม่ต้องพิมพ์ยศ "ว่าที่ ร.ต.")</span></label>
-        <input type="text" id="g_name1" placeholder="คมสรร  เครือศรี"></div>
+      <div><label>1. ชื่อ-สกุล (ประธานกรรมการ) <span class="hint">(พิมพ์ยศ/คำนำหน้าด้วยถ้ามี เช่น "ว่าที่ ร.ต.")</span></label>
+        <input type="text" id="g_name1" placeholder="ว่าที่ ร.ต. คมสรร  เครือศรี"></div>
       <div><label>1. ตำแหน่ง</label>
         <input type="text" id="g_pos1" placeholder="ผู้อำนวยการกองช่าง"></div>
       <div><label>2. ชื่อ-สกุล (กรรมการ)</label>
@@ -554,6 +554,7 @@ document.getElementById("pushShared").addEventListener("click", async () => {
     const data1 = {};
     if (projectNameVal) data1.projectName = projectNameVal;
     if (planRefVal) data1.planRef = planRefVal;
+    if (moneyVal) data1.moneyNum = moneyVal;
 
     // เอกสาร 2 และ 3: ใช้คณะกรรมการแบบรูปรายการตรงๆ (ชื่อในตารางต้องมียศนำหน้าถ้ามี เช่น "ว่าที่ ร.ต.")
     const dataCommittee = collectShared(SHARED_MAP_234, true);
@@ -653,9 +654,12 @@ document.getElementById("genAll").addEventListener("click", async () => {
     const nameSafe = projectName.replace(/[\\/:*?"<>|]/g, "-").slice(0, 40);
 
     statusEl.textContent = "กำลังสร้างไฟล์...";
+    const money1 = val("g_moneyNum") || (data1 && data1.moneyNum) || "";
     const doc1 = await buildOneDocx(window.TEMPLATE_1_BASE64, {
       "[ชื่อโครงการ]": projectName,
       "[อ้างอิงแผนพัฒนาท้องถิ่น]": val("g_planRef") || (data1 && data1.planRef) || "",
+      "[จำนวนเงินตัวเลข]": formatComma(money1),
+      "[จำนวนเงินตัวอักษร]": bahtText(money1),
     });
     const doc2 = await buildOneDocx(window.TEMPLATE_2_BASE64, {
       "[ชื่อโครงการ]": projectName,
@@ -764,6 +768,7 @@ if (cameBackFromDoc) {
       fetchFormDataFromDoc(DOC4_PATH, "doc4"),
       fetchFormDataFromDoc(DOC5_PATH, "doc5"),
     ]);
+    // เอกสาร 1 ก็มีช่องงบประมาณของตัวเองแล้วเหมือนกัน เผื่อกรอกตรงในเอกสาร 1 มาก่อน
     function fillFrom(map, data) {
       if (!data) return;
       for (const [gid, fid] of Object.entries(map)) {
@@ -780,7 +785,7 @@ if (cameBackFromDoc) {
     // งบประมาณ: เอาจากเอกสาร 3, 4 หรือ 5 (ตัวไหนมีค่าก็ใช้ตัวนั้น) เติมเฉพาะถ้าช่องยังว่าง
     const moneyEl = document.getElementById("g_moneyNum");
     if (!moneyEl.value.trim()) {
-      const m = (d3 && d3.moneyNum) || (d4 && d4.moneyNum) || (d5 && d5.moneyNum);
+      const m = (d1 && d1.moneyNum) || (d3 && d3.moneyNum) || (d4 && d4.moneyNum) || (d5 && d5.moneyNum);
       if (m) { moneyEl.value = m; updateGMoneyText(); }
     }
     // อ้างอิงแผนพัฒนาท้องถิ่น: เอาจากเอกสาร 1 หรือ 5

@@ -96,6 +96,12 @@
       <label>อ้างอิงแผนพัฒนาท้องถิ่น <span class="hint">(แทนที่ข้อความอ้างอิงแผนในย่อหน้าเรื่องเดิม)</span></label>
       <textarea id="planRef" placeholder="แผนพัฒนาท้องถิ่น (พ.ศ. ๒๕๖๖-๒๕๗๐) ฉบับทบทวน ครั้งที่ 1/2567 หน้า 90 ลำดับที่ 50 (กองช่าง)"></textarea>
 
+      <label>งบประมาณ (ตัวเลข) <span class="hint">(พิมพ์เฉพาะตัวเลข ใช้ในย่อหน้าเรื่องเดิม)</span></label>
+      <input type="text" id="moneyNum" placeholder="1384600" inputmode="decimal">
+
+      <label>งบประมาณ (ตัวอักษร) <span class="hint">(แปลงให้อัตโนมัติ)</span></label>
+      <input type="text" id="moneyText" readonly style="background:#f3f4f6; color:#374151;">
+
       <button type="button" id="gen">สร้างไฟล์ Word (.docx)</button>
       <div class="status" id="status"></div>
     </form>
@@ -110,7 +116,7 @@ function val(id) { return document.getElementById(id).value.trim(); }
 // ---- จำข้อมูลที่กรอกไว้ในฟอร์มนี้ (เก็บใน localStorage ของหน้านี้เอง) กันหายตอนกด
 // "กลับไปหน้าแรก" แล้วย้อนกลับเข้ามาใหม่ ----
 const AUTOSAVE_KEY = "consdocx_autosave_1_ขออนุมัติโครงการก่อสร้าง";
-const AUTOSAVE_FIELDS = ["projectName", "planRef"];
+const AUTOSAVE_FIELDS = ["projectName", "planRef", "moneyNum"];
 function saveAutosave() {
   const data = {};
   AUTOSAVE_FIELDS.forEach(id => { data[id] = document.getElementById(id).value; });
@@ -147,6 +153,66 @@ function updateBackLink() {
 document.getElementById("projectName").addEventListener("input", updateBackLink);
 updateBackLink();
 
+// ---- แปลงจำนวนเงินตัวเลข -> ตัวอักษรไทย + เติม comma (สำเนาเดียวกับฟอร์มอื่นๆ) ----
+function bahtText(numStr) {
+  const cleaned = String(numStr).replace(/[,\s฿]/g, "");
+  if (!cleaned || !/^\d*\.?\d*$/.test(cleaned) || cleaned === ".") return "";
+  let [intPart, decPart = ""] = cleaned.split(".");
+  intPart = intPart.replace(/^0+(?=\d)/, "") || "0";
+  const satang = parseInt((decPart + "00").slice(0, 2), 10) || 0;
+  const digits = ["ศูนย์","หนึ่ง","สอง","สาม","สี่","ห้า","หก","เจ็ด","แปด","เก้า"];
+  const posName = ["","สิบ","ร้อย","พัน","หมื่น","แสน"];
+  function readGroup(s, hasPrefix) {
+    let out = "";
+    const n = s.length;
+    for (let i = 0; i < n; i++) {
+      const d = +s[i], p = n - i - 1;
+      if (d === 0) continue;
+      if (p === 0 && d === 1 && (n > 1 || hasPrefix)) out += "เอ็ด";
+      else if (p === 1 && d === 2) out += "ยี่สิบ";
+      else if (p === 1 && d === 1) out += "สิบ";
+      else out += digits[d] + posName[p];
+    }
+    return out;
+  }
+  function readNumber(s) {
+    s = s.replace(/^0+/, "");
+    if (!s) return "";
+    if (s.length <= 6) return readGroup(s, false);
+    const head = s.slice(0, -6);
+    const tail = s.slice(-6).replace(/^0+/, "");
+    return readNumber(head) + "ล้าน" + (tail ? readGroup(tail, true) : "");
+  }
+  const intVal = intPart !== "0";
+  let out = "";
+  if (intVal) out += readNumber(intPart) + "บาท";
+  else if (satang === 0) return "ศูนย์บาทถ้วน";
+  if (satang > 0) {
+    const s = String(satang).padStart(2, "0").replace(/^0+/, "");
+    out += readGroup(s, false) + "สตางค์";
+  } else {
+    out += "ถ้วน";
+  }
+  return out;
+}
+function formatComma(numStr) {
+  const cleaned = String(numStr).replace(/[,\s฿]/g, "");
+  if (!cleaned || !/^\d*\.?\d*$/.test(cleaned) || cleaned === ".") return String(numStr).trim();
+  let [intPart, decPart] = cleaned.split(".");
+  intPart = (intPart.replace(/^0+(?=\d)/, "") || "0").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return decPart !== undefined && decPart !== "" ? intPart + "." + decPart.slice(0, 2) : intPart;
+}
+function updateMoneyText() {
+  document.getElementById("moneyText").value = bahtText(val("moneyNum"));
+}
+document.getElementById("moneyNum").addEventListener("input", updateMoneyText);
+document.getElementById("moneyNum").addEventListener("blur", () => {
+  const el = document.getElementById("moneyNum");
+  if (el.value.trim()) el.value = formatComma(el.value);
+  updateMoneyText();
+});
+updateMoneyText();
+
 // ---- ตอบข้อมูลฟอร์มปัจจุบันกลับไปให้หน้า main.html เวลาถูกเรียกผ่าน iframe ซ่อน
 // (ใช้ตอนกดปุ่ม "สร้างไฟล์ทั้งหมด" ที่ main เพื่อเอาข้อมูลจริงในฟอร์มนี้ไปใส่ในไฟล์ที่สร้าง) ----
 window.addEventListener("message", (event) => {
@@ -167,6 +233,7 @@ window.addEventListener("message", (event) => {
       }
     });
     if (typeof updateBackLink === "function") updateBackLink();
+    if (typeof updateMoneyText === "function") updateMoneyText();
     saveAutosave();
     event.source.postMessage({ type: "consdocx:setFormDataDone", docId: "doc1" }, "*");
   }
@@ -226,6 +293,8 @@ async function buildDocx() {
   const fields = {
     "[ชื่อโครงการ]": val("projectName"),
     "[อ้างอิงแผนพัฒนาท้องถิ่น]": val("planRef"),
+    "[จำนวนเงินตัวเลข]": formatComma(val("moneyNum")),
+    "[จำนวนเงินตัวอักษร]": bahtText(val("moneyNum")),
   };
   for (const [ph, value] of Object.entries(fields)) {
     xml = replacePlaceholder(xml, ph, value);
