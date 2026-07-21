@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>5. บันทึก — นำส่งเอกสารการขออนุมัติจัดทำโครงการ (แบบ template)</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: "TH Sarabun New", "Sarabun", sans-serif;
+    background: #f2f4f7;
+    margin: 0;
+    padding: 24px;
+    color: #1f2937;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: #6b7280; margin: 0 0 20px; font-size: 15px; }
+  .layout {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 18px;
+  }
+  .card h2 { font-size: 16px; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+  .card h3 { font-size: 14px; margin: 18px 0 6px; color: #2563eb; }
+  label { display: block; font-size: 14px; font-weight: 600; margin: 12px 0 4px; }
+  label .hint { font-weight: 400; color: #9ca3af; font-size: 12px; }
+  input[type=text] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 15px;
+  }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  button#gen {
+    margin-top: 18px;
+    width: 100%;
+    padding: 12px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button#gen:hover { background: #1d4ed8; }
+  button#gen:disabled { background: #93c5fd; cursor: default; }
+  .status { margin-top: 10px; font-size: 13px; color: #16a34a; min-height: 18px; }
+  .status.err { color: #dc2626; }
+  .fixed-note {
+    background: #fefce8;
+    border: 1px dashed #eab308;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px;
+    color: #854d0e;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+
+<a href="../main.html" id="backLink" style="display:inline-block; margin-bottom:14px; font-size:14px; color:#2563eb; text-decoration:none;">&larr; กลับไปหน้าแรก</a>
+
+<h1>5. บันทึก — นำส่งเอกสารการขออนุมัติจัดทำโครงการ</h1>
+<p class="sub">เวอร์ชัน <b>template + แทนที่คำ</b> — ใช้ไฟล์ต้นฉบับจริงเป็นต้นแบบ ตามจุดที่ทำเครื่องหมายสีแดงไว้</p>
+
+<div class="layout">
+  <div class="card">
+    <h2>1. ข้อมูลที่เปลี่ยนได้</h2>
+
+    <div class="fixed-note">
+      เลขที่หนังสือ วันที่ เรื่องเดิม (มติสภาฯ/ประกาศ/รายละเอียดขนาดถนน) ข้อกฎหมาย
+      และชื่อ ผอ.กองช่าง/ปลัด/นายกผู้ลงนามท้ายเอกสาร <b>ยังคงที่ตามไฟล์ต้นฉบับ</b>
+      เพราะยังไม่ได้ทำเครื่องหมายสีแดงไว้ — ถ้าต้องการแก้ไขจุดเหล่านี้ได้ด้วย
+      ให้กลับไปทำสีแดงเพิ่มในไฟล์ต้นฉบับแล้วส่งมาแปลงใหม่
+    </div>
+
+    <form id="form">
+      <label>ชื่อโครงการ <span class="hint">(ไม่ต้องพิมพ์คำว่า "โครงการ" นำหน้า — แทนที่ทั้ง 3 จุดพร้อมกัน)</span></label>
+      <input type="text" id="projectName" placeholder="ก่อสร้างถนน คสล.ซอยบ้านเจ๊จิตร หมู่ที่ 8">
+
+      <label>อ้างอิงแผนพัฒนาท้องถิ่น</label>
+      <input type="text" id="planRef" placeholder="แผนพัฒนาท้องถิ่น (พ.ศ. ๒๕๖๖-๒๕๗๐) ฉบับทบทวน ครั้งที่ 1/2567 หน้า 90 ลำดับที่ 50 (กองช่าง)">
+
+      <h3>ประมาณราคาค่าก่อสร้างเบื้องต้น</h3>
+      <div class="row2">
+        <div>
+          <label>จำนวนเงิน (ตัวเลข) <span class="hint">(พิมพ์เฉพาะตัวเลข)</span></label>
+          <input type="text" id="moneyNum" placeholder="2256000" inputmode="decimal">
+        </div>
+        <div>
+          <label>จำนวนเงิน (ตัวอักษร) <span class="hint">(แปลงให้อัตโนมัติ)</span></label>
+          <input type="text" id="moneyText" placeholder="สองล้านสองแสนห้าหมื่นหกพันบาทถ้วน" readonly style="background:#f3f4f6; color:#374151;">
+        </div>
+      </div>
+
+      <label>กำหนดเวลาแล้วเสร็จตามสัญญา (วัน) <span class="hint">(พิมพ์เฉพาะตัวเลข)</span></label>
+      <input type="text" id="workDays" placeholder="120" inputmode="numeric">
+
+      <h3>ประเภทงานและสูตรค่า K</h3>
+
+      <label>ประเภทงานก่อสร้าง (ข้อ ๕)</label>
+      <input type="text" id="constrType" placeholder="งานก่อสร้างทาง">
+      <label>ประเภทงานตามเงื่อนไขค่า K (ข้อ ๗)</label>
+      <input type="text" id="kWorkType" placeholder="งานทาง">
+      <label>ลักษณะงานที่ใช้สูตร (ข้อ ๗.๑)</label>
+      <input type="text" id="kSubWork" placeholder="งานผิวถนนคอนกรีตเสริมเหล็ก">
+      <label>สูตรค่า K <span class="hint">(พิมพ์ทั้งสูตร ขึ้นต้นด้วย K = )</span></label>
+      <input type="text" id="kFormula" placeholder="K = 0.30 + 0.10 It/Io + 0.35 Ct/Co + 0.10 Mt/Mo + 0.15 St/So">
+
+      <h3>8.1 คณะกรรมการกำหนดราคากลางงานก่อสร้าง</h3>
+      <label>1. ชื่อ-สกุล (ประธานกรรมการ) <span class="hint">(พิมพ์ยศ/คำนำหน้าด้วย)</span></label>
+      <input type="text" id="rc1name" placeholder="ว่าที่ ร.ต.คมสรร  เครือศรี">
+      <label>1. ตำแหน่ง</label>
+      <input type="text" id="rc1pos" placeholder="ผู้อำนวยการกองช่าง">
+      <label>2. ชื่อ-สกุล (กรรมการ)</label>
+      <input type="text" id="rc2name" placeholder="นายถิรพงศ์  พระใหญ่">
+      <label>2. ตำแหน่ง</label>
+      <input type="text" id="rc2pos" placeholder="วิศวกรโยธาปฏิบัติการ">
+      <label>3. ชื่อ-สกุล (กรรมการ)</label>
+      <input type="text" id="rc3name" placeholder="นายวิเชษฐ์  สุพัฒศร">
+      <label>3. ตำแหน่ง</label>
+      <input type="text" id="rc3pos" placeholder="นายช่างโยธาปฏิบัติงาน">
+
+      <h3>8.2 คณะกรรมการตรวจรับพัสดุในงานจ้างก่อสร้าง</h3>
+      <label>1. ชื่อ-สกุล (ประธานกรรมการ)</label>
+      <input type="text" id="ic1name" placeholder="นายพศิน  ภูแสน">
+      <label>1. ตำแหน่ง</label>
+      <input type="text" id="ic1pos" placeholder="ปลัด อบต.คลองด่าน">
+      <label>2. ชื่อ-สกุล (กรรมการ)</label>
+      <input type="text" id="ic2name" placeholder="นางมาลัย  เลิศฤทธิ์">
+      <label>2. ตำแหน่ง</label>
+      <input type="text" id="ic2pos" placeholder="รองปลัดฯ">
+      <label>3. ชื่อ-สกุล (กรรมการ)</label>
+      <input type="text" id="ic3name" placeholder="ว่าที่ ร.ต.คมสรร  เครือศรี">
+      <label>3. ตำแหน่ง</label>
+      <input type="text" id="ic3pos" placeholder="ผู้อำนวยการกองช่าง">
+
+      <h3>8.3 ผู้ควบคุมงานก่อสร้าง</h3>
+      <label>1. ชื่อ-สกุล (หัวหน้าผู้ควบคุมงานก่อสร้าง)</label>
+      <input type="text" id="sv1name" placeholder="นายถิรพงศ์  พระใหญ่">
+      <label>1. ตำแหน่ง</label>
+      <input type="text" id="sv1pos" placeholder="วิศวกรโยธาปฏิบัติการ">
+      <label>2. ชื่อ-สกุล (ผู้ควบคุมงานก่อสร้าง)</label>
+      <input type="text" id="sv2name" placeholder="นายวิเชษฐ์  สุพัฒศร">
+      <label>2. ตำแหน่ง</label>
+      <input type="text" id="sv2pos" placeholder="นายช่างโยธาปฏิบัติงาน">
+
+      <button type="button" id="gen">สร้างไฟล์ Word (.docx)</button>
+      <div class="status" id="status"></div>
+    </form>
+  </div>
+</div>
+
+<script src="../../shared/jszip.lib.js"></script>
+<script src="./template-data.js"></script>
+<script>
+function val(id) { return document.getElementById(id).value.trim(); }
+
+// ---- แปลงจำนวนเงินตัวเลข → ตัวอักษรไทย (แบบเดียวกับ BAHTTEXT ของ Excel) ----
+function bahtText(numStr) {
+  const cleaned = String(numStr).replace(/[,\s฿]/g, "");
+  if (!cleaned || !/^\d*\.?\d*$/.test(cleaned) || cleaned === ".") return "";
+  let [intPart, decPart = ""] = cleaned.split(".");
+  intPart = intPart.replace(/^0+(?=\d)/, "") || "0";
+  const satang = parseInt((decPart + "00").slice(0, 2), 10) || 0;
+  const digits = ["ศูนย์","หนึ่ง","สอง","สาม","สี่","ห้า","หก","เจ็ด","แปด","เก้า"];
+  const posName = ["","สิบ","ร้อย","พัน","หมื่น","แสน"];
+  function readGroup(s, hasPrefix) {
+    let out = "";
+    const n = s.length;
+    for (let i = 0; i < n; i++) {
+      const d = +s[i], p = n - i - 1;
+      if (d === 0) continue;
+      if (p === 0 && d === 1 && (n > 1 || hasPrefix)) out += "เอ็ด";
+      else if (p === 1 && d === 2) out += "ยี่สิบ";
+      else if (p === 1 && d === 1) out += "สิบ";
+      else out += digits[d] + posName[p];
+    }
+    return out;
+  }
+  function readNumber(s) {
+    s = s.replace(/^0+/, "");
+    if (!s) return "";
+    if (s.length <= 6) return readGroup(s, false);
+    const head = s.slice(0, -6);
+    const tail = s.slice(-6).replace(/^0+/, "");
+    return readNumber(head) + "ล้าน" + (tail ? readGroup(tail, true) : "");
+  }
+  const intVal = intPart !== "0";
+  let out = "";
+  if (intVal) out += readNumber(intPart) + "บาท";
+  else if (satang === 0) return "ศูนย์บาทถ้วน";
+  if (satang > 0) {
+    const s = String(satang).padStart(2, "0").replace(/^0+/, "");
+    out += readGroup(s, false) + "สตางค์";
+  } else {
+    out += "ถ้วน";
+  }
+  return out;
+}
+function formatComma(numStr) {
+  const cleaned = String(numStr).replace(/[,\s฿]/g, "");
+  if (!cleaned || !/^\d*\.?\d*$/.test(cleaned) || cleaned === ".") return String(numStr).trim();
+  let [intPart, decPart] = cleaned.split(".");
+  intPart = (intPart.replace(/^0+(?=\d)/, "") || "0").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return decPart !== undefined && decPart !== "" ? intPart + "." + decPart.slice(0, 2) : intPart;
+}
+function updateMoneyText() {
+  document.getElementById("moneyText").value = bahtText(val("moneyNum"));
+}
+
+// ---- จำข้อมูลที่กรอกไว้ในฟอร์มนี้ (localStorage ของหน้านี้เอง) ----
+const AUTOSAVE_KEY = "consdocx_autosave_5_นำส่งเอกสารการขออนุมัติ";
+const AUTOSAVE_FIELDS = ["projectName","planRef","moneyNum","moneyText","workDays","constrType","kWorkType","kSubWork","kFormula","rc1name","rc1pos","rc2name","rc2pos","rc3name","rc3pos","ic1name","ic1pos","ic2name","ic2pos","ic3name","ic3pos","sv1name","sv1pos","sv2name","sv2pos"];
+function saveAutosave() {
+  const data = {};
+  AUTOSAVE_FIELDS.forEach(id => { data[id] = document.getElementById(id).value; });
+  try { localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(data)); } catch (e) {}
+}
+function restoreAutosave() {
+  try {
+    const raw = localStorage.getItem(AUTOSAVE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    AUTOSAVE_FIELDS.forEach(id => {
+      if (data[id]) document.getElementById(id).value = data[id];
+    });
+  } catch (e) {}
+}
+restoreAutosave();
+updateMoneyText();
+AUTOSAVE_FIELDS.forEach(id => document.getElementById(id).addEventListener("input", saveAutosave));
+
+document.getElementById("moneyNum").addEventListener("input", () => {
+  updateMoneyText();
+  saveAutosave();
+});
+document.getElementById("moneyNum").addEventListener("blur", () => {
+  const el = document.getElementById("moneyNum");
+  if (el.value.trim()) el.value = formatComma(el.value);
+  updateMoneyText();
+  saveAutosave();
+});
+
+// รับค่าจาก main.html ผ่าน query string (ทำหลัง restoreAutosave — ค่าจาก main ใหม่กว่า)
+(function prefillFromMain() {
+  const params = new URLSearchParams(location.search);
+  const projectName = params.get("projectName");
+  if (projectName) document.getElementById("projectName").value = projectName;
+})();
+saveAutosave();
+
+// พาชื่อโครงการกลับไป main ด้วยตอนกด "กลับไปหน้าแรก"
+function updateBackLink() {
+  const projectName = val("projectName");
+  const q = projectName ? ("?projectName=" + encodeURIComponent(projectName)) : "";
+  document.getElementById("backLink").href = "../main.html" + q;
+}
+document.getElementById("projectName").addEventListener("input", updateBackLink);
+updateBackLink();
+
+// ---- ตอบข้อมูล/ล้างข้อมูลตามคำสั่งจาก main.html (ผ่าน iframe ซ่อน) ----
+window.addEventListener("message", (event) => {
+  if (!event.data) return;
+  if (event.data.type === "consdocx:getFormData") {
+    const data = {};
+    AUTOSAVE_FIELDS.forEach(id => { data[id] = document.getElementById(id).value; });
+    event.source.postMessage({ type: "consdocx:formData", docId: "doc5", data }, "*");
+  } else if (event.data.type === "consdocx:clearFormData") {
+    try { localStorage.removeItem(AUTOSAVE_KEY); } catch (e) {}
+    AUTOSAVE_FIELDS.forEach(id => { document.getElementById(id).value = ""; });
+  } else if (event.data.type === "consdocx:setFormData") {
+    // รับ "ข้อมูลร่วม" ที่ส่งมาจากหน้า main (เช่น รายชื่อคณะกรรมการ) มาใส่ฟอร์ม + จำไว้ใน localStorage
+    const data = event.data.data || {};
+    AUTOSAVE_FIELDS.forEach(id => {
+      if (typeof data[id] === "string" && data[id] !== "") {
+        document.getElementById(id).value = data[id];
+      }
+    });
+    if (typeof updateMoneyText === "function") updateMoneyText();
+    if (typeof updateBackLink === "function") updateBackLink();
+    saveAutosave();
+    event.source.postMessage({ type: "consdocx:setFormDataDone", docId: "doc5" }, "*");
+  }
+});
+
+function base64ToArrayBuffer(b64) {
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
+}
+
+function xmlEscape(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// รองรับ placeholder ที่ปรากฏซ้ำหลายจุดในเอกสาร (เช่น [ชื่อโครงการ] x3)
+function replacePlaceholder(xml, placeholder, value) {
+  const escapedPh = placeholder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const runRegex = new RegExp(`<w:r(?:\\s[^>]*)?>((?:(?!</w:r>)[\\s\\S])*?)<w:t([^>]*)>([^<]*${escapedPh}[^<]*)</w:t></w:r>`, "g");
+  let match;
+  let lastIndex = 0;
+  let result = "";
+  while ((match = runRegex.exec(xml)) !== null) {
+    const [fullMatch, preRunXml, , textContent] = match;
+    result += xml.slice(lastIndex, match.index);
+    const rPrMatch = preRunXml.match(/<w:rPr>[\s\S]*?<\/w:rPr>/);
+    const rPr = rPrMatch ? rPrMatch[0] : "";
+    const idx = textContent.indexOf(placeholder);
+    const prefix = textContent.slice(0, idx);
+    const suffix = textContent.slice(idx + placeholder.length);
+    const lines = String(value).split(/\n+/);
+    let replacement;
+    if (lines.length <= 1) {
+      replacement = `<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(prefix + value + suffix)}</w:t></w:r>`;
+    } else {
+      const parts = [];
+      parts.push(`<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(prefix + lines[0])}</w:t></w:r>`);
+      for (let i = 1; i < lines.length - 1; i++) {
+        parts.push(`<w:r>${rPr}<w:br/><w:t xml:space="preserve">${xmlEscape(lines[i])}</w:t></w:r>`);
+      }
+      parts.push(`<w:r>${rPr}<w:br/><w:t xml:space="preserve">${xmlEscape(lines[lines.length - 1] + suffix)}</w:t></w:r>`);
+      replacement = parts.join("");
+    }
+    result += replacement;
+    lastIndex = match.index + fullMatch.length;
+    runRegex.lastIndex = lastIndex;
+  }
+  result += xml.slice(lastIndex);
+  return result;
+}
+
+async function buildDocx() {
+  const templateBuffer = base64ToArrayBuffer(window.TEMPLATE_DOCX_BASE64);
+  const zip = await JSZip.loadAsync(templateBuffer);
+  let xml = await zip.file("word/document.xml").async("string");
+
+  const fields = {
+    "[ชื่อโครงการ]": val("projectName"),
+    "[อ้างอิงแผนพัฒนาท้องถิ่น]": val("planRef"),
+    "[จำนวนเงินตัวเลข]": formatComma(val("moneyNum")),
+    "[จำนวนเงินตัวอักษร]": bahtText(val("moneyNum")),
+    "[จำนวนวันแล้วเสร็จ]": val("workDays"),
+    "[ประเภทงานก่อสร้าง]": val("constrType"),
+    "[ประเภทงานค่าK]": val("kWorkType"),
+    "[ลักษณะงานที่ใช้สูตรค่าK]": val("kSubWork"),
+    "[สูตรค่าK]": val("kFormula"),
+    "[ชื่อกรรมการราคากลาง1]": val("rc1name"),
+    "[ตำแหน่งกรรมการราคากลาง1]": val("rc1pos"),
+    "[ชื่อกรรมการราคากลาง2]": val("rc2name"),
+    "[ตำแหน่งกรรมการราคากลาง2]": val("rc2pos"),
+    "[ชื่อกรรมการราคากลาง3]": val("rc3name"),
+    "[ตำแหน่งกรรมการราคากลาง3]": val("rc3pos"),
+    "[ชื่อกรรมการตรวจรับ1]": val("ic1name"),
+    "[ตำแหน่งกรรมการตรวจรับ1]": val("ic1pos"),
+    "[ชื่อกรรมการตรวจรับ2]": val("ic2name"),
+    "[ตำแหน่งกรรมการตรวจรับ2]": val("ic2pos"),
+    "[ชื่อกรรมการตรวจรับ3]": val("ic3name"),
+    "[ตำแหน่งกรรมการตรวจรับ3]": val("ic3pos"),
+    "[ชื่อผู้ควบคุมงาน1]": val("sv1name"),
+    "[ตำแหน่งผู้ควบคุมงาน1]": val("sv1pos"),
+    "[ชื่อผู้ควบคุมงาน2]": val("sv2name"),
+    "[ตำแหน่งผู้ควบคุมงาน2]": val("sv2pos"),
+  };
+  for (const [ph, value] of Object.entries(fields)) {
+    xml = replacePlaceholder(xml, ph, value);
+  }
+
+  zip.file("word/document.xml", xml);
+  return await zip.generateAsync({ type: "blob" });
+}
+
+document.getElementById("gen").addEventListener("click", async () => {
+  const btn = document.getElementById("gen");
+  const statusEl = document.getElementById("status");
+  statusEl.className = "status";
+  btn.disabled = true;
+  statusEl.textContent = "กำลังสร้างไฟล์...";
+  try {
+    const blob = await buildDocx();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const nameSafe = (val("projectName") || "นำส่งเอกสาร").replace(/[\\/:*?"<>|]/g, "-").slice(0, 40);
+    a.href = url;
+    a.download = `นำส่งเอกสารการขออนุมัติ_${nameSafe}.docx`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    statusEl.textContent = "สร้างไฟล์สำเร็จ — ไฟล์ถูกดาวน์โหลดแล้ว";
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "เกิดข้อผิดพลาด: " + err.message;
+    statusEl.className = "status err";
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>

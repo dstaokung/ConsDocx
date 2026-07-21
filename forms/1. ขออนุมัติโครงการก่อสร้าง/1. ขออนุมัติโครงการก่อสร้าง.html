@@ -174,7 +174,7 @@ function xmlEscape(s) {
 
 function replacePlaceholder(xml, placeholder, value) {
   const escapedPh = placeholder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const runRegex = new RegExp(`<w:r[^>]*>((?:(?!</w:r>)[\\s\\S])*?)<w:t([^>]*)>([^<]*${escapedPh}[^<]*)</w:t></w:r>`, "g");
+  const runRegex = new RegExp(`<w:r(?:\\s[^>]*)?>((?:(?!</w:r>)[\\s\\S])*?)<w:t([^>]*)>([^<]*${escapedPh}[^<]*)</w:t></w:r>`, "g");
   let match;
   let lastIndex = 0;
   let result = "";

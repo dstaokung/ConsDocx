@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>2. คำสั่ง — แต่งตั้งคณะกรรมการจัดทำแบบรูปรายการงานก่อสร้าง (แบบ template)</title>
+<title>4. บันทึก — รายงานการจัดทำแบบรูปรายการงานก่อสร้าง (แบบ template)</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -28,7 +28,7 @@
   .card h3 { font-size: 14px; margin: 18px 0 6px; color: #2563eb; }
   label { display: block; font-size: 14px; font-weight: 600; margin: 12px 0 4px; }
   label .hint { font-weight: 400; color: #9ca3af; font-size: 12px; }
-  input[type=text], input[type=file] {
+  input[type=text] {
     width: 100%;
     padding: 8px 10px;
     border: 1px solid #d1d5db;
@@ -53,15 +53,6 @@
   button#gen:disabled { background: #93c5fd; cursor: default; }
   .status { margin-top: 10px; font-size: 13px; color: #16a34a; min-height: 18px; }
   .status.err { color: #dc2626; }
-  .template-box {
-    background: #eff6ff;
-    border: 1px dashed #93c5fd;
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 13px;
-    color: #1e40af;
-    margin-bottom: 16px;
-  }
   .fixed-note {
     background: #fefce8;
     border: 1px dashed #eab308;
@@ -77,27 +68,39 @@
 
 <a href="../main.html" id="backLink" style="display:inline-block; margin-bottom:14px; font-size:14px; color:#2563eb; text-decoration:none;">&larr; กลับไปหน้าแรก</a>
 
-<h1>2. คำสั่ง — แต่งตั้งคณะกรรมการจัดทำแบบรูปรายการงานก่อสร้าง</h1>
-<p class="sub">เวอร์ชัน <b>template + แทนที่คำ</b> — ใช้ไฟล์ต้นฉบับจริงเป็นต้นแบบ คงจำนวนกรรมการไว้ที่ 3 คนตามที่ทำเครื่องหมายไว้</p>
+<h1>4. บันทึก — รายงานการจัดทำแบบรูปรายการงานก่อสร้าง</h1>
+<p class="sub">เวอร์ชัน <b>template + แทนที่คำ</b> — ใช้ไฟล์ต้นฉบับจริงเป็นต้นแบบ ตามจุดที่ทำเครื่องหมายสีแดงไว้</p>
 
 <div class="layout">
   <div class="card">
     <h2>1. ข้อมูลที่เปลี่ยนได้</h2>
 
     <div class="fixed-note">
-      เลขที่คำสั่ง วันที่สั่ง และชื่อนายกผู้ลงนาม <b>ยังคงที่ตามไฟล์ต้นฉบับ</b>
-      เพราะยังไม่ได้ทำเครื่องหมายสีแดงไว้ — จำนวนกรรมการคงที่ 3 คน (ทำสีแดงไว้แค่ 3 คนนี้)
-      ถ้าต้องการแก้ไขจุดเหล่านี้ได้ด้วย หรือปรับจำนวนกรรมการ ให้กลับไปทำสีแดงเพิ่ม/ลดในไฟล์ต้นฉบับ
+      เลขที่หนังสือ วันที่ และชื่อปลัด/นายกผู้ลงนามท้ายเอกสาร <b>ยังคงที่ตามไฟล์ต้นฉบับ</b>
+      เพราะยังไม่ได้ทำเครื่องหมายสีแดงไว้ — ถ้าต้องการแก้ไขจุดเหล่านี้ได้ด้วย
+      ให้กลับไปทำสีแดงเพิ่มในไฟล์ต้นฉบับแล้วส่งมาแปลงใหม่
     </div>
 
     <form id="form">
-      <label>ชื่อโครงการ <span class="hint">(แทนที่ทั้ง 3 จุดในเอกสารพร้อมกัน)</span></label>
+      <label>ชื่อโครงการ <span class="hint">(ไม่ต้องพิมพ์คำว่า "โครงการ" นำหน้า — แทนที่ทั้ง 2 จุดพร้อมกัน)</span></label>
       <input type="text" id="projectName" placeholder="ก่อสร้างถนน คสล.ซอยบ้านเจ๊จิตร หมู่ที่ 8">
 
-      <h3>คณะกรรมการ 3 คน</h3>
+      <h3>ประมาณราคาค่าก่อสร้างเบื้องต้น</h3>
+      <div class="row2">
+        <div>
+          <label>จำนวนเงิน (ตัวเลข) <span class="hint">(พิมพ์เฉพาะตัวเลข)</span></label>
+          <input type="text" id="moneyNum" placeholder="2256000" inputmode="decimal">
+        </div>
+        <div>
+          <label>จำนวนเงิน (ตัวอักษร) <span class="hint">(แปลงให้อัตโนมัติ)</span></label>
+          <input type="text" id="moneyText" placeholder="สองล้านสองแสนห้าหมื่นหกพันบาทถ้วน" readonly style="background:#f3f4f6; color:#374151;">
+        </div>
+      </div>
 
-      <label>1. ชื่อ-สกุล (ประธานกรรมการ)</label>
-      <input type="text" id="name1" placeholder="ว่าที่ ร.ต. คมสรร  เครือศรี">
+      <h3>คณะกรรมการผู้ลงนาม 3 คน</h3>
+
+      <label>1. ชื่อ-สกุล (ประธานกรรมการฯ) <span class="hint">(ไม่ต้องใส่วงเล็บ/ยศ "ว่าที่ ร.ต." มีในบรรทัดลงชื่ออยู่แล้ว)</span></label>
+      <input type="text" id="name1" placeholder="คมสรร  เครือศรี">
       <label>1. ตำแหน่ง</label>
       <input type="text" id="pos1" placeholder="ผู้อำนวยการกองช่าง">
 
@@ -122,10 +125,62 @@
 <script>
 function val(id) { return document.getElementById(id).value.trim(); }
 
-// ---- จำข้อมูลที่กรอกไว้ในฟอร์มนี้ (เก็บใน localStorage ของหน้านี้เอง) กันหายตอนกด
-// "กลับไปหน้าแรก" แล้วย้อนกลับเข้ามาใหม่ ----
-const AUTOSAVE_KEY = "consdocx_autosave_2_คำสั่งแต่งตั้งคณะกรรมการ";
-const AUTOSAVE_FIELDS = ["projectName","name1","pos1","name2","pos2","name3","pos3"];
+// ---- แปลงจำนวนเงินตัวเลข → ตัวอักษรไทย (แบบเดียวกับ BAHTTEXT ของ Excel) ----
+function bahtText(numStr) {
+  const cleaned = String(numStr).replace(/[,\s฿]/g, "");
+  if (!cleaned || !/^\d*\.?\d*$/.test(cleaned) || cleaned === ".") return "";
+  let [intPart, decPart = ""] = cleaned.split(".");
+  intPart = intPart.replace(/^0+(?=\d)/, "") || "0";
+  const satang = parseInt((decPart + "00").slice(0, 2), 10) || 0;
+  const digits = ["ศูนย์","หนึ่ง","สอง","สาม","สี่","ห้า","หก","เจ็ด","แปด","เก้า"];
+  const posName = ["","สิบ","ร้อย","พัน","หมื่น","แสน"];
+  function readGroup(s, hasPrefix) {
+    let out = "";
+    const n = s.length;
+    for (let i = 0; i < n; i++) {
+      const d = +s[i], p = n - i - 1;
+      if (d === 0) continue;
+      if (p === 0 && d === 1 && (n > 1 || hasPrefix)) out += "เอ็ด";
+      else if (p === 1 && d === 2) out += "ยี่สิบ";
+      else if (p === 1 && d === 1) out += "สิบ";
+      else out += digits[d] + posName[p];
+    }
+    return out;
+  }
+  function readNumber(s) {
+    s = s.replace(/^0+/, "");
+    if (!s) return "";
+    if (s.length <= 6) return readGroup(s, false);
+    const head = s.slice(0, -6);
+    const tail = s.slice(-6).replace(/^0+/, "");
+    return readNumber(head) + "ล้าน" + (tail ? readGroup(tail, true) : "");
+  }
+  const intVal = intPart !== "0";
+  let out = "";
+  if (intVal) out += readNumber(intPart) + "บาท";
+  else if (satang === 0) return "ศูนย์บาทถ้วน";
+  if (satang > 0) {
+    const s = String(satang).padStart(2, "0").replace(/^0+/, "");
+    out += readGroup(s, false) + "สตางค์";
+  } else {
+    out += "ถ้วน";
+  }
+  return out;
+}
+function formatComma(numStr) {
+  const cleaned = String(numStr).replace(/[,\s฿]/g, "");
+  if (!cleaned || !/^\d*\.?\d*$/.test(cleaned) || cleaned === ".") return String(numStr).trim();
+  let [intPart, decPart] = cleaned.split(".");
+  intPart = (intPart.replace(/^0+(?=\d)/, "") || "0").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return decPart !== undefined && decPart !== "" ? intPart + "." + decPart.slice(0, 2) : intPart;
+}
+function updateMoneyText() {
+  document.getElementById("moneyText").value = bahtText(val("moneyNum"));
+}
+
+// ---- จำข้อมูลที่กรอกไว้ในฟอร์มนี้ (localStorage ของหน้านี้เอง) ----
+const AUTOSAVE_KEY = "consdocx_autosave_4_บันทึกรายงานแบบรูปรายการ";
+const AUTOSAVE_FIELDS = ["projectName","moneyNum","moneyText","name1","pos1","name2","pos2","name3","pos3"];
 function saveAutosave() {
   const data = {};
   AUTOSAVE_FIELDS.forEach(id => { data[id] = document.getElementById(id).value; });
@@ -142,10 +197,21 @@ function restoreAutosave() {
   } catch (e) {}
 }
 restoreAutosave();
+updateMoneyText();
 AUTOSAVE_FIELDS.forEach(id => document.getElementById(id).addEventListener("input", saveAutosave));
 
-// รับค่าที่ส่งมาจากหน้า main.html ผ่าน query string เช่น ?projectName=... (ยังแก้ไขในฟอร์มนี้ได้ตามปกติ)
-// ทำหลัง restoreAutosave เพราะค่าจาก main ถือว่าใหม่กว่า ให้ทับค่าที่จำไว้เดิมได้
+document.getElementById("moneyNum").addEventListener("input", () => {
+  updateMoneyText();
+  saveAutosave();
+});
+document.getElementById("moneyNum").addEventListener("blur", () => {
+  const el = document.getElementById("moneyNum");
+  if (el.value.trim()) el.value = formatComma(el.value);
+  updateMoneyText();
+  saveAutosave();
+});
+
+// รับค่าจาก main.html ผ่าน query string (ทำหลัง restoreAutosave — ค่าจาก main ใหม่กว่า)
 (function prefillFromMain() {
   const params = new URLSearchParams(location.search);
   const projectName = params.get("projectName");
@@ -153,7 +219,7 @@ AUTOSAVE_FIELDS.forEach(id => document.getElementById(id).addEventListener("inpu
 })();
 saveAutosave();
 
-// เวลากด "กลับไปหน้าแรก" ให้พาชื่อโครงการที่กรอกไว้กลับไปด้วย ไม่ให้ข้อมูลหายตอนกลับไป main
+// พาชื่อโครงการกลับไป main ด้วยตอนกด "กลับไปหน้าแรก"
 function updateBackLink() {
   const projectName = val("projectName");
   const q = projectName ? ("?projectName=" + encodeURIComponent(projectName)) : "";
@@ -162,14 +228,13 @@ function updateBackLink() {
 document.getElementById("projectName").addEventListener("input", updateBackLink);
 updateBackLink();
 
-// ---- ตอบข้อมูลฟอร์มปัจจุบันกลับไปให้หน้า main.html เวลาถูกเรียกผ่าน iframe ซ่อน
-// (ใช้ตอนกดปุ่ม "สร้างไฟล์ทั้งหมด" ที่ main เพื่อเอาข้อมูลจริงในฟอร์มนี้ไปใส่ในไฟล์ที่สร้าง) ----
+// ---- ตอบข้อมูล/ล้างข้อมูลตามคำสั่งจาก main.html (ผ่าน iframe ซ่อน) ----
 window.addEventListener("message", (event) => {
   if (!event.data) return;
   if (event.data.type === "consdocx:getFormData") {
     const data = {};
     AUTOSAVE_FIELDS.forEach(id => { data[id] = document.getElementById(id).value; });
-    event.source.postMessage({ type: "consdocx:formData", docId: "doc2", data }, "*");
+    event.source.postMessage({ type: "consdocx:formData", docId: "doc4", data }, "*");
   } else if (event.data.type === "consdocx:clearFormData") {
     try { localStorage.removeItem(AUTOSAVE_KEY); } catch (e) {}
     AUTOSAVE_FIELDS.forEach(id => { document.getElementById(id).value = ""; });
@@ -184,7 +249,7 @@ window.addEventListener("message", (event) => {
     if (typeof updateMoneyText === "function") updateMoneyText();
     if (typeof updateBackLink === "function") updateBackLink();
     saveAutosave();
-    event.source.postMessage({ type: "consdocx:setFormDataDone", docId: "doc2" }, "*");
+    event.source.postMessage({ type: "consdocx:setFormDataDone", docId: "doc4" }, "*");
   }
 });
 
@@ -199,7 +264,7 @@ function xmlEscape(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-// รองรับ placeholder ที่ปรากฏซ้ำหลายจุดในเอกสาร (เช่น [ชื่อโครงการ] x3)
+// รองรับ placeholder ที่ปรากฏซ้ำหลายจุดในเอกสาร (เช่น [ชื่อโครงการ] x2)
 function replacePlaceholder(xml, placeholder, value) {
   const escapedPh = placeholder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const runRegex = new RegExp(`<w:r(?:\\s[^>]*)?>((?:(?!</w:r>)[\\s\\S])*?)<w:t([^>]*)>([^<]*${escapedPh}[^<]*)</w:t></w:r>`, "g");
@@ -242,6 +307,8 @@ async function buildDocx() {
 
   const fields = {
     "[ชื่อโครงการ]": val("projectName"),
+    "[จำนวนเงินตัวเลข]": formatComma(val("moneyNum")),
+    "[จำนวนเงินตัวอักษร]": bahtText(val("moneyNum")),
     "[ชื่อกรรมการ1]": val("name1"),
     "[ตำแหน่งกรรมการ1]": val("pos1"),
     "[ชื่อกรรมการ2]": val("name2"),
@@ -267,9 +334,9 @@ document.getElementById("gen").addEventListener("click", async () => {
     const blob = await buildDocx();
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    const nameSafe = (val("projectName") || "คำสั่ง").replace(/[\\/:*?"<>|]/g, "-").slice(0, 40);
+    const nameSafe = (val("projectName") || "บันทึกรายงาน").replace(/[\\/:*?"<>|]/g, "-").slice(0, 40);
     a.href = url;
-    a.download = `คำสั่งแต่งตั้งคณะกรรมการ_${nameSafe}.docx`;
+    a.download = `บันทึกรายงานแบบรูปรายการ_${nameSafe}.docx`;
     document.body.appendChild(a);
     a.click();
     a.remove();

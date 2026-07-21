@@ -271,7 +271,7 @@ function xmlEscape(s) {
 function replacePlaceholder(xml, placeholder, value) {
   // จับ run ที่มี placeholder อยู่ "ภายใน" ข้อความ (อาจมีคำอื่นนำหน้า/ตามหลังในรันเดียวกัน เช่น "ที่  [ที่]")
   const escapedPh = placeholder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const runRegex = new RegExp(`<w:r[^>]*>((?:(?!</w:r>)[\\s\\S])*?)<w:t([^>]*)>([^<]*${escapedPh}[^<]*)</w:t></w:r>`);
+  const runRegex = new RegExp(`<w:r(?:\\s[^>]*)?>((?:(?!</w:r>)[\\s\\S])*?)<w:t([^>]*)>([^<]*${escapedPh}[^<]*)</w:t></w:r>`);
   const match = xml.match(runRegex);
   if (!match) {
     // placeholder อาจไม่พบ (เช่น ไม่ได้อยู่ใน template ที่ผู้ใช้แก้เอง) — ข้ามไปเงียบๆ

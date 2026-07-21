@@ -23,8 +23,10 @@
     margin-bottom: 20px;
   }
   .card h2 { font-size: 16px; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+  .card h3 { font-size: 14px; margin: 18px 0 6px; color: #2563eb; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   label { display: block; font-size: 14px; font-weight: 600; margin: 10px 0 4px; }
-  label .hint { font-weight: 400; color: #9ca3af; font-size: 12px; }
+  .hint { font-weight: 400; color: #9ca3af; font-size: 12px; }
   input[type=text] {
     width: 100%;
     padding: 10px 12px;
@@ -79,6 +81,21 @@
   }
   button#genAll:hover { background: #15803d; }
   button#genAll:disabled { background: #86efac; cursor: default; }
+  button#pushShared {
+    margin-top: 16px;
+    width: 100%;
+    padding: 12px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  button#pushShared:hover { background: #1d4ed8; }
+  button#pushShared:disabled { background: #93c5fd; cursor: default; }
   .status { margin-top: 10px; font-size: 13px; color: #16a34a; min-height: 18px; }
   .status.err { color: #dc2626; }
 </style>
@@ -91,11 +108,76 @@
 
   <div class="card">
     <h2>ข้อมูลร่วม (กรอกครั้งเดียว ส่งต่อให้ทุกเอกสารที่ใช้ฟิลด์นี้)</h2>
-    <label>ชื่อโครงการ <span class="hint">(ใช้ในเอกสาร 1 และ 2)</span></label>
+    <label>ชื่อโครงการ <span class="hint">(ใช้ในเอกสารทุกฉบับ)</span></label>
     <input type="text" id="projectName" placeholder="ก่อสร้างถนน คสล.ซอยบ้านเจ๊จิตร หมู่ที่ 8">
+    <h3>คณะกรรมการจัดทำแบบรูปรายการงานก่อสร้าง <span class="hint">(ใช้ในเอกสาร 2, 3 และ 4)</span></h3>
+    <div class="row2">
+      <div><label>1. ชื่อ-สกุล (ประธานกรรมการ) <span class="hint">(ไม่ต้องพิมพ์ยศ "ว่าที่ ร.ต.")</span></label>
+        <input type="text" id="g_name1" placeholder="คมสรร  เครือศรี"></div>
+      <div><label>1. ตำแหน่ง</label>
+        <input type="text" id="g_pos1" placeholder="ผู้อำนวยการกองช่าง"></div>
+      <div><label>2. ชื่อ-สกุล (กรรมการ)</label>
+        <input type="text" id="g_name2" placeholder="นายถิรพงศ์  พระใหญ่"></div>
+      <div><label>2. ตำแหน่ง</label>
+        <input type="text" id="g_pos2" placeholder="วิศวกรโยธาปฏิบัติการ"></div>
+      <div><label>3. ชื่อ-สกุล (กรรมการ)</label>
+        <input type="text" id="g_name3" placeholder="นายวิเชษฐ์  สุพัฒศร"></div>
+      <div><label>3. ตำแหน่ง</label>
+        <input type="text" id="g_pos3" placeholder="นายช่างโยธาปฏิบัติงาน"></div>
+    </div>
+
+    <h3>คณะกรรมการกำหนดราคากลางงานก่อสร้าง <span class="hint">(ใช้ในเอกสาร 5 ข้อ 8.1)</span></h3>
+    <div class="row2">
+      <div><label>1. ชื่อ-สกุล (ประธานกรรมการ) <span class="hint">(พิมพ์ยศ/คำนำหน้าด้วย)</span></label>
+        <input type="text" id="g_rc1name" placeholder="ว่าที่ ร.ต.คมสรร  เครือศรี"></div>
+      <div><label>1. ตำแหน่ง</label>
+        <input type="text" id="g_rc1pos" placeholder="ผู้อำนวยการกองช่าง"></div>
+      <div><label>2. ชื่อ-สกุล (กรรมการ)</label>
+        <input type="text" id="g_rc2name" placeholder="นายถิรพงศ์  พระใหญ่"></div>
+      <div><label>2. ตำแหน่ง</label>
+        <input type="text" id="g_rc2pos" placeholder="วิศวกรโยธาปฏิบัติการ"></div>
+      <div><label>3. ชื่อ-สกุล (กรรมการ)</label>
+        <input type="text" id="g_rc3name" placeholder="นายวิเชษฐ์  สุพัฒศร"></div>
+      <div><label>3. ตำแหน่ง</label>
+        <input type="text" id="g_rc3pos" placeholder="นายช่างโยธาปฏิบัติงาน"></div>
+    </div>
+
+    <h3>คณะกรรมการตรวจรับพัสดุในงานจ้างก่อสร้าง <span class="hint">(ใช้ในเอกสาร 5 ข้อ 8.2)</span></h3>
+    <div class="row2">
+      <div><label>1. ชื่อ-สกุล (ประธานกรรมการ)</label>
+        <input type="text" id="g_ic1name" placeholder="นายพศิน  ภูแสน"></div>
+      <div><label>1. ตำแหน่ง</label>
+        <input type="text" id="g_ic1pos" placeholder="ปลัด อบต.คลองด่าน"></div>
+      <div><label>2. ชื่อ-สกุล (กรรมการ)</label>
+        <input type="text" id="g_ic2name" placeholder="นางมาลัย  เลิศฤทธิ์"></div>
+      <div><label>2. ตำแหน่ง</label>
+        <input type="text" id="g_ic2pos" placeholder="รองปลัดฯ"></div>
+      <div><label>3. ชื่อ-สกุล (กรรมการ)</label>
+        <input type="text" id="g_ic3name" placeholder="ว่าที่ ร.ต.คมสรร  เครือศรี"></div>
+      <div><label>3. ตำแหน่ง</label>
+        <input type="text" id="g_ic3pos" placeholder="ผู้อำนวยการกองช่าง"></div>
+    </div>
+
+    <h3>ผู้ควบคุมงานก่อสร้าง <span class="hint">(ใช้ในเอกสาร 5 ข้อ 8.3)</span></h3>
+    <div class="row2">
+      <div><label>1. ชื่อ-สกุล (หัวหน้าผู้ควบคุมงาน)</label>
+        <input type="text" id="g_sv1name" placeholder="นายถิรพงศ์  พระใหญ่"></div>
+      <div><label>1. ตำแหน่ง</label>
+        <input type="text" id="g_sv1pos" placeholder="วิศวกรโยธาปฏิบัติการ"></div>
+      <div><label>2. ชื่อ-สกุล (ผู้ควบคุมงาน)</label>
+        <input type="text" id="g_sv2name" placeholder="นายวิเชษฐ์  สุพัฒศร"></div>
+      <div><label>2. ตำแหน่ง</label>
+        <input type="text" id="g_sv2pos" placeholder="นายช่างโยธาปฏิบัติงาน"></div>
+    </div>
+
+    <button id="pushShared" type="button">บันทึกข้อมูลร่วมลงทุกเอกสาร</button>
+    <div class="status" id="shareStatus"></div>
+
     <div class="note">
-      พิมพ์แล้วลิงก์ด้านล่างจะพาไปเปิดเอกสารพร้อมชื่อโครงการกรอกไว้ให้แล้วอัตโนมัติ (แก้ไขต่อในหน้านั้นได้ตามปกติ)
-      ฟิลด์อื่น ๆ ที่เฉพาะเอกสารนั้น ๆ (เช่น รายชื่อกรรมการ อ้างอิงแผนพัฒนาท้องถิ่น) ยังต้องไปกรอกในหน้าของเอกสารนั้นโดยตรง
+      พิมพ์ชื่อโครงการแล้วลิงก์ด้านล่างจะพาไปเปิดเอกสารพร้อมกรอกให้อัตโนมัติ ส่วนคณะกรรมการให้กด
+      "บันทึกข้อมูลร่วมลงทุกเอกสาร" — โปรแกรมจะส่งค่าลงไปเก็บในทุกเอกสารที่ใช้ (ช่องที่เว้นว่างจะไม่ไปทับ
+      ค่าเดิมในเอกสาร) ฟิลด์เฉพาะของเอกสารนั้น ๆ (เช่น จำนวนเงิน อ้างอิงแผนพัฒนาท้องถิ่น ผู้จด/ผู้ตรวจรายงาน)
+      ยังไปกรอกในหน้าของเอกสารนั้นโดยตรง
     </div>
   </div>
 
@@ -114,6 +196,24 @@
           <span class="badge">รับชื่อโครงการอัตโนมัติ →</span>
         </a>
       </li>
+      <li>
+        <a class="doclink linked" id="link-3" href="./3. รายงานการประชุมแบบรูปรายการ/3. รายงานการประชุมแบบรูปรายการ.html">
+          <span class="title">3. รายงานการประชุมคณะกรรมการจัดทำแบบรูปรายการ</span>
+          <span class="badge">รับชื่อโครงการอัตโนมัติ →</span>
+        </a>
+      </li>
+      <li>
+        <a class="doclink linked" id="link-4" href="./4. บันทึกรายงานแบบรูปรายการ/4. บันทึกรายงานแบบรูปรายการ.html">
+          <span class="title">4. บันทึกรายงานการจัดทำแบบรูปรายการงานก่อสร้าง</span>
+          <span class="badge">รับชื่อโครงการอัตโนมัติ →</span>
+        </a>
+      </li>
+      <li>
+        <a class="doclink linked" id="link-5" href="./5. นำส่งเอกสารการขออนุมัติ/5. นำส่งเอกสารการขออนุมัติ.html">
+          <span class="title">5. บันทึกนำส่งเอกสารการขออนุมัติจัดทำโครงการ</span>
+          <span class="badge">รับชื่อโครงการอัตโนมัติ →</span>
+        </a>
+      </li>
     </ul>
   </div>
 
@@ -122,7 +222,7 @@
     <button id="genAll">สร้างไฟล์ทั้งหมด (.zip)</button>
     <div class="status" id="status"></div>
     <div class="note">
-      สร้างเอกสาร 1 และ 2 พร้อมกัน โดยดึงข้อมูลที่กรอกไว้จริงในแต่ละหน้าเอกสาร (ชื่อโครงการ,
+      สร้างเอกสาร 1–5 พร้อมกัน โดยดึงข้อมูลที่กรอกไว้จริงในแต่ละหน้าเอกสาร (ชื่อโครงการ,
       อ้างอิงแผนพัฒนาท้องถิ่น, รายชื่อกรรมการ ฯลฯ) มาใส่ให้ครบอัตโนมัติ แล้วรวมเป็นไฟล์ .zip เดียว —
       ต้องเคยเปิดกรอกข้อมูลในหน้าเอกสารนั้นอย่างน้อยครั้งหนึ่งก่อน (ข้อมูลจะถูกจำไว้ในเครื่อง)
       ถ้าฟิลด์ไหนยังไม่เคยกรอกจะปล่อยว่างไว้ในไฟล์ที่ได้
@@ -138,6 +238,9 @@
 <script>
 const DOC1_PATH = "./1. ขออนุมัติโครงการก่อสร้าง/1. ขออนุมัติโครงการก่อสร้าง.html";
 const DOC2_PATH = "./2. คำสั่งแต่งตั้งคณะกรรมการ/2. คำสั่งแต่งตั้งคณะกรรมการ.html";
+const DOC3_PATH = "./3. รายงานการประชุมแบบรูปรายการ/3. รายงานการประชุมแบบรูปรายการ.html";
+const DOC4_PATH = "./4. บันทึกรายงานแบบรูปรายการ/4. บันทึกรายงานแบบรูปรายการ.html";
+const DOC5_PATH = "./5. นำส่งเอกสารการขออนุมัติ/5. นำส่งเอกสารการขออนุมัติ.html";
 const MEMO_PATH = "./บันทึกข้อความ/บันทึกข้อความ.html";
 
 function val(id) { return document.getElementById(id).value.trim(); }
@@ -148,6 +251,9 @@ function updateLinks() {
 
   document.getElementById("link-1").href = DOC1_PATH + q;
   document.getElementById("link-2").href = DOC2_PATH + q;
+  document.getElementById("link-3").href = DOC3_PATH + q;
+  document.getElementById("link-4").href = DOC4_PATH + q;
+  document.getElementById("link-5").href = DOC5_PATH + q;
 }
 document.getElementById("projectName").addEventListener("input", updateLinks);
 
@@ -167,7 +273,7 @@ updateLinks();
 
 // ส่งคำสั่งล้างข้อมูล (localStorage) ไปให้ทุกเอกสารย่อยผ่าน iframe ซ่อน
 function clearAllDocsData() {
-  [DOC1_PATH, DOC2_PATH, MEMO_PATH].forEach((src) => {
+  [DOC1_PATH, DOC2_PATH, DOC3_PATH, DOC4_PATH, DOC5_PATH, MEMO_PATH].forEach((src) => {
     const iframe = document.createElement("iframe");
     iframe.style.display = "none";
     iframe.addEventListener("load", () => {
@@ -190,9 +296,59 @@ function xmlEscape(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+// ---- แปลงจำนวนเงินตัวเลข → ตัวอักษรไทย + เติม comma (สำเนาเดียวกับในฟอร์มเอกสาร 3) ----
+function bahtText(numStr) {
+  const cleaned = String(numStr).replace(/[,\s฿]/g, "");
+  if (!cleaned || !/^\d*\.?\d*$/.test(cleaned) || cleaned === ".") return "";
+  let [intPart, decPart = ""] = cleaned.split(".");
+  intPart = intPart.replace(/^0+(?=\d)/, "") || "0";
+  const satang = parseInt((decPart + "00").slice(0, 2), 10) || 0;
+  const digits = ["ศูนย์","หนึ่ง","สอง","สาม","สี่","ห้า","หก","เจ็ด","แปด","เก้า"];
+  const posName = ["","สิบ","ร้อย","พัน","หมื่น","แสน"];
+  function readGroup(s, hasPrefix) {
+    let out = "";
+    const n = s.length;
+    for (let i = 0; i < n; i++) {
+      const d = +s[i], p = n - i - 1;
+      if (d === 0) continue;
+      if (p === 0 && d === 1 && (n > 1 || hasPrefix)) out += "เอ็ด";
+      else if (p === 1 && d === 2) out += "ยี่สิบ";
+      else if (p === 1 && d === 1) out += "สิบ";
+      else out += digits[d] + posName[p];
+    }
+    return out;
+  }
+  function readNumber(s) {
+    s = s.replace(/^0+/, "");
+    if (!s) return "";
+    if (s.length <= 6) return readGroup(s, false);
+    const head = s.slice(0, -6);
+    const tail = s.slice(-6).replace(/^0+/, "");
+    return readNumber(head) + "ล้าน" + (tail ? readGroup(tail, true) : "");
+  }
+  const intVal = intPart !== "0";
+  let out = "";
+  if (intVal) out += readNumber(intPart) + "บาท";
+  else if (satang === 0) return "ศูนย์บาทถ้วน";
+  if (satang > 0) {
+    const s = String(satang).padStart(2, "0").replace(/^0+/, "");
+    out += readGroup(s, false) + "สตางค์";
+  } else {
+    out += "ถ้วน";
+  }
+  return out;
+}
+function formatComma(numStr) {
+  const cleaned = String(numStr).replace(/[,\s฿]/g, "");
+  if (!cleaned || !/^\d*\.?\d*$/.test(cleaned) || cleaned === ".") return String(numStr).trim();
+  let [intPart, decPart] = cleaned.split(".");
+  intPart = (intPart.replace(/^0+(?=\d)/, "") || "0").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return decPart !== undefined && decPart !== "" ? intPart + "." + decPart.slice(0, 2) : intPart;
+}
+
 function replacePlaceholder(xml, placeholder, value) {
   const escapedPh = placeholder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const runRegex = new RegExp(`<w:r[^>]*>((?:(?!</w:r>)[\\s\\S])*?)<w:t([^>]*)>([^<]*${escapedPh}[^<]*)</w:t></w:r>`, "g");
+  const runRegex = new RegExp(`<w:r(?:\\s[^>]*)?>((?:(?!</w:r>)[\\s\\S])*?)<w:t([^>]*)>([^<]*${escapedPh}[^<]*)</w:t></w:r>`, "g");
   let match;
   let lastIndex = 0;
   let result = "";
@@ -236,6 +392,97 @@ async function buildOneDocx(base64, fieldsMap) {
   return await zip.generateAsync({ type: "uint8array" });
 }
 
+// ---- ฟิลด์ร่วมคณะกรรมการ: mapping ช่องที่ main → id ฟิลด์ในเอกสารปลายทาง ----
+// เอกสาร 2, 3, 4 ใช้คณะกรรมการจัดทำแบบรูปรายการชุดเดียวกัน (id name1..pos3 ตรงกันทุกหน้า)
+const SHARED_MAP_234 = {
+  g_name1: "name1", g_pos1: "pos1",
+  g_name2: "name2", g_pos2: "pos2",
+  g_name3: "name3", g_pos3: "pos3",
+};
+// เอกสาร 5: ราคากลาง (rc) / ตรวจรับ (ic) / ผู้ควบคุมงาน (sv)
+const SHARED_MAP_5 = {
+  g_rc1name: "rc1name", g_rc1pos: "rc1pos", g_rc2name: "rc2name", g_rc2pos: "rc2pos", g_rc3name: "rc3name", g_rc3pos: "rc3pos",
+  g_ic1name: "ic1name", g_ic1pos: "ic1pos", g_ic2name: "ic2name", g_ic2pos: "ic2pos", g_ic3name: "ic3name", g_ic3pos: "ic3pos",
+  g_sv1name: "sv1name", g_sv1pos: "sv1pos", g_sv2name: "sv2name", g_sv2pos: "sv2pos",
+};
+
+// รวมค่าที่กรอกไว้จริง (เว้นว่าง = ไม่ส่ง จะได้ไม่ไปทับค่าเดิมในเอกสาร)
+function collectShared(map, includeProject) {
+  const out = {};
+  for (const [gid, fid] of Object.entries(map)) {
+    const v = document.getElementById(gid).value.trim();
+    if (v) out[fid] = v;
+  }
+  if (includeProject) {
+    const pj = val("projectName");
+    if (pj) out.projectName = pj;
+  }
+  return out;
+}
+
+// ส่งข้อมูลเข้าไปเก็บในเอกสาร (ผ่าน iframe ซ่อน + postMessage แบบเดียวกับ getFormData/clearFormData)
+function pushDataToDoc(src, docId, data, timeoutMs = 4000) {
+  return new Promise((resolve) => {
+    let done = false;
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+
+    function cleanup() {
+      window.removeEventListener("message", onMessage);
+      iframe.remove();
+    }
+    function onMessage(event) {
+      if (event.data && event.data.type === "consdocx:setFormDataDone" && event.data.docId === docId) {
+        done = true;
+        cleanup();
+        resolve(true);
+      }
+    }
+    window.addEventListener("message", onMessage);
+
+    iframe.addEventListener("load", () => {
+      iframe.contentWindow.postMessage({ type: "consdocx:setFormData", data }, "*");
+    });
+    iframe.src = src;
+    document.body.appendChild(iframe);
+
+    setTimeout(() => {
+      if (!done) { cleanup(); resolve(false); }
+    }, timeoutMs);
+  });
+}
+
+document.getElementById("pushShared").addEventListener("click", async () => {
+  const btn = document.getElementById("pushShared");
+  const statusEl = document.getElementById("shareStatus");
+  statusEl.className = "status";
+  btn.disabled = true;
+  statusEl.textContent = "กำลังบันทึกลงเอกสาร...";
+  try {
+    const data234 = collectShared(SHARED_MAP_234, true);
+    const data5 = collectShared(SHARED_MAP_5, true);
+    const results = await Promise.all([
+      pushDataToDoc(DOC2_PATH, "doc2", data234),
+      pushDataToDoc(DOC3_PATH, "doc3", data234),
+      pushDataToDoc(DOC4_PATH, "doc4", data234),
+      pushDataToDoc(DOC5_PATH, "doc5", data5),
+    ]);
+    const fails = results.filter(r => !r).length;
+    if (fails === 0) {
+      statusEl.textContent = "บันทึกลงเอกสาร 2, 3, 4 และ 5 เรียบร้อย — เปิดเอกสารไหนก็จะเห็นค่ากรอกไว้ให้แล้ว";
+    } else {
+      statusEl.textContent = `บันทึกสำเร็จบางส่วน (${4 - fails}/4 เอกสาร) — ลองกดอีกครั้ง`;
+      statusEl.className = "status err";
+    }
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "เกิดข้อผิดพลาด: " + err.message;
+    statusEl.className = "status err";
+  } finally {
+    btn.disabled = false;
+  }
+});
+
 // เปิดไฟล์เอกสารในหน้าที่ซ่อนไว้ (iframe) เพื่อไปดึงข้อมูลจริงที่กรอกไว้ในฟอร์มนั้น
 // (แต่ละหน้าจะโหลดค่าที่จำไว้ใน localStorage ของตัวเองก่อน แล้วส่งกลับมาให้ผ่าน postMessage)
 function fetchFormDataFromDoc(src, docId, timeoutMs = 4000) {
@@ -276,16 +523,19 @@ document.getElementById("genAll").addEventListener("click", async () => {
   btn.disabled = true;
   try {
     statusEl.textContent = "กำลังดึงข้อมูลจากแต่ละเอกสาร...";
-    const [data1, data2] = await Promise.all([
+    const [data1, data2, data3, data4, data5] = await Promise.all([
       fetchFormDataFromDoc(DOC1_PATH, "doc1"),
       fetchFormDataFromDoc(DOC2_PATH, "doc2"),
+      fetchFormDataFromDoc(DOC3_PATH, "doc3"),
+      fetchFormDataFromDoc(DOC4_PATH, "doc4"),
+      fetchFormDataFromDoc(DOC5_PATH, "doc5"),
     ]);
 
-    if (!data1 || !data2) {
+    if (!data1 || !data2 || !data3 || !data4 || !data5) {
       statusEl.textContent = "ดึงข้อมูลจากบางเอกสารไม่สำเร็จ — จะใส่เท่าที่มีให้ (ฟิลด์ที่เหลือจะว่าง)";
     }
 
-    const projectName = (data1 && data1.projectName) || (data2 && data2.projectName) || val("projectName") || "โครงการ";
+    const projectName = (data1 && data1.projectName) || (data2 && data2.projectName) || (data3 && data3.projectName) || (data4 && data4.projectName) || (data5 && data5.projectName) || val("projectName") || "โครงการ";
     const nameSafe = projectName.replace(/[\\/:*?"<>|]/g, "-").slice(0, 40);
 
     statusEl.textContent = "กำลังสร้างไฟล์...";
@@ -295,17 +545,73 @@ document.getElementById("genAll").addEventListener("click", async () => {
     });
     const doc2 = await buildOneDocx(window.TEMPLATE_2_BASE64, {
       "[ชื่อโครงการ]": projectName,
-      "[ชื่อกรรมการ1]": (data2 && data2.name1) || "",
-      "[ตำแหน่งกรรมการ1]": (data2 && data2.pos1) || "",
-      "[ชื่อกรรมการ2]": (data2 && data2.name2) || "",
-      "[ตำแหน่งกรรมการ2]": (data2 && data2.pos2) || "",
-      "[ชื่อกรรมการ3]": (data2 && data2.name3) || "",
-      "[ตำแหน่งกรรมการ3]": (data2 && data2.pos3) || "",
+      "[ชื่อกรรมการ1]": val("g_name1") || (data2 && data2.name1) || "",
+      "[ตำแหน่งกรรมการ1]": val("g_pos1") || (data2 && data2.pos1) || "",
+      "[ชื่อกรรมการ2]": val("g_name2") || (data2 && data2.name2) || "",
+      "[ตำแหน่งกรรมการ2]": val("g_pos2") || (data2 && data2.pos2) || "",
+      "[ชื่อกรรมการ3]": val("g_name3") || (data2 && data2.name3) || "",
+      "[ตำแหน่งกรรมการ3]": val("g_pos3") || (data2 && data2.pos3) || "",
+    });
+    const doc3 = await buildOneDocx(window.TEMPLATE_3_BASE64, {
+      "[ชื่อโครงการ]": projectName,
+      "[จำนวนเงินตัวเลข]": formatComma((data3 && data3.moneyNum) || ""),
+      "[จำนวนเงินตัวอักษร]": bahtText((data3 && data3.moneyNum) || ""),
+      "[ชื่อกรรมการ1]": val("g_name1") || (data3 && data3.name1) || "",
+      "[ตำแหน่งกรรมการ1]": val("g_pos1") || (data3 && data3.pos1) || "",
+      "[ชื่อกรรมการ2]": val("g_name2") || (data3 && data3.name2) || "",
+      "[ตำแหน่งกรรมการ2]": val("g_pos2") || (data3 && data3.pos2) || "",
+      "[ชื่อกรรมการ3]": val("g_name3") || (data3 && data3.name3) || "",
+      "[ตำแหน่งกรรมการ3]": val("g_pos3") || (data3 && data3.pos3) || "",
+      "[ชื่อผู้จดรายงานการประชุม]": (data3 && data3.recName) || "",
+      "[ตำแหน่งผู้จดรายงานการประชุม]": (data3 && data3.recPos) || "",
+      "[ชื่อผู้ตรวจรายงานการประชุม]": (data3 && data3.chkName) || "",
+      "[ตำแหน่งผู้ตรวจรายงานการประชุม]": (data3 && data3.chkPos) || "",
+    });
+    const doc4 = await buildOneDocx(window.TEMPLATE_4_BASE64, {
+      "[ชื่อโครงการ]": projectName,
+      "[จำนวนเงินตัวเลข]": formatComma((data4 && data4.moneyNum) || ""),
+      "[จำนวนเงินตัวอักษร]": bahtText((data4 && data4.moneyNum) || ""),
+      "[ชื่อกรรมการ1]": val("g_name1") || (data4 && data4.name1) || "",
+      "[ตำแหน่งกรรมการ1]": val("g_pos1") || (data4 && data4.pos1) || "",
+      "[ชื่อกรรมการ2]": val("g_name2") || (data4 && data4.name2) || "",
+      "[ตำแหน่งกรรมการ2]": val("g_pos2") || (data4 && data4.pos2) || "",
+      "[ชื่อกรรมการ3]": val("g_name3") || (data4 && data4.name3) || "",
+      "[ตำแหน่งกรรมการ3]": val("g_pos3") || (data4 && data4.pos3) || "",
+    });
+    const doc5 = await buildOneDocx(window.TEMPLATE_5_BASE64, {
+      "[ชื่อโครงการ]": projectName,
+      "[อ้างอิงแผนพัฒนาท้องถิ่น]": (data5 && data5.planRef) || "",
+      "[จำนวนเงินตัวเลข]": formatComma((data5 && data5.moneyNum) || ""),
+      "[จำนวนเงินตัวอักษร]": bahtText((data5 && data5.moneyNum) || ""),
+      "[จำนวนวันแล้วเสร็จ]": (data5 && data5.workDays) || "",
+      "[ประเภทงานก่อสร้าง]": (data5 && data5.constrType) || "",
+      "[ประเภทงานค่าK]": (data5 && data5.kWorkType) || "",
+      "[ลักษณะงานที่ใช้สูตรค่าK]": (data5 && data5.kSubWork) || "",
+      "[สูตรค่าK]": (data5 && data5.kFormula) || "",
+      "[ชื่อกรรมการราคากลาง1]": val("g_rc1name") || (data5 && data5.rc1name) || "",
+      "[ตำแหน่งกรรมการราคากลาง1]": val("g_rc1pos") || (data5 && data5.rc1pos) || "",
+      "[ชื่อกรรมการราคากลาง2]": val("g_rc2name") || (data5 && data5.rc2name) || "",
+      "[ตำแหน่งกรรมการราคากลาง2]": val("g_rc2pos") || (data5 && data5.rc2pos) || "",
+      "[ชื่อกรรมการราคากลาง3]": val("g_rc3name") || (data5 && data5.rc3name) || "",
+      "[ตำแหน่งกรรมการราคากลาง3]": val("g_rc3pos") || (data5 && data5.rc3pos) || "",
+      "[ชื่อกรรมการตรวจรับ1]": val("g_ic1name") || (data5 && data5.ic1name) || "",
+      "[ตำแหน่งกรรมการตรวจรับ1]": val("g_ic1pos") || (data5 && data5.ic1pos) || "",
+      "[ชื่อกรรมการตรวจรับ2]": val("g_ic2name") || (data5 && data5.ic2name) || "",
+      "[ตำแหน่งกรรมการตรวจรับ2]": val("g_ic2pos") || (data5 && data5.ic2pos) || "",
+      "[ชื่อกรรมการตรวจรับ3]": val("g_ic3name") || (data5 && data5.ic3name) || "",
+      "[ตำแหน่งกรรมการตรวจรับ3]": val("g_ic3pos") || (data5 && data5.ic3pos) || "",
+      "[ชื่อผู้ควบคุมงาน1]": val("g_sv1name") || (data5 && data5.sv1name) || "",
+      "[ตำแหน่งผู้ควบคุมงาน1]": val("g_sv1pos") || (data5 && data5.sv1pos) || "",
+      "[ชื่อผู้ควบคุมงาน2]": val("g_sv2name") || (data5 && data5.sv2name) || "",
+      "[ตำแหน่งผู้ควบคุมงาน2]": val("g_sv2pos") || (data5 && data5.sv2pos) || "",
     });
 
     const outerZip = new JSZip();
     outerZip.file(`1. ขออนุมัติโครงการก่อสร้าง_${nameSafe}.docx`, doc1);
     outerZip.file(`2. คำสั่งแต่งตั้งคณะกรรมการ_${nameSafe}.docx`, doc2);
+    outerZip.file(`3. รายงานการประชุมแบบรูปรายการ_${nameSafe}.docx`, doc3);
+    outerZip.file(`4. บันทึกรายงานแบบรูปรายการ_${nameSafe}.docx`, doc4);
+    outerZip.file(`5. นำส่งเอกสารการขออนุมัติ_${nameSafe}.docx`, doc5);
 
     const blob = await outerZip.generateAsync({ type: "blob" });
     const url = URL.createObjectURL(blob);
@@ -325,6 +631,26 @@ document.getElementById("genAll").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
+// กลับมาจากหน้าเอกสาร (ไม่ใช่เปิดใหม่): ดึงค่าคณะกรรมการที่เคยกรอก/บันทึกไว้ มาแสดงในช่องข้อมูลร่วมด้วย
+// (เติมเฉพาะช่องที่ยังว่าง ไม่ทับสิ่งที่ผู้ใช้พิมพ์ค้างไว้)
+if (cameBackFromDoc) {
+  (async () => {
+    const [d2, d5] = await Promise.all([
+      fetchFormDataFromDoc(DOC2_PATH, "doc2"),
+      fetchFormDataFromDoc(DOC5_PATH, "doc5"),
+    ]);
+    function fillFrom(map, data) {
+      if (!data) return;
+      for (const [gid, fid] of Object.entries(map)) {
+        const el = document.getElementById(gid);
+        if (!el.value.trim() && data[fid]) el.value = data[fid];
+      }
+    }
+    fillFrom(SHARED_MAP_234, d2);
+    fillFrom(SHARED_MAP_5, d5);
+  })();
+}
 </script>
 
 </body>
