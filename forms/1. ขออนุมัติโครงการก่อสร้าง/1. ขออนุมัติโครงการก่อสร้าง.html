@@ -158,6 +158,17 @@ window.addEventListener("message", (event) => {
   } else if (event.data.type === "consdocx:clearFormData") {
     try { localStorage.removeItem(AUTOSAVE_KEY); } catch (e) {}
     AUTOSAVE_FIELDS.forEach(id => { document.getElementById(id).value = ""; });
+  } else if (event.data.type === "consdocx:setFormData") {
+    // รับ "ข้อมูลร่วม" ที่ส่งมาจากหน้า main (เช่น อ้างอิงแผนพัฒนาท้องถิ่น) มาใส่ฟอร์ม + จำไว้ใน localStorage
+    const data = event.data.data || {};
+    AUTOSAVE_FIELDS.forEach(id => {
+      if (typeof data[id] === "string" && data[id] !== "") {
+        document.getElementById(id).value = data[id];
+      }
+    });
+    if (typeof updateBackLink === "function") updateBackLink();
+    saveAutosave();
+    event.source.postMessage({ type: "consdocx:setFormDataDone", docId: "doc1" }, "*");
   }
 });
 

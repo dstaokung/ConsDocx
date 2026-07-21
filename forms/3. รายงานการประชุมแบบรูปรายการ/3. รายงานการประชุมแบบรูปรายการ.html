@@ -121,10 +121,10 @@
       <label>ตำแหน่งผู้จดรายงานการประชุม</label>
       <input type="text" id="recPos" placeholder="นายช่างโยธาปฏิบัติงาน">
 
-      <label>ชื่อผู้ตรวจรายงานการประชุม <span class="hint">(ไม่ต้องใส่วงเล็บ/ยศ "ว่าที่ ร.ต." มีในบรรทัดลงชื่ออยู่แล้ว)</span></label>
-      <input type="text" id="chkName" placeholder="คมสรร  เครือศรี">
-      <label>ตำแหน่งผู้ตรวจรายงานการประชุม</label>
-      <input type="text" id="chkPos" placeholder="ผู้อำนวยการกองช่าง">
+      <div class="fixed-note" style="margin-top:12px;">
+        ผู้ตรวจรายงานการประชุมคือ<b>ประธานกรรมการ (คนที่ 1) เสมอ</b> — ไม่ต้องกรอกซ้ำ
+        โปรแกรมจะใส่ให้อัตโนมัติจากช่อง "1. ชื่อ-สกุล (ประธานกรรมการ)" ด้านบน
+      </div>
 
       <button type="button" id="gen">สร้างไฟล์ Word (.docx)</button>
       <div class="status" id="status"></div>
@@ -194,10 +194,16 @@ function updateMoneyText() {
   document.getElementById("moneyText").value = bahtText(val("moneyNum"));
 }
 
+// ตัดคำนำหน้ายศ "ว่าที่ ร.ต." ออกจากชื่อประธานกรรมการ — ใช้ตอนใส่ชื่อผู้ตรวจรายงานการประชุม
+// เพราะบรรทัดลงชื่อมีคำว่า "ว่าที่ ร.ต." เป็นข้อความคงที่อยู่แล้ว (ถ้าไม่มียศนี้นำหน้าจะคืนค่าเดิม)
+function stripActingRank(name) {
+  return String(name).replace(/^ว่าที่\s*ร\.?\s*ต\.?\s*/, "").trim();
+}
+
 // ---- จำข้อมูลที่กรอกไว้ในฟอร์มนี้ (เก็บใน localStorage ของหน้านี้เอง) กันหายตอนกด
 // "กลับไปหน้าแรก" แล้วย้อนกลับเข้ามาใหม่ ----
 const AUTOSAVE_KEY = "consdocx_autosave_3_รายงานการประชุมแบบรูปรายการ";
-const AUTOSAVE_FIELDS = ["projectName","moneyNum","moneyText","name1","pos1","name2","pos2","name3","pos3","recName","recPos","chkName","chkPos"];
+const AUTOSAVE_FIELDS = ["projectName","moneyNum","moneyText","name1","pos1","name2","pos2","name3","pos3","recName","recPos"];
 function saveAutosave() {
   const data = {};
   AUTOSAVE_FIELDS.forEach(id => { data[id] = document.getElementById(id).value; });
@@ -337,8 +343,9 @@ async function buildDocx() {
     "[ตำแหน่งกรรมการ3]": val("pos3"),
     "[ชื่อผู้จดรายงานการประชุม]": val("recName"),
     "[ตำแหน่งผู้จดรายงานการประชุม]": val("recPos"),
-    "[ชื่อผู้ตรวจรายงานการประชุม]": val("chkName"),
-    "[ตำแหน่งผู้ตรวจรายงานการประชุม]": val("chkPos"),
+    // ผู้ตรวจรายงานการประชุมคือประธานคณะกรรมการ (คนที่ 1) เสมอ ไม่ต้องกรอกซ้ำ
+    "[ชื่อผู้ตรวจรายงานการประชุม]": stripActingRank(val("name1")),
+    "[ตำแหน่งผู้ตรวจรายงานการประชุม]": val("pos1"),
   };
   for (const [ph, value] of Object.entries(fields)) {
     xml = replacePlaceholder(xml, ph, value);

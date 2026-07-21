@@ -98,18 +98,48 @@
   button#pushShared:disabled { background: #93c5fd; cursor: default; }
   .status { margin-top: 10px; font-size: 13px; color: #16a34a; min-height: 18px; }
   .status.err { color: #dc2626; }
+  .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  button#newProject {
+    background: none;
+    border: 1px solid #d1d5db;
+    color: #6b7280;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  button#newProject:hover { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <h1>โปรแกรมทำเอกสารโครงการก่อสร้าง</h1>
-  <p class="sub">เมนูหลัก — เลือกเอกสารที่จะสร้าง (ทำตามลำดับเลขได้เลย)</p>
+  <div class="topbar">
+    <div>
+      <h1>โปรแกรมทำเอกสารโครงการก่อสร้าง</h1>
+      <p class="sub">เมนูหลัก — เลือกเอกสารที่จะสร้าง (ทำตามลำดับเลขได้เลย) — ข้อมูลที่กรอกไว้จะถูกจำไว้ให้อัตโนมัติ</p>
+    </div>
+    <button id="newProject" type="button">เริ่มโครงการใหม่ (ล้างข้อมูลทั้งหมด)</button>
+  </div>
 
   <div class="card">
     <h2>ข้อมูลร่วม (กรอกครั้งเดียว ส่งต่อให้ทุกเอกสารที่ใช้ฟิลด์นี้)</h2>
     <label>ชื่อโครงการ <span class="hint">(ใช้ในเอกสารทุกฉบับ)</span></label>
     <input type="text" id="projectName" placeholder="ก่อสร้างถนน คสล.ซอยบ้านเจ๊จิตร หมู่ที่ 8">
+
+    <h3>ราคาค่าก่อสร้างเบื้องต้น (งบประมาณ) <span class="hint">(ใช้ในเอกสาร 3, 4 และ 5)</span></h3>
+    <div class="row2">
+      <div><label>จำนวนเงิน (ตัวเลข) <span class="hint">(พิมพ์เฉพาะตัวเลข)</span></label>
+        <input type="text" id="g_moneyNum" placeholder="2256000" inputmode="decimal"></div>
+      <div><label>จำนวนเงิน (ตัวอักษร) <span class="hint">(แปลงให้อัตโนมัติ)</span></label>
+        <input type="text" id="g_moneyText" placeholder="สองล้านสองแสนห้าหมื่นหกพันบาทถ้วน" readonly style="background:#f3f4f6; color:#374151;"></div>
+    </div>
+
+    <label>อ้างอิงแผนพัฒนาท้องถิ่น <span class="hint">(ใช้ในเอกสาร 1 และ 5)</span></label>
+    <input type="text" id="g_planRef" placeholder="แผนพัฒนาท้องถิ่น (พ.ศ. ๒๕๖๖-๒๕๗๐) ฉบับทบทวน ครั้งที่ 1/2567 หน้า 90 ลำดับที่ 50 (กองช่าง)">
+
     <h3>คณะกรรมการจัดทำแบบรูปรายการงานก่อสร้าง <span class="hint">(ใช้ในเอกสาร 2, 3 และ 4)</span></h3>
     <div class="row2">
       <div><label>1. ชื่อ-สกุล (ประธานกรรมการ) <span class="hint">(ไม่ต้องพิมพ์ยศ "ว่าที่ ร.ต.")</span></label>
@@ -174,10 +204,10 @@
     <div class="status" id="shareStatus"></div>
 
     <div class="note">
-      พิมพ์ชื่อโครงการแล้วลิงก์ด้านล่างจะพาไปเปิดเอกสารพร้อมกรอกให้อัตโนมัติ ส่วนคณะกรรมการให้กด
-      "บันทึกข้อมูลร่วมลงทุกเอกสาร" — โปรแกรมจะส่งค่าลงไปเก็บในทุกเอกสารที่ใช้ (ช่องที่เว้นว่างจะไม่ไปทับ
-      ค่าเดิมในเอกสาร) ฟิลด์เฉพาะของเอกสารนั้น ๆ (เช่น จำนวนเงิน อ้างอิงแผนพัฒนาท้องถิ่น ผู้จด/ผู้ตรวจรายงาน)
-      ยังไปกรอกในหน้าของเอกสารนั้นโดยตรง
+      พิมพ์ชื่อโครงการแล้วลิงก์ด้านล่างจะพาไปเปิดเอกสารพร้อมกรอกให้อัตโนมัติ ส่วนงบประมาณ/อ้างอิงแผนพัฒนา/
+      คณะกรรมการ ให้กด "บันทึกข้อมูลร่วมลงทุกเอกสาร" — โปรแกรมจะส่งค่าลงไปเก็บในทุกเอกสารที่ใช้ (ช่องที่เว้นว่าง
+      จะไม่ไปทับค่าเดิมในเอกสาร) ฟิลด์เฉพาะของเอกสารนั้น ๆ ที่ไม่มีในหน้านี้ (เช่น ผู้จด/ผู้ตรวจรายงานการประชุม,
+      กำหนดเวลาแล้วเสร็จ, สูตรค่า K) ยังไปกรอกในหน้าของเอกสารนั้นโดยตรง
     </div>
   </div>
 
@@ -255,21 +285,6 @@ function updateLinks() {
   document.getElementById("link-4").href = DOC4_PATH + q;
   document.getElementById("link-5").href = DOC5_PATH + q;
 }
-document.getElementById("projectName").addEventListener("input", updateLinks);
-
-// รับชื่อโครงการกลับมาจากหน้าเอกสาร (เวลากด "กลับไปหน้าแรก") ไม่ให้ข้อมูลหายตอนกลับมา
-const paramsOnLoad = new URLSearchParams(location.search);
-const cameBackFromDoc = paramsOnLoad.has("projectName");
-if (cameBackFromDoc) {
-  document.getElementById("projectName").value = paramsOnLoad.get("projectName");
-} else {
-  // เปิดไฟล์ main.html ตรงๆ (ไม่ได้กด "กลับไปหน้าแรก" มา) ถือว่าเริ่มโครงการใหม่ —
-  // ล้างข้อมูลเก่าที่จำไว้ในทุกเอกสารย่อยทิ้งให้หมด
-  document.getElementById("projectName").value = "";
-  clearAllDocsData();
-}
-
-updateLinks();
 
 // ส่งคำสั่งล้างข้อมูล (localStorage) ไปให้ทุกเอกสารย่อยผ่าน iframe ซ่อน
 function clearAllDocsData() {
@@ -284,6 +299,61 @@ function clearAllDocsData() {
     document.body.appendChild(iframe);
   });
 }
+
+// ---- จำข้อมูล "ข้อมูลร่วม" ของหน้า main เองไว้ใน localStorage (เหมือนทุกหน้าเอกสารย่อย) ----
+// เดิมหน้า main ไม่จำอะไรเลย อาศัยแค่ query string ?projectName=... ตอนกดลิงก์ไปเอกสาร แล้วดึงข้อมูล
+// คณะกรรมการ/งบประมาณ/แผนพัฒนาฯ กลับมาจากเอกสารย่อยตอนกลับมาเท่านั้น — ถ้าเปิดลิงก์ไปเอกสารอื่นก่อนกด
+// "บันทึกข้อมูลร่วมลงทุกเอกสาร" ค่าที่พิมพ์ไว้ในหน้า main จะหายเพราะไม่เคยถูกจำที่ไหนเลย ตอนนี้จำเองไว้ด้วย
+const AUTOSAVE_KEY = "consdocx_autosave_main";
+const AUTOSAVE_FIELDS = [
+  "projectName", "g_moneyNum", "g_planRef",
+  "g_name1", "g_pos1", "g_name2", "g_pos2", "g_name3", "g_pos3",
+  "g_rc1name", "g_rc1pos", "g_rc2name", "g_rc2pos", "g_rc3name", "g_rc3pos",
+  "g_ic1name", "g_ic1pos", "g_ic2name", "g_ic2pos", "g_ic3name", "g_ic3pos",
+  "g_sv1name", "g_sv1pos", "g_sv2name", "g_sv2pos",
+];
+function saveAutosave() {
+  const data = {};
+  AUTOSAVE_FIELDS.forEach(id => { data[id] = document.getElementById(id).value; });
+  try { localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(data)); } catch (e) {}
+}
+function restoreAutosave() {
+  try {
+    const raw = localStorage.getItem(AUTOSAVE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    AUTOSAVE_FIELDS.forEach(id => {
+      if (data[id]) document.getElementById(id).value = data[id];
+    });
+  } catch (e) {}
+}
+
+// เปิดหน้า main ตรงๆ หรือกลับมาจากเอกสารย่อย: คืนค่าที่เคยกรอกไว้เสมอ (ไม่ล้างข้อมูลอัตโนมัติแล้ว)
+// ถ้าอยากเริ่มโครงการใหม่จริงๆ ให้กดปุ่ม "เริ่มโครงการใหม่" แทน
+restoreAutosave();
+if (typeof updateGMoneyText === "function") updateGMoneyText();
+
+// รับชื่อโครงการกลับมาจากหน้าเอกสาร (เวลากด "กลับไปหน้าแรก") — ถือว่าใหม่กว่า ให้ทับค่าที่จำไว้เดิมได้
+const paramsOnLoad = new URLSearchParams(location.search);
+const cameBackFromDoc = paramsOnLoad.has("projectName");
+if (cameBackFromDoc) {
+  document.getElementById("projectName").value = paramsOnLoad.get("projectName");
+}
+
+updateLinks();
+saveAutosave();
+AUTOSAVE_FIELDS.forEach(id => document.getElementById(id).addEventListener("input", saveAutosave));
+document.getElementById("projectName").addEventListener("input", updateLinks);
+
+document.getElementById("newProject").addEventListener("click", () => {
+  if (!confirm("ล้างข้อมูลที่กรอกไว้ทั้งหมด (ทั้งหน้านี้และทุกเอกสาร 1-5) เพื่อเริ่มโครงการใหม่?")) return;
+  AUTOSAVE_FIELDS.forEach(id => { document.getElementById(id).value = ""; });
+  document.getElementById("g_moneyText").value = "";
+  try { localStorage.removeItem(AUTOSAVE_KEY); } catch (e) {}
+  clearAllDocsData();
+  updateLinks();
+  history.replaceState(null, "", location.pathname);
+});
 
 function base64ToArrayBuffer(b64) {
   const binary = atob(b64);
@@ -345,6 +415,23 @@ function formatComma(numStr) {
   intPart = (intPart.replace(/^0+(?=\d)/, "") || "0").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   return decPart !== undefined && decPart !== "" ? intPart + "." + decPart.slice(0, 2) : intPart;
 }
+
+// ตัดคำนำหน้ายศ "ว่าที่ ร.ต." ออกจากชื่อ — ใช้เฉพาะตอนส่งชื่อประธานกรรมการไปลงจุดที่เอกสารนั้น
+// มีคำว่า "ว่าที่ ร.ต." เป็นข้อความคงที่อยู่แล้ว (เช่น บรรทัดลงชื่อในเอกสาร 4) ถ้าไม่มียศนี้นำหน้า
+// จะคืนค่าเดิมโดยไม่แตะต้อง (คนอื่นที่ไม่มียศนี้จะไม่ได้รับผลกระทบ)
+function stripActingRank(name) {
+  return String(name).replace(/^ว่าที่\s*ร\.?\s*ต\.?\s*/, "").trim();
+}
+
+function updateGMoneyText() {
+  document.getElementById("g_moneyText").value = bahtText(val("g_moneyNum"));
+}
+document.getElementById("g_moneyNum").addEventListener("input", updateGMoneyText);
+document.getElementById("g_moneyNum").addEventListener("blur", () => {
+  const el = document.getElementById("g_moneyNum");
+  if (el.value.trim()) el.value = formatComma(el.value);
+  updateGMoneyText();
+});
 
 function replacePlaceholder(xml, placeholder, value) {
   const escapedPh = placeholder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -459,19 +546,46 @@ document.getElementById("pushShared").addEventListener("click", async () => {
   btn.disabled = true;
   statusEl.textContent = "กำลังบันทึกลงเอกสาร...";
   try {
-    const data234 = collectShared(SHARED_MAP_234, true);
+    const projectNameVal = val("projectName");
+    const moneyVal = val("g_moneyNum");
+    const planRefVal = val("g_planRef");
+
+    // เอกสาร 1: ยังไม่มีคณะกรรมการ มีแค่ชื่อโครงการ + อ้างอิงแผนพัฒนาท้องถิ่น
+    const data1 = {};
+    if (projectNameVal) data1.projectName = projectNameVal;
+    if (planRefVal) data1.planRef = planRefVal;
+
+    // เอกสาร 2 และ 3: ใช้คณะกรรมการแบบรูปรายการตรงๆ (ชื่อในตารางต้องมียศนำหน้าถ้ามี เช่น "ว่าที่ ร.ต.")
+    const dataCommittee = collectShared(SHARED_MAP_234, true);
+    const data2 = { ...dataCommittee };
+    const data3 = { ...dataCommittee };
+    if (moneyVal) data3.moneyNum = moneyVal;
+
+    // เอกสาร 4: คณะกรรมการชุดเดียวกัน แต่บรรทัดลงชื่อมีคำว่า "ว่าที่ ร.ต." เป็นข้อความคงที่อยู่แล้ว
+    // ต้องตัดยศออกจากชื่อก่อนส่ง ไม่งั้นจะซ้ำกัน 2 ที่
+    const data4 = {};
+    for (const [fid, v] of Object.entries(dataCommittee)) {
+      data4[fid] = fid.startsWith("name") ? stripActingRank(v) : v;
+    }
+    if (moneyVal) data4.moneyNum = moneyVal;
+
+    // เอกสาร 5: คณะกรรมการอีก 3 ชุด + งบประมาณ + อ้างอิงแผนพัฒนาท้องถิ่น
     const data5 = collectShared(SHARED_MAP_5, true);
+    if (moneyVal) data5.moneyNum = moneyVal;
+    if (planRefVal) data5.planRef = planRefVal;
+
     const results = await Promise.all([
-      pushDataToDoc(DOC2_PATH, "doc2", data234),
-      pushDataToDoc(DOC3_PATH, "doc3", data234),
-      pushDataToDoc(DOC4_PATH, "doc4", data234),
+      pushDataToDoc(DOC1_PATH, "doc1", data1),
+      pushDataToDoc(DOC2_PATH, "doc2", data2),
+      pushDataToDoc(DOC3_PATH, "doc3", data3),
+      pushDataToDoc(DOC4_PATH, "doc4", data4),
       pushDataToDoc(DOC5_PATH, "doc5", data5),
     ]);
     const fails = results.filter(r => !r).length;
     if (fails === 0) {
-      statusEl.textContent = "บันทึกลงเอกสาร 2, 3, 4 และ 5 เรียบร้อย — เปิดเอกสารไหนก็จะเห็นค่ากรอกไว้ให้แล้ว";
+      statusEl.textContent = "บันทึกลงเอกสาร 1–5 เรียบร้อย — เปิดเอกสารไหนก็จะเห็นค่ากรอกไว้ให้แล้ว";
     } else {
-      statusEl.textContent = `บันทึกสำเร็จบางส่วน (${4 - fails}/4 เอกสาร) — ลองกดอีกครั้ง`;
+      statusEl.textContent = `บันทึกสำเร็จบางส่วน (${5 - fails}/5 เอกสาร) — ลองกดอีกครั้ง`;
       statusEl.className = "status err";
     }
   } catch (err) {
@@ -541,7 +655,7 @@ document.getElementById("genAll").addEventListener("click", async () => {
     statusEl.textContent = "กำลังสร้างไฟล์...";
     const doc1 = await buildOneDocx(window.TEMPLATE_1_BASE64, {
       "[ชื่อโครงการ]": projectName,
-      "[อ้างอิงแผนพัฒนาท้องถิ่น]": (data1 && data1.planRef) || "",
+      "[อ้างอิงแผนพัฒนาท้องถิ่น]": val("g_planRef") || (data1 && data1.planRef) || "",
     });
     const doc2 = await buildOneDocx(window.TEMPLATE_2_BASE64, {
       "[ชื่อโครงการ]": projectName,
@@ -552,37 +666,44 @@ document.getElementById("genAll").addEventListener("click", async () => {
       "[ชื่อกรรมการ3]": val("g_name3") || (data2 && data2.name3) || "",
       "[ตำแหน่งกรรมการ3]": val("g_pos3") || (data2 && data2.pos3) || "",
     });
+    const money3 = val("g_moneyNum") || (data3 && data3.moneyNum) || "";
+    const chair3Name = val("g_name1") || (data3 && data3.name1) || "";
+    const chair3Pos = val("g_pos1") || (data3 && data3.pos1) || "";
     const doc3 = await buildOneDocx(window.TEMPLATE_3_BASE64, {
       "[ชื่อโครงการ]": projectName,
-      "[จำนวนเงินตัวเลข]": formatComma((data3 && data3.moneyNum) || ""),
-      "[จำนวนเงินตัวอักษร]": bahtText((data3 && data3.moneyNum) || ""),
-      "[ชื่อกรรมการ1]": val("g_name1") || (data3 && data3.name1) || "",
-      "[ตำแหน่งกรรมการ1]": val("g_pos1") || (data3 && data3.pos1) || "",
+      "[จำนวนเงินตัวเลข]": formatComma(money3),
+      "[จำนวนเงินตัวอักษร]": bahtText(money3),
+      "[ชื่อกรรมการ1]": chair3Name,
+      "[ตำแหน่งกรรมการ1]": chair3Pos,
       "[ชื่อกรรมการ2]": val("g_name2") || (data3 && data3.name2) || "",
       "[ตำแหน่งกรรมการ2]": val("g_pos2") || (data3 && data3.pos2) || "",
       "[ชื่อกรรมการ3]": val("g_name3") || (data3 && data3.name3) || "",
       "[ตำแหน่งกรรมการ3]": val("g_pos3") || (data3 && data3.pos3) || "",
       "[ชื่อผู้จดรายงานการประชุม]": (data3 && data3.recName) || "",
       "[ตำแหน่งผู้จดรายงานการประชุม]": (data3 && data3.recPos) || "",
-      "[ชื่อผู้ตรวจรายงานการประชุม]": (data3 && data3.chkName) || "",
-      "[ตำแหน่งผู้ตรวจรายงานการประชุม]": (data3 && data3.chkPos) || "",
+      // ผู้ตรวจรายงานการประชุมคือประธานคณะกรรมการจัดทำแบบรูปรายการเสมอ (ตัดยศ "ว่าที่ ร.ต." ออก
+      // เพราะบรรทัดลงชื่อในเอกสารมีคำนี้เป็นข้อความคงที่อยู่แล้ว)
+      "[ชื่อผู้ตรวจรายงานการประชุม]": stripActingRank(chair3Name),
+      "[ตำแหน่งผู้ตรวจรายงานการประชุม]": chair3Pos,
     });
+    const money4 = val("g_moneyNum") || (data4 && data4.moneyNum) || "";
     const doc4 = await buildOneDocx(window.TEMPLATE_4_BASE64, {
       "[ชื่อโครงการ]": projectName,
-      "[จำนวนเงินตัวเลข]": formatComma((data4 && data4.moneyNum) || ""),
-      "[จำนวนเงินตัวอักษร]": bahtText((data4 && data4.moneyNum) || ""),
-      "[ชื่อกรรมการ1]": val("g_name1") || (data4 && data4.name1) || "",
+      "[จำนวนเงินตัวเลข]": formatComma(money4),
+      "[จำนวนเงินตัวอักษร]": bahtText(money4),
+      "[ชื่อกรรมการ1]": stripActingRank(val("g_name1") || (data4 && data4.name1) || ""),
       "[ตำแหน่งกรรมการ1]": val("g_pos1") || (data4 && data4.pos1) || "",
-      "[ชื่อกรรมการ2]": val("g_name2") || (data4 && data4.name2) || "",
+      "[ชื่อกรรมการ2]": stripActingRank(val("g_name2") || (data4 && data4.name2) || ""),
       "[ตำแหน่งกรรมการ2]": val("g_pos2") || (data4 && data4.pos2) || "",
-      "[ชื่อกรรมการ3]": val("g_name3") || (data4 && data4.name3) || "",
+      "[ชื่อกรรมการ3]": stripActingRank(val("g_name3") || (data4 && data4.name3) || ""),
       "[ตำแหน่งกรรมการ3]": val("g_pos3") || (data4 && data4.pos3) || "",
     });
+    const money5 = val("g_moneyNum") || (data5 && data5.moneyNum) || "";
     const doc5 = await buildOneDocx(window.TEMPLATE_5_BASE64, {
       "[ชื่อโครงการ]": projectName,
-      "[อ้างอิงแผนพัฒนาท้องถิ่น]": (data5 && data5.planRef) || "",
-      "[จำนวนเงินตัวเลข]": formatComma((data5 && data5.moneyNum) || ""),
-      "[จำนวนเงินตัวอักษร]": bahtText((data5 && data5.moneyNum) || ""),
+      "[อ้างอิงแผนพัฒนาท้องถิ่น]": val("g_planRef") || (data5 && data5.planRef) || "",
+      "[จำนวนเงินตัวเลข]": formatComma(money5),
+      "[จำนวนเงินตัวอักษร]": bahtText(money5),
       "[จำนวนวันแล้วเสร็จ]": (data5 && data5.workDays) || "",
       "[ประเภทงานก่อสร้าง]": (data5 && data5.constrType) || "",
       "[ประเภทงานค่าK]": (data5 && data5.kWorkType) || "",
@@ -636,8 +757,11 @@ document.getElementById("genAll").addEventListener("click", async () => {
 // (เติมเฉพาะช่องที่ยังว่าง ไม่ทับสิ่งที่ผู้ใช้พิมพ์ค้างไว้)
 if (cameBackFromDoc) {
   (async () => {
-    const [d2, d5] = await Promise.all([
+    const [d1, d2, d3, d4, d5] = await Promise.all([
+      fetchFormDataFromDoc(DOC1_PATH, "doc1"),
       fetchFormDataFromDoc(DOC2_PATH, "doc2"),
+      fetchFormDataFromDoc(DOC3_PATH, "doc3"),
+      fetchFormDataFromDoc(DOC4_PATH, "doc4"),
       fetchFormDataFromDoc(DOC5_PATH, "doc5"),
     ]);
     function fillFrom(map, data) {
@@ -647,8 +771,25 @@ if (cameBackFromDoc) {
         if (!el.value.trim() && data[fid]) el.value = data[fid];
       }
     }
+    // คณะกรรมการจัดทำแบบรูปรายการ: เผื่อผู้ใช้กรอกตรงในเอกสาร 2 หรือ 3 มาก่อน (ไม่ใช่ d4 เพราะ
+    // เอกสาร 4 ตัดยศ "ว่าที่ ร.ต." ออกไปแล้ว จะทำให้ช่องที่ main ขาดยศไปด้วย)
     fillFrom(SHARED_MAP_234, d2);
+    fillFrom(SHARED_MAP_234, d3);
     fillFrom(SHARED_MAP_5, d5);
+
+    // งบประมาณ: เอาจากเอกสาร 3, 4 หรือ 5 (ตัวไหนมีค่าก็ใช้ตัวนั้น) เติมเฉพาะถ้าช่องยังว่าง
+    const moneyEl = document.getElementById("g_moneyNum");
+    if (!moneyEl.value.trim()) {
+      const m = (d3 && d3.moneyNum) || (d4 && d4.moneyNum) || (d5 && d5.moneyNum);
+      if (m) { moneyEl.value = m; updateGMoneyText(); }
+    }
+    // อ้างอิงแผนพัฒนาท้องถิ่น: เอาจากเอกสาร 1 หรือ 5
+    const planEl = document.getElementById("g_planRef");
+    if (!planEl.value.trim()) {
+      const p = (d1 && d1.planRef) || (d5 && d5.planRef);
+      if (p) planEl.value = p;
+    }
+    saveAutosave();
   })();
 }
 </script>
