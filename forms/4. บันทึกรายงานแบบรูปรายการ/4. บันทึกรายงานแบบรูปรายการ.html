@@ -2,36 +2,57 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
+<script src="../../shared/theme.js"></script>
 <title>4. บันทึก — รายงานการจัดทำแบบรูปรายการงานก่อสร้าง (แบบ template)</title>
 <style>
+  :root {
+    --accent: #2563eb;
+    --accent-dark: #1d4ed8;
+    --accent-light: #93c5fd;
+    --accent-bg: #eff6ff;
+    --accent-text: #1e40af;
+    --page-bg: #f2f4f7;
+    --card-bg: #ffffff;
+    --border: #e5e7eb;
+    --input-border: #d1d5db;
+    --text: #1f2937;
+    --text-muted: #6b7280;
+    --text-faint: #9ca3af;
+    --surface: #f9fafb;
+    --input-bg: #ffffff;
+    --input-text: #1f2937;
+  }
+
   * { box-sizing: border-box; }
   body {
     font-family: "TH Sarabun New", "Sarabun", sans-serif;
-    background: #f2f4f7;
+    background: var(--page-bg);
     margin: 0;
     padding: 24px;
-    color: #1f2937;
+    color: var(--text);
   }
   h1 { font-size: 22px; margin: 0 0 4px; }
-  .sub { color: #6b7280; margin: 0 0 20px; font-size: 15px; }
+  .sub { color: var(--text-muted); margin: 0 0 20px; font-size: 15px; }
   .layout {
     max-width: 560px;
     margin: 0 auto;
   }
   .card {
-    background: #fff;
-    border: 1px solid #e5e7eb;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
     border-radius: 10px;
     padding: 18px;
   }
-  .card h2 { font-size: 16px; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
-  .card h3 { font-size: 14px; margin: 18px 0 6px; color: #2563eb; }
+  .card h2 { font-size: 16px; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .card h3 { font-size: 14px; margin: 18px 0 6px; color: var(--accent); }
   label { display: block; font-size: 14px; font-weight: 600; margin: 12px 0 4px; }
-  label .hint { font-weight: 400; color: #9ca3af; font-size: 12px; }
+  label .hint { font-weight: 400; color: var(--text-faint); font-size: 12px; }
   input[type=text] {
     width: 100%;
     padding: 8px 10px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--input-text);
     border-radius: 6px;
     font-family: inherit;
     font-size: 15px;
@@ -41,7 +62,7 @@
     margin-top: 18px;
     width: 100%;
     padding: 12px;
-    background: #2563eb;
+    background: var(--accent);
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -49,8 +70,8 @@
     font-weight: 600;
     cursor: pointer;
   }
-  button#gen:hover { background: #1d4ed8; }
-  button#gen:disabled { background: #93c5fd; cursor: default; }
+  button#gen:hover { background: var(--accent-dark); }
+  button#gen:disabled { background: var(--accent-light); cursor: default; }
   .status { margin-top: 10px; font-size: 13px; color: #16a34a; min-height: 18px; }
   .status.err { color: #dc2626; }
   .fixed-note {
@@ -66,7 +87,7 @@
 </head>
 <body>
 
-<a href="../main.html" id="backLink" style="display:inline-block; margin-bottom:14px; font-size:14px; color:#2563eb; text-decoration:none;">&larr; กลับไปหน้าแรก</a>
+<a href="../main.html" id="backLink" style="display:inline-block; margin-bottom:14px; font-size:14px; color:var(--accent); text-decoration:none;">&larr; กลับไปหน้าแรก</a>
 
 <h1>4. บันทึก — รายงานการจัดทำแบบรูปรายการงานก่อสร้าง</h1>
 <p class="sub">เวอร์ชัน <b>template + แทนที่คำ</b> — ใช้ไฟล์ต้นฉบับจริงเป็นต้นแบบ ตามจุดที่ทำเครื่องหมายสีแดงไว้</p>
@@ -93,7 +114,7 @@
         </div>
         <div>
           <label>จำนวนเงิน (ตัวอักษร) <span class="hint">(แปลงให้อัตโนมัติ)</span></label>
-          <input type="text" id="moneyText" placeholder="สองล้านสองแสนห้าหมื่นหกพันบาทถ้วน" readonly style="background:#f3f4f6; color:#374151;">
+          <input type="text" id="moneyText" placeholder="สองล้านสองแสนห้าหมื่นหกพันบาทถ้วน" readonly style="background:var(--surface); color:var(--text);">
         </div>
       </div>
 
@@ -220,12 +241,17 @@ document.getElementById("moneyNum").addEventListener("blur", () => {
 saveAutosave();
 
 // พาชื่อโครงการกลับไป main ด้วยตอนกด "กลับไปหน้าแรก"
+function withTheme(url) {
+  return window.ConsDocxTheme ? window.ConsDocxTheme.withTheme(url) : url;
+}
+
 function updateBackLink() {
   const projectName = val("projectName");
   const q = projectName ? ("?projectName=" + encodeURIComponent(projectName)) : "";
-  document.getElementById("backLink").href = "../main.html" + q;
+  document.getElementById("backLink").href = withTheme("../main.html" + q);
 }
 document.getElementById("projectName").addEventListener("input", updateBackLink);
+window.addEventListener("consdocx:themechange", updateBackLink);
 updateBackLink();
 
 // ---- ตอบข้อมูล/ล้างข้อมูลตามคำสั่งจาก main.html (ผ่าน iframe ซ่อน) ----
