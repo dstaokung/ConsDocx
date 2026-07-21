@@ -28,13 +28,14 @@
   .card h3 { font-size: 14px; margin: 18px 0 6px; color: #2563eb; }
   label { display: block; font-size: 14px; font-weight: 600; margin: 12px 0 4px; }
   label .hint { font-weight: 400; color: #9ca3af; font-size: 12px; }
-  input[type=text] {
+  input[type=text], select {
     width: 100%;
     padding: 8px 10px;
     border: 1px solid #d1d5db;
     border-radius: 6px;
     font-family: inherit;
     font-size: 15px;
+    background: #fff;
   }
   .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   button#gen {
@@ -105,6 +106,10 @@
       <input type="text" id="workDays" placeholder="120" inputmode="numeric">
 
       <h3>ประเภทงานและสูตรค่า K</h3>
+
+      <label>เลือกจากสูตรมาตรฐาน <span class="hint">(ตามหลักเกณฑ์สัญญาแบบปรับราคาได้ — เลือกแล้วเติมช่องด้านล่างให้อัตโนมัติ ยังแก้เองได้)</span></label>
+      <select id="kCategorySelect"><option value="">— เลือกหมวดงาน —</option></select>
+      <select id="kItemSelect" style="margin-top:8px;"><option value="">— เลือกหมวดงานก่อน —</option></select>
 
       <label>ประเภทงานก่อสร้าง (ข้อ ๕)</label>
       <input type="text" id="constrType" placeholder="งานก่อสร้างทาง">
@@ -216,6 +221,98 @@ function formatComma(numStr) {
 function updateMoneyText() {
   document.getElementById("moneyText").value = bahtText(val("moneyNum"));
 }
+
+// ---- สูตรค่า K มาตรฐาน ตาม "หลักเกณฑ์ เงื่อนไข ประเภทงานก่อสร้าง สูตรและวิธีการคำนวณที่ใช้กับ
+// สัญญาแบบปรับราคาได้" (มติคณะรัฐมนตรี ว 109) — ไม่รวมหมวด 5.7-5.9 เพราะระบุไว้ในเอกสารต้นฉบับว่า
+// ใช้เฉพาะงานก่อสร้างของการไฟฟ้าฝ่ายผลิต/การไฟฟ้าส่วนภูมิภาคเท่านั้น ไม่เกี่ยวกับงาน อบต./เทศบาลทั่วไป
+// constrTypeSuggest = คำแนะนำช่อง "ประเภทงานก่อสร้าง (ข้อ ๕)" ให้ต่อหมวด (ยังแก้เองได้เสมอ)
+const K_FORMULA_DATA = {
+  "งานอาคาร": {
+    constrTypeSuggest: "งานก่อสร้างอาคาร",
+    items: [
+      { name: "งานอาคาร (ตัวอาคาร รวมไฟฟ้า/ประปา/ทางระบายน้ำของอาคาร และทางเท้ารอบอาคารไม่เกิน 3 เมตร)", formula: "K = 0.25 + 0.15 It/Io + 0.10 Ct/Co + 0.40 Mt/Mo + 0.10 St/So" },
+    ],
+  },
+  "งานดิน": {
+    constrTypeSuggest: "งานก่อสร้างงานดิน",
+    items: [
+      { name: "งานดิน (ขุด ตัก บดอัด ถม คันดิน คันคลอง คันทาง)", formula: "K = 0.30 + 0.10 It/Io + 0.40 Et/Eo + 0.20 Ft/Fo" },
+      { name: "งานหินเรียง", formula: "K = 0.40 + 0.20 It/Io + 0.20 Mt/Mo + 0.20 Ft/Fo" },
+      { name: "งานเจาะระเบิดหิน", formula: "K = 0.45 + 0.15 It/Io + 0.10 Mt/Mo + 0.20 Et/Eo + 0.10 Ft/Fo" },
+    ],
+  },
+  "งานทาง": {
+    constrTypeSuggest: "งานก่อสร้างทาง",
+    items: [
+      { name: "งานผิวทาง PRIME COAT, TACK COAT, SEAL COAT", formula: "K = 0.30 + 0.40 At/Ao + 0.20 Et/Eo + 0.10 Ft/Fo" },
+      { name: "งานผิวทาง SURFACE TREATMENT, SLURRY SEAL", formula: "K = 0.30 + 0.10 Mt/Mo + 0.30 At/Ao + 0.20 Et/Eo + 0.10 Ft/Fo" },
+      { name: "งานผิวทาง ASPHALTIC CONCRETE, PENETRATION MACADAM", formula: "K = 0.30 + 0.10 Mt/Mo + 0.40 At/Ao + 0.10 Et/Eo + 0.10 Ft/Fo" },
+      { name: "งานผิวถนนคอนกรีตเสริมเหล็ก", formula: "K = 0.30 + 0.10 It/Io + 0.35 Ct/Co + 0.10 Mt/Mo + 0.15 St/So" },
+      { name: "งานท่อระบายน้ำคอนกรีตเสริมเหล็กและงานบ่อพัก", formula: "K = 0.35 + 0.20 It/Io + 0.15 Ct/Co + 0.15 Mt/Mo + 0.15 St/So" },
+      { name: "งานโครงสร้างคอนกรีตเสริมเหล็กและงานเขื่อนกันตลิ่ง", formula: "K = 0.30 + 0.10 It/Io + 0.15 Ct/Co + 0.20 Mt/Mo + 0.25 St/So" },
+      { name: "งานโครงสร้างเหล็ก", formula: "K = 0.25 + 0.10 It/Io + 0.05 Ct/Co + 0.20 Mt/Mo + 0.40 St/So" },
+    ],
+  },
+  "งานชลประทาน": {
+    constrTypeSuggest: "งานก่อสร้างชลประทาน",
+    items: [
+      { name: "งานอาคารชลประทานไม่รวมบานเหล็ก", formula: "K = 0.40 + 0.20 It/Io + 0.10 Ct/Co + 0.10 Mt/Mo + 0.20 St/So" },
+      { name: "งานอาคารชลประทานรวมบานเหล็ก", formula: "K = 0.35 + 0.20 It/Io + 0.10 Ct/Co + 0.10 Mt/Mo + 0.25 St/So" },
+      { name: "งานบานระบาย TRASHRACK และ STEEL LINER", formula: "K = 0.35 + 0.20 It/Io + 0.45 Gt/Go" },
+      { name: "งานเหล็กเสริมคอนกรีต และ ANCHOR BAR", formula: "K = 0.25 + 0.15 It/Io + 0.60 St/So" },
+      { name: "งานคอนกรีตไม่รวมเหล็กและคอนกรีตดาดคลอง", formula: "K = 0.40 + 0.15 It/Io + 0.25 Ct/Co + 0.20 Mt/Mo" },
+      { name: "งานเจาะ (อัดฉีดน้ำปูน)", formula: "K = 0.40 + 0.20 It/Io + 0.10 Mt/Mo + 0.20 Et/Eo + 0.10 Ft/Fo" },
+    ],
+  },
+  "งานระบบสาธารณูปโภค": {
+    constrTypeSuggest: "งานก่อสร้างระบบสาธารณูปโภค",
+    items: [
+      { name: "งานวางท่อ AC/PVC (กรณีผู้ว่าจ้างเป็นผู้จัดหาท่อ/อุปกรณ์)", formula: "K = 0.50 + 0.25 It/Io + 0.25 Mt/Mo" },
+      { name: "งานวางท่อ AC (กรณีผู้รับจ้างเป็นผู้จัดหาท่อ)", formula: "K = 0.40 + 0.10 It/Io + 0.10 Mt/Mo + 0.40 ACt/ACo" },
+      { name: "งานวางท่อ PVC (กรณีผู้รับจ้างเป็นผู้จัดหาท่อ)", formula: "K = 0.40 + 0.10 It/Io + 0.10 Mt/Mo + 0.40 PVCt/PVCo" },
+      { name: "งานวางท่อเหล็กเหนียว/HDPE (กรณีผู้ว่าจ้างเป็นผู้จัดหาท่อ)", formula: "K = 0.40 + 0.10 It/Io + 0.15 Mt/Mo + 0.20 Et/Eo + 0.15 Ft/Fo" },
+      { name: "งานวางท่อเหล็กเหนียว (กรณีผู้รับจ้างเป็นผู้จัดหาท่อ)", formula: "K = 0.40 + 0.10 It/Io + 0.10 Mt/Mo + 0.10 Et/Eo + 0.30 GIPt/GIPo" },
+      { name: "งานวางท่อ HDPE (กรณีผู้รับจ้างเป็นผู้จัดหาท่อ)", formula: "K = 0.50 + 0.10 It/Io + 0.10 Mt/Mo + 0.30 PEt/PEo" },
+      { name: "งานปรับปรุงระบบอุโมงค์ส่งน้ำ (SECONDARY LINING)", formula: "K = 0.40 + 0.10 It/Io + 0.15 Et/Eo + 0.35 GIPt/GIPo" },
+      { name: "งานวางท่อ PVC หุ้มด้วยคอนกรีต", formula: "K = 0.30 + 0.10 It/Io + 0.20 Ct/Co + 0.05 Mt/Mo + 0.05 St/So + 0.30 PVCt/PVCo" },
+      { name: "งานวางท่อ PVC กลบทราย", formula: "K = 0.25 + 0.05 It/Io + 0.05 Mt/Mo + 0.65 PVCt/PVCo" },
+      { name: "งานวางท่อเหล็กอาบสังกะสี", formula: "K = 0.25 + 0.25 It/Io + 0.50 GIPt/GIPo" },
+    ],
+  },
+};
+
+(function setupKFormulaDropdown() {
+  const catSel = document.getElementById("kCategorySelect");
+  const itemSel = document.getElementById("kItemSelect");
+  Object.keys(K_FORMULA_DATA).forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    catSel.appendChild(opt);
+  });
+  catSel.addEventListener("change", () => {
+    itemSel.innerHTML = "";
+    const cat = K_FORMULA_DATA[catSel.value];
+    if (!cat) {
+      itemSel.appendChild(new Option("— เลือกหมวดงานก่อน —", ""));
+      return;
+    }
+    itemSel.appendChild(new Option("— เลือกลักษณะงาน —", ""));
+    cat.items.forEach((item, i) => itemSel.appendChild(new Option(item.name, String(i))));
+    const constrTypeEl = document.getElementById("constrType");
+    if (!constrTypeEl.value.trim()) constrTypeEl.value = cat.constrTypeSuggest;
+    document.getElementById("kWorkType").value = catSel.value;
+    saveAutosave();
+  });
+  itemSel.addEventListener("change", () => {
+    const cat = K_FORMULA_DATA[catSel.value];
+    if (!cat || itemSel.value === "") return;
+    const item = cat.items[Number(itemSel.value)];
+    document.getElementById("kSubWork").value = item.name;
+    document.getElementById("kFormula").value = item.formula;
+    saveAutosave();
+  });
+})();
 
 // ---- จำข้อมูลที่กรอกไว้ในฟอร์มนี้ (localStorage ของหน้านี้เอง) ----
 const AUTOSAVE_KEY = "consdocx_autosave_5_นำส่งเอกสารการขออนุมัติ";
