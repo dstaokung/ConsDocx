@@ -2,6 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="../shared/theme.js"></script>
 <title>โปรแกรมทำเอกสารโครงการก่อสร้าง — เมนูหลัก</title>
 <style>
@@ -25,7 +26,7 @@
 
   * { box-sizing: border-box; }
   body {
-    font-family: "TH Sarabun New", "Sarabun", sans-serif;
+    font-family: "Sarabun", sans-serif;
     background: var(--page-bg);
     margin: 0;
     padding: 24px;
@@ -34,7 +35,7 @@
     line-height: 1.5;
   }
   .wrap { max-width: 1100px; margin: 0 auto; }
-  .layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; }
+  .layout { display: grid; grid-template-columns: 1fr 440px; gap: 20px; align-items: start; }
   .col-right { position: sticky; top: 24px; }
   @media (max-width: 900px) {
     .wrap { max-width: 720px; }
@@ -52,10 +53,10 @@
   }
   .card h2 { font-size: 19px; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
   .card h3 { font-size: 17px; margin: 18px 0 6px; color: var(--accent); }
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end; }
   label { display: block; font-size: 16px; font-weight: 600; margin: 10px 0 4px; }
   .hint { font-weight: 400; color: var(--text-faint); font-size: 14px; }
-  input[type=text], select {
+  input[type=text], select, textarea {
     width: 100%;
     padding: 10px 12px;
     border: 1px solid var(--input-border);
@@ -202,13 +203,19 @@
     <label>ชื่อโครงการ <span class="hint">(ใช้ในเอกสารทุกฉบับ)</span></label>
     <input type="text" id="projectName" placeholder="ก่อสร้างถนน คสล.ซอยบ้านเจ๊จิตร หมู่ที่ 8">
 
-    <h3>เดือน/ปี ที่ใช้ในเอกสาร <span class="hint">(แทนที่คำว่า "กรกฎาคม" เดิมในทุกเอกสารที่มี)</span></h3>
+    <h3>เดือน/ปี ที่ใช้ในเอกสาร</h3>
     <div class="row2">
       <div><label>เดือน</label>
         <select id="g_month"></select></div>
       <div><label>ปี (พ.ศ.)</label>
         <select id="g_year"></select></div>
     </div>
+
+    <h3>เรื่องเดิม <span class="hint">(ใช้ในเอกสาร 1 และ 5)</span></h3>
+    <textarea id="g_priorMatter" rows="4" placeholder="อ้างถึง มติสภาองค์การบริหารส่วนตำบล..." style="resize:none; line-height:1.5;"></textarea>
+
+    <h3>ข้อเท็จจริง <span class="hint">(ใช้ในเอกสาร 1 และ 5)</span></h3>
+    <textarea id="g_facts" rows="4" style="resize:none; line-height:1.5;" placeholder="นายกองค์การบริหารส่วนตำบลคลองด่านได้สั่งการให้กองช่างดำเนินการจัดทำโครงการดังกล่าวเพื่อแก้ไขปัญหาความเดือดร้อนของประชาชน เนื่องจากถนนเดิมอยู่ในระดับต่ำ เป็นเหตุให้น้ำทะเลท่วมถนนอยู่เป็นประจำ ทำให้ประชาชนใช้เส้นทางสัญจรด้วยความลำบากและอาจก่อให้เกิดอันตรายแก่ประชาชนในการใช้สัญจร ไป – มา ได้ ซึ่งเมื่อจัดทำโครงการดังกล่าวเสร็จสิ้นจะก่อให้เกิดประโยชน์แก่ประชาชนเป็นอย่างมาก"></textarea>
 
     <h3>ราคาค่าก่อสร้างเบื้องต้น (งบประมาณ) <span class="hint">(ใช้ในเอกสาร 3, 4 และ 5)</span></h3>
     <div class="row2">
@@ -218,12 +225,9 @@
         <input type="text" id="g_moneyText" placeholder="สองล้านสองแสนห้าหมื่นหกพันบาทถ้วน" readonly style="background:var(--surface); color:var(--text);"></div>
     </div>
 
-    <label>อ้างอิงแผนพัฒนาท้องถิ่น <span class="hint">(ใช้ในเอกสาร 1 และ 5)</span></label>
-    <input type="text" id="g_planRef" placeholder="แผนพัฒนาท้องถิ่น (พ.ศ. ๒๕๖๖-๒๕๗๐) ฉบับทบทวน ครั้งที่ 1/2567 หน้า 90 ลำดับที่ 50 (กองช่าง)">
-
     <h3>คณะกรรมการจัดทำแบบรูปรายการงานก่อสร้าง <span class="hint">(ใช้ในเอกสาร 2, 3 และ 4)</span></h3>
     <div class="row2">
-      <div><label>1. ชื่อ-สกุล (ประธานกรรมการ) <span class="hint">(พิมพ์ยศ/คำนำหน้าด้วยถ้ามี เช่น "ว่าที่ ร.ต.")</span></label>
+      <div><label>1. ชื่อ-สกุล (ประธานกรรมการ)</label>
         <select class="roster-select" data-name="g_name1" data-pos="g_pos1"></select>
         <input type="text" id="g_name1" placeholder="ว่าที่ ร.ต. คมสรร  เครือศรี"></div>
       <div><label>1. ตำแหน่ง</label>
@@ -242,7 +246,7 @@
 
     <h3>คณะกรรมการกำหนดราคากลางงานก่อสร้าง <span class="hint">(ใช้ในเอกสาร 5 ข้อ 8.1)</span></h3>
     <div class="row2">
-      <div><label>1. ชื่อ-สกุล (ประธานกรรมการ) <span class="hint">(พิมพ์ยศ/คำนำหน้าด้วย)</span></label>
+      <div><label>1. ชื่อ-สกุล (ประธานกรรมการ)</label>
         <select class="roster-select" data-name="g_rc1name" data-pos="g_rc1pos"></select>
         <input type="text" id="g_rc1name" placeholder="ว่าที่ ร.ต.คมสรร  เครือศรี"></div>
       <div><label>1. ตำแหน่ง</label>
@@ -312,31 +316,26 @@
       <li>
         <a class="doclink linked" id="link-1" href="./1. ขออนุมัติโครงการก่อสร้าง/1. ขออนุมัติโครงการก่อสร้าง.html">
           <span class="title">1. ขออนุมัติจัดทำโครงการก่อสร้าง</span>
-          <span class="badge">รับชื่อโครงการอัตโนมัติ →</span>
         </a>
       </li>
       <li>
         <a class="doclink linked" id="link-2" href="./2. คำสั่งแต่งตั้งคณะกรรมการ/2. คำสั่งแต่งตั้งคณะกรรมการ.html">
           <span class="title">2. คำสั่งแต่งตั้งคณะกรรมการจัดทำแบบรูปรายการ</span>
-          <span class="badge">รับชื่อโครงการอัตโนมัติ →</span>
         </a>
       </li>
       <li>
         <a class="doclink linked" id="link-3" href="./3. รายงานการประชุมแบบรูปรายการ/3. รายงานการประชุมแบบรูปรายการ.html">
           <span class="title">3. รายงานการประชุมคณะกรรมการจัดทำแบบรูปรายการ</span>
-          <span class="badge">รับชื่อโครงการอัตโนมัติ →</span>
         </a>
       </li>
       <li>
         <a class="doclink linked" id="link-4" href="./4. บันทึกรายงานแบบรูปรายการ/4. บันทึกรายงานแบบรูปรายการ.html">
           <span class="title">4. บันทึกรายงานการจัดทำแบบรูปรายการงานก่อสร้าง</span>
-          <span class="badge">รับชื่อโครงการอัตโนมัติ →</span>
         </a>
       </li>
       <li>
         <a class="doclink linked" id="link-5" href="./5. นำส่งเอกสารการขออนุมัติ/5. นำส่งเอกสารการขออนุมัติ.html">
           <span class="title">5. บันทึกนำส่งเอกสารการขออนุมัติจัดทำโครงการ</span>
-          <span class="badge">รับชื่อโครงการอัตโนมัติ →</span>
         </a>
       </li>
     </ul>
@@ -404,13 +403,18 @@ function clearAllDocsData() {
   });
 }
 
+const DEFAULT_PM_1 = "ตามข้อบัญญัติองค์การบริหารส่วนตำบลคลองด่าน งบประมาณรายจ่ายประจำปี พ.ศ.2569 งานก่อสร้าง งบลงทุน ค่าที่ดินและสิ่งก่อสร้าง ค่าที่ปรับปรุงที่ดินและสิ่งก่อสร้าง หน้า 243 (แผนงานอุตสาหกรรมและการโยธา)";
+const DEFAULT_PM_2 = "โครงการปรับปรุงทางเท้าคอนกรีตเสริมเหล็กทางชมนกกุฏิหลวงปู่ หมู่ที่ 12 (กองช่าง) ตำบลคลองด่าน เพื่อจ่ายเป็นค่าปรับปรุงทางเท้าคอนกรีตเสริมเหล็ก กว้าง 1.40 เมตร ยาว 230 เมตรรายละเอียดตามประมาณการงานก่อสร้าง และตามแบบแปลนที่องค์การบริหารส่วนตำบลคองด่านกำหนด จำนวนเงินงบประมาณ 1,384,600.-บาท (หนึ่งล้านสามแสนแปดหมื่นสี่พันหกร้อยบาทถ้วน)";
+const DEFAULT_PM_3 = "- เป็นไปตามพระราชบัญญัติสภาตำบลและองค์การบริหารส่วนตำบล พ.ศ. 2537 และที่แก้ไขเพิ่มเติมถึง (ฉบับที่ 7) พ.ศ. 2569";
+const DEFAULT_PM_4 = "- เป็นไปตามแผนพัฒนาท้องถิ่น พ.ศ. ๒๕๖๖-๒๕๗๐ เพิ่มเติมฉบับที่ 1 ประจำปี 2568 หน้าที่ 20 ลำดับที่ 30 (กองช่าง)";
+
 // ---- จำข้อมูล "ข้อมูลร่วม" ของหน้า main เองไว้ใน localStorage (เหมือนทุกหน้าเอกสารย่อย) ----
 // เดิมหน้า main ไม่จำอะไรเลย อาศัยแค่ query string ?projectName=... ตอนกดลิงก์ไปเอกสาร แล้วดึงข้อมูล
 // คณะกรรมการ/งบประมาณ/แผนพัฒนาฯ กลับมาจากเอกสารย่อยตอนกลับมาเท่านั้น — ถ้าเปิดลิงก์ไปเอกสารอื่นก่อนกด
 // "บันทึกข้อมูลร่วมลงทุกเอกสาร" ค่าที่พิมพ์ไว้ในหน้า main จะหายเพราะไม่เคยถูกจำที่ไหนเลย ตอนนี้จำเองไว้ด้วย
 const AUTOSAVE_KEY = "consdocx_autosave_main";
 const AUTOSAVE_FIELDS = [
-  "projectName", "g_month", "g_year", "g_moneyNum", "g_planRef",
+  "projectName", "g_month", "g_year", "g_priorMatter", "g_facts", "g_moneyNum",
   "g_name1", "g_pos1", "g_name2", "g_pos2", "g_name3", "g_pos3",
   "g_rc1name", "g_rc1pos", "g_rc2name", "g_rc2pos", "g_rc3name", "g_rc3pos",
   "g_ic1name", "g_ic1pos", "g_ic2name", "g_ic2pos", "g_ic3name", "g_ic3pos",
@@ -474,6 +478,26 @@ function base64ToArrayBuffer(b64) {
 
 function xmlEscape(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function getParaText(para) {
+  return (para.match(/<w:t(?:[^>]*)?>([^<]*)<\/w:t>/g) || [])
+    .map(t => t.replace(/<[^>]+>/g, '')).join('');
+}
+
+// Merge split [PM#] placeholders: Word may store as 3 runs ([, PM#, ]) or 4 runs ([, PM, #, ])
+function normalizePMRuns(xml) {
+  const R = `(?:<w:r[^>]*>(?:<w:rPr>[\\s\\S]*?<\\/w:rPr>)?<w:t[^>]*>)`;
+  const E = `<\\/w:t><\\/w:r>`;
+  for (let n = 1; n <= 4; n++) {
+    const head = `(<w:t(?:[^>]*)?>)((?:[^<]*)\\[)${E}`;
+    const tail = `${R}\\]((?:[^<]*)<\\/w:t>)`;
+    xml = xml.replace(new RegExp(`${head}${R}PM${n}${E}${tail}`, 'g'),
+      (_, tOpen, before, after) => `${tOpen}${before}PM${n}]${after}`);
+    xml = xml.replace(new RegExp(`${head}${R}PM${E}${R}${n}${E}${tail}`, 'g'),
+      (_, tOpen, before, after) => `${tOpen}${before}PM${n}]${after}`);
+  }
+  return xml;
 }
 
 // ---- แปลงจำนวนเงินตัวเลข → ตัวอักษรไทย + เติม comma (สำเนาเดียวกับในฟอร์มเอกสาร 3) ----
@@ -582,8 +606,13 @@ async function buildOneDocx(base64, fieldsMap) {
   const buf = base64ToArrayBuffer(base64);
   const zip = await JSZip.loadAsync(buf);
   let xml = await zip.file("word/document.xml").async("string");
+  xml = normalizePMRuns(xml);
   for (const [ph, value] of Object.entries(fieldsMap)) {
-    xml = replacePlaceholder(xml, ph, value || "");
+    if (value === null) {
+      xml = xml.replace(/<w:p[ >][\s\S]*?<\/w:p>/g, para => getParaText(para).includes(ph) ? "" : para);
+    } else {
+      xml = replacePlaceholder(xml, ph, value || "");
+    }
   }
   zip.file("word/document.xml", xml);
   return await zip.generateAsync({ type: "uint8array" });
@@ -658,14 +687,16 @@ document.getElementById("pushShared").addEventListener("click", async () => {
   try {
     const projectNameVal = val("projectName");
     const moneyVal = val("g_moneyNum");
-    const planRefVal = val("g_planRef");
+    const priorMatterVal = val("g_priorMatter");
+    const factsVal = val("g_facts");
     const monthVal = val("g_month");
     const yearVal = val("g_year");
 
-    // เอกสาร 1: ยังไม่มีคณะกรรมการ มีแค่ชื่อโครงการ + อ้างอิงแผนพัฒนาท้องถิ่น
+    // เอกสาร 1
     const data1 = {};
     if (projectNameVal) data1.projectName = projectNameVal;
-    if (planRefVal) data1.planRef = planRefVal;
+    if (priorMatterVal) data1.priorMatter = priorMatterVal;
+    if (factsVal) data1.facts = factsVal;
     if (moneyVal) data1.moneyNum = moneyVal;
     if (monthVal) data1.docMonth = monthVal;
     if (yearVal) data1.docYear = yearVal;
@@ -690,8 +721,9 @@ document.getElementById("pushShared").addEventListener("click", async () => {
 
     // เอกสาร 5: คณะกรรมการอีก 3 ชุด + งบประมาณ + อ้างอิงแผนพัฒนาท้องถิ่น
     const data5 = collectShared(SHARED_MAP_5, true);
+    if (priorMatterVal) data5.priorMatter = priorMatterVal;
+    if (factsVal) data5.facts = factsVal;
     if (moneyVal) data5.moneyNum = moneyVal;
-    if (planRefVal) data5.planRef = planRefVal;
     if (monthVal) data5.docMonth = monthVal;
     if (yearVal) data5.docYear = yearVal;
 
@@ -702,11 +734,11 @@ document.getElementById("pushShared").addEventListener("click", async () => {
       pushDataToDoc(DOC4_PATH, "doc4", data4),
       pushDataToDoc(DOC5_PATH, "doc5", data5),
     ]);
-    const fails = results.filter(r => !r).length;
-    if (fails === 0) {
+    const failedDocs = results.map((r, i) => r ? null : i + 1).filter(Boolean);
+    if (failedDocs.length === 0) {
       statusEl.textContent = "บันทึกลงเอกสาร 1–5 เรียบร้อย — เปิดเอกสารไหนก็จะเห็นค่ากรอกไว้ให้แล้ว";
     } else {
-      statusEl.textContent = `บันทึกสำเร็จบางส่วน (${5 - fails}/5 เอกสาร) — ลองกดอีกครั้ง`;
+      statusEl.textContent = `บันทึกไม่สำเร็จ: เอกสาร ${failedDocs.join(", ")} — ลองกดอีกครั้ง`;
       statusEl.className = "status err";
     }
   } catch (err) {
@@ -777,9 +809,14 @@ document.getElementById("genAll").addEventListener("click", async () => {
 
     statusEl.textContent = "กำลังสร้างไฟล์...";
     const money1 = val("g_moneyNum") || (data1 && data1.moneyNum) || "";
+    const pm1 = val("g_priorMatter") || (data1 && data1.priorMatter) || "";
     const doc1 = await buildOneDocx(window.TEMPLATE_1_BASE64, {
       "[ชื่อโครงการ]": projectName,
-      "[อ้างอิงแผนพัฒนาท้องถิ่น]": val("g_planRef") || (data1 && data1.planRef) || "",
+      "[PM1]": pm1 || DEFAULT_PM_1,
+      "[PM2]": pm1 ? null : DEFAULT_PM_2,
+      "[PM3]": pm1 ? null : DEFAULT_PM_3,
+      "[PM4]": pm1 ? null : DEFAULT_PM_4,
+      "[ข้อเท็จจริง]": val("g_facts") || (data1 && data1.facts) || "นายกองค์การบริหารส่วนตำบลคลองด่านได้สั่งการให้กองช่างดำเนินการจัดทำโครงการดังกล่าวเพื่อแก้ไขปัญหาความเดือดร้อนของประชาชน เนื่องจากถนนเดิมอยู่ในระดับต่ำ เป็นเหตุให้น้ำทะเลท่วมถนนอยู่เป็นประจำ ทำให้ประชาชนใช้เส้นทางสัญจรด้วยความลำบากและอาจก่อให้เกิดอันตรายแก่ประชาชนในการใช้สัญจร ไป – มา ได้ ซึ่งเมื่อจัดทำโครงการดังกล่าวเสร็จสิ้นจะก่อให้เกิดประโยชน์แก่ประชาชนเป็นอย่างมาก",
       "[จำนวนเงินตัวเลข]": formatComma(money1),
       "[จำนวนเงินตัวอักษร]": bahtText(money1),
       "[เดือน]": monthG || (data1 && data1.docMonth) || "",
@@ -833,9 +870,14 @@ document.getElementById("genAll").addEventListener("click", async () => {
       "[ปี]": yearG || (data4 && data4.docYear) || "",
     });
     const money5 = val("g_moneyNum") || (data5 && data5.moneyNum) || "";
+    const pm5 = val("g_priorMatter") || (data5 && data5.priorMatter) || "";
     const doc5 = await buildOneDocx(window.TEMPLATE_5_BASE64, {
       "[ชื่อโครงการ]": projectName,
-      "[อ้างอิงแผนพัฒนาท้องถิ่น]": val("g_planRef") || (data5 && data5.planRef) || "",
+      "[PM1]": pm5 || DEFAULT_PM_1,
+      "[PM2]": pm5 ? null : DEFAULT_PM_2,
+      "[PM3]": pm5 ? null : DEFAULT_PM_3,
+      "[PM4]": pm5 ? null : DEFAULT_PM_4,
+      "[ข้อเท็จจริง]": val("g_facts") || (data5 && data5.facts) || "นายกองค์การบริหารส่วนตำบลคลองด่านได้สั่งการให้กองช่างดำเนินการจัดทำโครงการดังกล่าวเพื่อแก้ไขปัญหาความเดือดร้อนของประชาชน เนื่องจากถนนเดิมอยู่ในระดับต่ำ เป็นเหตุให้น้ำทะเลท่วมถนนอยู่เป็นประจำ ทำให้ประชาชนใช้เส้นทางสัญจรด้วยความลำบากและอาจก่อให้เกิดอันตรายแก่ประชาชนในการใช้สัญจร ไป – มา ได้ ซึ่งเมื่อจัดทำโครงการดังกล่าวเสร็จสิ้นจะก่อให้เกิดประโยชน์แก่ประชาชนเป็นอย่างมาก",
       "[จำนวนเงินตัวเลข]": formatComma(money5),
       "[จำนวนเงินตัวอักษร]": bahtText(money5),
       "[จำนวนวันแล้วเสร็จ]": (data5 && data5.workDays) || "",
@@ -919,12 +961,6 @@ if (cameBackFromDoc) {
     if (!moneyEl.value.trim()) {
       const m = (d1 && d1.moneyNum) || (d3 && d3.moneyNum) || (d4 && d4.moneyNum) || (d5 && d5.moneyNum);
       if (m) { moneyEl.value = m; updateGMoneyText(); }
-    }
-    // อ้างอิงแผนพัฒนาท้องถิ่น: เอาจากเอกสาร 1 หรือ 5
-    const planEl = document.getElementById("g_planRef");
-    if (!planEl.value.trim()) {
-      const p = (d1 && d1.planRef) || (d5 && d5.planRef);
-      if (p) planEl.value = p;
     }
     saveAutosave();
   })();

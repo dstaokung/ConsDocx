@@ -2,6 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="../../shared/theme.js"></script>
 <title>5. บันทึก — นำส่งเอกสารการขออนุมัติจัดทำโครงการ (แบบ template)</title>
 <style>
@@ -25,7 +26,7 @@
 
   * { box-sizing: border-box; }
   body {
-    font-family: "TH Sarabun New", "Sarabun", sans-serif;
+    font-family: "Sarabun", sans-serif;
     background: var(--page-bg);
     margin: 0;
     padding: 24px;
@@ -113,20 +114,11 @@
         <select id="docYear"></select>
       </div>
 
-      <label>อ้างอิงแผนพัฒนาท้องถิ่น</label>
-      <input type="text" id="planRef" placeholder="แผนพัฒนาท้องถิ่น (พ.ศ. ๒๕๖๖-๒๕๗๐) ฉบับทบทวน ครั้งที่ 1/2567 หน้า 90 ลำดับที่ 50 (กองช่าง)">
+<input type="hidden" id="moneyNum">
+      <input type="hidden" id="moneyText">
 
-      <h3>ประมาณราคาค่าก่อสร้างเบื้องต้น</h3>
-      <div class="row2">
-        <div>
-          <label>จำนวนเงิน (ตัวเลข) <span class="hint">(พิมพ์เฉพาะตัวเลข)</span></label>
-          <input type="text" id="moneyNum" placeholder="2256000" inputmode="decimal">
-        </div>
-        <div>
-          <label>จำนวนเงิน (ตัวอักษร) <span class="hint">(แปลงให้อัตโนมัติ)</span></label>
-          <input type="text" id="moneyText" placeholder="สองล้านสองแสนห้าหมื่นหกพันบาทถ้วน" readonly style="background:var(--surface); color:var(--text);">
-        </div>
-      </div>
+      <textarea id="priorMatter" style="display:none"></textarea>
+      <textarea id="facts" style="display:none"></textarea>
 
       <label>กำหนดเวลาแล้วเสร็จตามสัญญา (วัน) <span class="hint">(พิมพ์เฉพาะตัวเลข)</span></label>
       <input type="text" id="workDays" placeholder="120" inputmode="numeric">
@@ -147,7 +139,7 @@
       <input type="text" id="kFormula" placeholder="K = 0.30 + 0.10 It/Io + 0.35 Ct/Co + 0.10 Mt/Mo + 0.15 St/So">
 
       <h3>8.1 คณะกรรมการกำหนดราคากลางงานก่อสร้าง</h3>
-      <label>1. ชื่อ-สกุล (ประธานกรรมการ) <span class="hint">(พิมพ์ยศ/คำนำหน้าด้วย)</span></label>
+      <label>1. ชื่อ-สกุล (ประธานกรรมการ)</label>
       <input type="text" id="rc1name" placeholder="ว่าที่ ร.ต.คมสรร  เครือศรี">
       <label>1. ตำแหน่ง</label>
       <input type="text" id="rc1pos" placeholder="ผู้อำนวยการกองช่าง">
@@ -343,7 +335,7 @@ const K_FORMULA_DATA = {
 
 // ---- จำข้อมูลที่กรอกไว้ในฟอร์มนี้ (localStorage ของหน้านี้เอง) ----
 const AUTOSAVE_KEY = "consdocx_autosave_5_นำส่งเอกสารการขออนุมัติ";
-const AUTOSAVE_FIELDS = ["projectName","docMonth","docYear","planRef","moneyNum","moneyText","workDays","constrType","kWorkType","kSubWork","kFormula","rc1name","rc1pos","rc2name","rc2pos","rc3name","rc3pos","ic1name","ic1pos","ic2name","ic2pos","ic3name","ic3pos","sv1name","sv1pos","sv2name","sv2pos"];
+const AUTOSAVE_FIELDS = ["projectName","docMonth","docYear","moneyNum","priorMatter","facts","workDays","constrType","kWorkType","kSubWork","kFormula","rc1name","rc1pos","rc2name","rc2pos","rc3name","rc3pos","ic1name","ic1pos","ic2name","ic2pos","ic3name","ic3pos","sv1name","sv1pos","sv2name","sv2pos"];
 if (window.ConsDocxMonthYear) {
   ConsDocxMonthYear.populateMonthSelect(document.getElementById("docMonth"));
   ConsDocxMonthYear.populateYearSelect(document.getElementById("docYear"));
@@ -436,6 +428,26 @@ function xmlEscape(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+function getParaText(para) {
+  return (para.match(/<w:t(?:[^>]*)?>([^<]*)<\/w:t>/g) || [])
+    .map(t => t.replace(/<[^>]+>/g, '')).join('');
+}
+
+// Merge split [PM#] placeholders: Word may store as 3 runs ([, PM#, ]) or 4 runs ([, PM, #, ])
+function normalizePMRuns(xml) {
+  const R = `(?:<w:r[^>]*>(?:<w:rPr>[\\s\\S]*?<\\/w:rPr>)?<w:t[^>]*>)`;
+  const E = `<\\/w:t><\\/w:r>`;
+  for (let n = 1; n <= 4; n++) {
+    const head = `(<w:t(?:[^>]*)?>)((?:[^<]*)\\[)${E}`;
+    const tail = `${R}\\]((?:[^<]*)<\\/w:t>)`;
+    xml = xml.replace(new RegExp(`${head}${R}PM${n}${E}${tail}`, 'g'),
+      (_, tOpen, before, after) => `${tOpen}${before}PM${n}]${after}`);
+    xml = xml.replace(new RegExp(`${head}${R}PM${E}${R}${n}${E}${tail}`, 'g'),
+      (_, tOpen, before, after) => `${tOpen}${before}PM${n}]${after}`);
+  }
+  return xml;
+}
+
 // รองรับ placeholder ที่ปรากฏซ้ำหลายจุดในเอกสาร (เช่น [ชื่อโครงการ] x3)
 function replacePlaceholder(xml, placeholder, value) {
   const escapedPh = placeholder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -477,9 +489,18 @@ async function buildDocx() {
   const zip = await JSZip.loadAsync(templateBuffer);
   let xml = await zip.file("word/document.xml").async("string");
 
+  const DEFAULT_PM_1 = "ตามข้อบัญญัติองค์การบริหารส่วนตำบลคลองด่าน งบประมาณรายจ่ายประจำปี พ.ศ.2569 งานก่อสร้าง งบลงทุน ค่าที่ดินและสิ่งก่อสร้าง ค่าที่ปรับปรุงที่ดินและสิ่งก่อสร้าง หน้า 243 (แผนงานอุตสาหกรรมและการโยธา)";
+  const DEFAULT_PM_2 = "โครงการปรับปรุงทางเท้าคอนกรีตเสริมเหล็กทางชมนกกุฏิหลวงปู่ หมู่ที่ 12 (กองช่าง) ตำบลคลองด่าน เพื่อจ่ายเป็นค่าปรับปรุงทางเท้าคอนกรีตเสริมเหล็ก กว้าง 1.40 เมตร ยาว 230 เมตรรายละเอียดตามประมาณการงานก่อสร้าง และตามแบบแปลนที่องค์การบริหารส่วนตำบลคองด่านกำหนด จำนวนเงินงบประมาณ 1,384,600.-บาท (หนึ่งล้านสามแสนแปดหมื่นสี่พันหกร้อยบาทถ้วน)";
+  const DEFAULT_PM_3 = "- เป็นไปตามพระราชบัญญัติสภาตำบลและองค์การบริหารส่วนตำบล พ.ศ. 2537 และที่แก้ไขเพิ่มเติมถึง (ฉบับที่ 7) พ.ศ. 2569";
+  const DEFAULT_PM_4 = "- เป็นไปตามแผนพัฒนาท้องถิ่น พ.ศ. ๒๕๖๖-๒๕๗๐ เพิ่มเติมฉบับที่ 1 ประจำปี 2568 หน้าที่ 20 ลำดับที่ 30 (กองช่าง)";
+  const pm = val("priorMatter");
   const fields = {
     "[ชื่อโครงการ]": val("projectName"),
-    "[อ้างอิงแผนพัฒนาท้องถิ่น]": val("planRef"),
+    "[PM1]": pm || DEFAULT_PM_1,
+    "[PM2]": pm ? null : DEFAULT_PM_2,
+    "[PM3]": pm ? null : DEFAULT_PM_3,
+    "[PM4]": pm ? null : DEFAULT_PM_4,
+    "[ข้อเท็จจริง]": val("facts") || "นายกองค์การบริหารส่วนตำบลคลองด่านได้สั่งการให้กองช่างดำเนินการจัดทำโครงการดังกล่าวเพื่อแก้ไขปัญหาความเดือดร้อนของประชาชน เนื่องจากถนนเดิมอยู่ในระดับต่ำ เป็นเหตุให้น้ำทะเลท่วมถนนอยู่เป็นประจำ ทำให้ประชาชนใช้เส้นทางสัญจรด้วยความลำบากและอาจก่อให้เกิดอันตรายแก่ประชาชนในการใช้สัญจร ไป – มา ได้ ซึ่งเมื่อจัดทำโครงการดังกล่าวเสร็จสิ้นจะก่อให้เกิดประโยชน์แก่ประชาชนเป็นอย่างมาก",
     "[จำนวนเงินตัวเลข]": formatComma(val("moneyNum")),
     "[จำนวนเงินตัวอักษร]": bahtText(val("moneyNum")),
     "[จำนวนวันแล้วเสร็จ]": val("workDays"),
@@ -506,8 +527,13 @@ async function buildDocx() {
     "[เดือน]": val("docMonth"),
     "[ปี]": val("docYear"),
   };
+  xml = normalizePMRuns(xml);
   for (const [ph, value] of Object.entries(fields)) {
-    xml = replacePlaceholder(xml, ph, value);
+    if (value === null) {
+      xml = xml.replace(/<w:p[ >][\s\S]*?<\/w:p>/g, para => getParaText(para).includes(ph) ? "" : para);
+    } else {
+      xml = replacePlaceholder(xml, ph, value);
+    }
   }
 
   zip.file("word/document.xml", xml);
