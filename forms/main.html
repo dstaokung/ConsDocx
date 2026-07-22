@@ -280,6 +280,10 @@
         <input type="text" id="g_recName" placeholder="นายวิเชษฐ์  สุพัฒศร"></div>
       <div><label>ตำแหน่ง</label>
         <input type="text" id="g_recPos" placeholder="นายช่างโยธาปฏิบัติงาน"></div>
+      <div><label>เวลาเริ่มประชุม</label>
+        <input type="text" id="g_meetStart" placeholder="13.30"></div>
+      <div><label>เวลาเลิกประชุม</label>
+        <input type="text" id="g_meetEnd" placeholder="14.00"></div>
     </div>
   </div>
 
@@ -490,7 +494,7 @@ const AUTOSAVE_KEY = "consdocx_autosave_main";
 const AUTOSAVE_FIELDS = [
   "projectName", "g_month", "g_year", "g_priorMatter", "g_facts", "g_moneyNum",
   "g_name1", "g_pos1", "g_name2", "g_pos2", "g_name3", "g_pos3",
-  "g_recName", "g_recPos",
+  "g_recName", "g_recPos", "g_meetStart", "g_meetEnd",
   "g_workDays", "g_constrType", "g_kWorkType", "g_kSubWork", "g_kFormula",
   "g_rc1name", "g_rc1pos", "g_rc2name", "g_rc2pos", "g_rc3name", "g_rc3pos",
   "g_ic1name", "g_ic1pos", "g_ic2name", "g_ic2pos", "g_ic3name", "g_ic3pos",
@@ -750,8 +754,8 @@ const SHARED_MAP_5 = {
   g_ic1name: "ic1name", g_ic1pos: "ic1pos", g_ic2name: "ic2name", g_ic2pos: "ic2pos", g_ic3name: "ic3name", g_ic3pos: "ic3pos",
   g_sv1name: "sv1name", g_sv1pos: "sv1pos", g_sv2name: "sv2name", g_sv2pos: "sv2pos",
 };
-// เอกสาร 3: ผู้จดรายงานการประชุม
-const SHARED_MAP_3REC = { g_recName: "recName", g_recPos: "recPos" };
+// เอกสาร 3: ผู้จดรายงานการประชุม + เวลาเริ่ม/เลิกประชุม
+const SHARED_MAP_3REC = { g_recName: "recName", g_recPos: "recPos", g_meetStart: "meetStart", g_meetEnd: "meetEnd" };
 // เอกสาร 5: รายละเอียดเพิ่มเติม (กำหนดเวลา/ประเภทงาน/สูตรค่า K)
 const SHARED_MAP_5EXTRA = {
   g_workDays: "workDays", g_constrType: "constrType",
@@ -956,6 +960,8 @@ async function buildDoc3(data3, projectName, monthG, yearG) {
     "[ตำแหน่งกรรมการ3]": val("g_pos3") || (data3 && data3.pos3) || "",
     "[ชื่อผู้จดรายงานการประชุม]": val("g_recName") || (data3 && data3.recName) || "",
     "[ตำแหน่งผู้จดรายงานการประชุม]": val("g_recPos") || (data3 && data3.recPos) || "",
+    "[เวลาเริ่มประชุม]": val("g_meetStart") || (data3 && data3.meetStart) || "",
+    "[เวลาเลิกประชุม]": val("g_meetEnd") || (data3 && data3.meetEnd) || "",
     // ผู้ตรวจรายงานการประชุมคือประธานคณะกรรมการจัดทำแบบรูปรายการเสมอ (ตัดยศ "ว่าที่ ร.ต." ออก
     // เพราะบรรทัดลงชื่อในเอกสารมีคำนี้เป็นข้อความคงที่อยู่แล้ว)
     "[ชื่อผู้ตรวจรายงานการประชุม]": stripActingRank(chair3Name),

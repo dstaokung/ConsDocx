@@ -98,7 +98,7 @@
     <h2>1. ข้อมูลที่เปลี่ยนได้</h2>
 
     <div class="fixed-note">
-      เวลา/สถานที่ประชุม เลขที่คำสั่ง รายละเอียดขนาดถนนในข้อ ๑) และเวลาเลิกประชุม
+      สถานที่ประชุม เลขที่คำสั่ง และรายละเอียดขนาดถนนในข้อ ๑)
       <b>ยังคงที่ตามไฟล์ต้นฉบับ</b> เพราะยังไม่ได้ทำเครื่องหมายสีแดงไว้ — เดือน/ปีที่ประชุมและเดือน/ปีของคำสั่ง
       แก้ไขได้แล้วที่ช่องด้านล่าง (ใช้ค่าเดียวกันทั้งสองจุด)
       ถ้าต้องการแก้ไขจุดอื่นเพิ่มเติม ให้กลับไปทำสีแดงเพิ่มในไฟล์ต้นฉบับแล้วส่งมาแปลงใหม่
@@ -149,6 +149,13 @@
       <input type="text" id="recName" placeholder="นายวิเชษฐ์  สุพัฒศร">
       <label>ตำแหน่งผู้จดรายงานการประชุม</label>
       <input type="text" id="recPos" placeholder="นายช่างโยธาปฏิบัติงาน">
+
+      <div class="row2">
+        <div><label>เวลาเริ่มประชุม</label>
+          <input type="text" id="meetStart" placeholder="13.30"></div>
+        <div><label>เวลาเลิกประชุม</label>
+          <input type="text" id="meetEnd" placeholder="14.00"></div>
+      </div>
 
       <div class="fixed-note" style="margin-top:12px;">
         ผู้ตรวจรายงานการประชุมคือ<b>ประธานกรรมการ (คนที่ 1) เสมอ</b> — ไม่ต้องกรอกซ้ำ
@@ -233,7 +240,7 @@ function stripActingRank(name) {
 // ---- จำข้อมูลที่กรอกไว้ในฟอร์มนี้ (เก็บใน localStorage ของหน้านี้เอง) กันหายตอนกด
 // "กลับไปหน้าแรก" แล้วย้อนกลับเข้ามาใหม่ ----
 const AUTOSAVE_KEY = "consdocx_autosave_3_รายงานการประชุมแบบรูปรายการ";
-const AUTOSAVE_FIELDS = ["projectName","docMonth","docYear","moneyNum","moneyText","name1","pos1","name2","pos2","name3","pos3","recName","recPos"];
+const AUTOSAVE_FIELDS = ["projectName","docMonth","docYear","moneyNum","moneyText","name1","pos1","name2","pos2","name3","pos3","recName","recPos","meetStart","meetEnd"];
 if (window.ConsDocxMonthYear) {
   ConsDocxMonthYear.populateMonthSelect(document.getElementById("docMonth"));
   ConsDocxMonthYear.populateYearSelect(document.getElementById("docYear"));
@@ -382,6 +389,8 @@ async function buildDocx() {
     "[ตำแหน่งกรรมการ3]": val("pos3"),
     "[ชื่อผู้จดรายงานการประชุม]": val("recName"),
     "[ตำแหน่งผู้จดรายงานการประชุม]": val("recPos"),
+    "[เวลาเริ่มประชุม]": val("meetStart"),
+    "[เวลาเลิกประชุม]": val("meetEnd"),
     // ผู้ตรวจรายงานการประชุมคือประธานคณะกรรมการ (คนที่ 1) เสมอ ไม่ต้องกรอกซ้ำ
     "[ชื่อผู้ตรวจรายงานการประชุม]": stripActingRank(val("name1")),
     "[ตำแหน่งผู้ตรวจรายงานการประชุม]": val("pos1"),
