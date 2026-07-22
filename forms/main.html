@@ -273,6 +273,37 @@
   </div>
 
   <div class="card">
+    <h2>ผู้จดรายงานการประชุม <span class="hint">(ใช้ในเอกสาร 3 เท่านั้น)</span></h2>
+    <div class="row2">
+      <div><label>ชื่อ-สกุล</label>
+        <select class="roster-select" data-name="g_recName" data-pos="g_recPos"></select>
+        <input type="text" id="g_recName" placeholder="นายวิเชษฐ์  สุพัฒศร"></div>
+      <div><label>ตำแหน่ง</label>
+        <input type="text" id="g_recPos" placeholder="นายช่างโยธาปฏิบัติงาน"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>รายละเอียดเพิ่มเติม <span class="hint">(ใช้ในเอกสาร 5 เท่านั้น)</span></h2>
+    <label>จำนวนวันแล้วเสร็จตามสัญญา</label>
+    <input type="text" id="g_workDays" placeholder="120" inputmode="numeric">
+
+    <h3>ประเภทงานและสูตรค่า K</h3>
+    <label>เลือกจากสูตรมาตรฐาน <span class="hint">(ตามหลักเกณฑ์สัญญาแบบปรับราคาได้ — เลือกแล้วเติมช่องด้านล่างให้อัตโนมัติ ยังแก้เองได้)</span></label>
+    <select id="g_kCategorySelect"><option value="">— เลือกหมวดงาน —</option></select>
+    <select id="g_kItemSelect" style="margin-top:8px;"><option value="">— เลือกหมวดงานก่อน —</option></select>
+
+    <label>ประเภทงานก่อสร้าง (ข้อ ๕)</label>
+    <input type="text" id="g_constrType" placeholder="งานก่อสร้างทาง">
+    <label>ประเภทงานตามเงื่อนไขค่า K (ข้อ ๗)</label>
+    <input type="text" id="g_kWorkType" placeholder="งานทาง">
+    <label>ลักษณะงานที่ใช้สูตร (ข้อ ๗.๑)</label>
+    <input type="text" id="g_kSubWork" placeholder="งานผิวถนนคอนกรีตเสริมเหล็ก">
+    <label>สูตรค่า K <span class="hint">(พิมพ์ทั้งสูตร ขึ้นต้นด้วย K = )</span></label>
+    <input type="text" id="g_kFormula" placeholder="K = 0.30 + 0.10 It/Io + 0.35 Ct/Co + 0.10 Mt/Mo + 0.15 St/So">
+  </div>
+
+  <div class="card">
     <h2>คณะกรรมการกำหนดราคากลางงานก่อสร้าง <span class="hint">(ใช้ในเอกสาร 5 ข้อ 8.1)</span></h2>
     <div class="row2">
       <div><label>1. ชื่อ-สกุล (ประธานกรรมการ)</label>
@@ -459,6 +490,8 @@ const AUTOSAVE_KEY = "consdocx_autosave_main";
 const AUTOSAVE_FIELDS = [
   "projectName", "g_month", "g_year", "g_priorMatter", "g_facts", "g_moneyNum",
   "g_name1", "g_pos1", "g_name2", "g_pos2", "g_name3", "g_pos3",
+  "g_recName", "g_recPos",
+  "g_workDays", "g_constrType", "g_kWorkType", "g_kSubWork", "g_kFormula",
   "g_rc1name", "g_rc1pos", "g_rc2name", "g_rc2pos", "g_rc3name", "g_rc3pos",
   "g_ic1name", "g_ic1pos", "g_ic2name", "g_ic2pos", "g_ic3name", "g_ic3pos",
   "g_sv1name", "g_sv1pos", "g_sv2name", "g_sv2pos",
@@ -528,19 +561,62 @@ function getParaText(para) {
     .map(t => t.replace(/<[^>]+>/g, '')).join('');
 }
 
-// Merge split [PM#] placeholders: Word may store as 3 runs ([, PM#, ]) or 4 runs ([, PM, #, ])
-function normalizePMRuns(xml) {
-  const R = `(?:<w:r[^>]*>(?:<w:rPr>[\\s\\S]*?<\\/w:rPr>)?<w:t[^>]*>)`;
-  const E = `<\\/w:t><\\/w:r>`;
-  for (let n = 1; n <= 4; n++) {
-    const head = `(<w:t(?:[^>]*)?>)((?:[^<]*)\\[)${E}`;
-    const tail = `${R}\\]((?:[^<]*)<\\/w:t>)`;
-    xml = xml.replace(new RegExp(`${head}${R}PM${n}${E}${tail}`, 'g'),
-      (_, tOpen, before, after) => `${tOpen}${before}PM${n}]${after}`);
-    xml = xml.replace(new RegExp(`${head}${R}PM${E}${R}${n}${E}${tail}`, 'g'),
-      (_, tOpen, before, after) => `${tOpen}${before}PM${n}]${after}`);
+// Merge any "[placeholder]" text that Word split across multiple <w:r> runs (happens on
+// save whenever a run's language/font boundary falls inside the brackets — e.g. mixed Thai/English
+// text like "[สูตรค่าK]", or the "[PM1]" style placeholders). <w:proofErr/> spell-check markers
+// (purely cosmetic, safe to drop) are stripped first so the runs become directly adjacent.
+function normalizePlaceholderRuns(xml) {
+  xml = xml.replace(/<w:proofErr[^>]*\/>/g, "");
+  const runRe = /<w:r(?:\s[^>]*)?>(?:(?!<\/w:r>)[\s\S])*?<\/w:r>/g;
+  const rPrRe = /<w:rPr>[\s\S]*?<\/w:rPr>/;
+  const textRe = /<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/;
+
+  let result = "";
+  let lastIndex = 0;
+  let pending = null; // { rPr, text, raw } — accumulating a "[...]" placeholder split across runs
+  let m;
+  while ((m = runRe.exec(xml)) !== null) {
+    const gap = xml.slice(lastIndex, m.index);
+    lastIndex = runRe.lastIndex;
+    const runXml = m[0];
+
+    if (pending && gap.includes("</w:p>")) {
+      // paragraph ended before the "]" showed up — not a real split placeholder, leave untouched
+      result += pending.raw;
+      pending = null;
+    }
+    result += gap;
+
+    const textMatch = runXml.match(textRe);
+    if (!textMatch) {
+      if (pending) { result += pending.raw; pending = null; }
+      result += runXml;
+      continue;
+    }
+
+    const text = textMatch[1];
+    if (pending) {
+      pending.text += text;
+      pending.raw += runXml;
+      if (text.includes("]")) {
+        result += `<w:r>${pending.rPr}<w:t xml:space="preserve">${pending.text}</w:t></w:r>`;
+        pending = null;
+      }
+      continue;
+    }
+
+    const bracketIdx = text.indexOf("[");
+    if (bracketIdx !== -1 && !text.slice(bracketIdx).includes("]")) {
+      const rPrMatch = runXml.match(rPrRe);
+      pending = { rPr: rPrMatch ? rPrMatch[0] : "", text, raw: runXml };
+      continue;
+    }
+
+    result += runXml;
   }
-  return xml;
+  result += xml.slice(lastIndex);
+  if (pending) result += pending.raw;
+  return result;
 }
 
 // ---- แปลงจำนวนเงินตัวเลข → ตัวอักษรไทย + เติม comma (สำเนาเดียวกับในฟอร์มเอกสาร 3) ----
@@ -649,7 +725,7 @@ async function buildOneDocx(base64, fieldsMap) {
   const buf = base64ToArrayBuffer(base64);
   const zip = await JSZip.loadAsync(buf);
   let xml = await zip.file("word/document.xml").async("string");
-  xml = normalizePMRuns(xml);
+  xml = normalizePlaceholderRuns(xml);
   for (const [ph, value] of Object.entries(fieldsMap)) {
     if (value === null) {
       xml = xml.replace(/<w:p[ >][\s\S]*?<\/w:p>/g, para => getParaText(para).includes(ph) ? "" : para);
@@ -673,6 +749,13 @@ const SHARED_MAP_5 = {
   g_rc1name: "rc1name", g_rc1pos: "rc1pos", g_rc2name: "rc2name", g_rc2pos: "rc2pos", g_rc3name: "rc3name", g_rc3pos: "rc3pos",
   g_ic1name: "ic1name", g_ic1pos: "ic1pos", g_ic2name: "ic2name", g_ic2pos: "ic2pos", g_ic3name: "ic3name", g_ic3pos: "ic3pos",
   g_sv1name: "sv1name", g_sv1pos: "sv1pos", g_sv2name: "sv2name", g_sv2pos: "sv2pos",
+};
+// เอกสาร 3: ผู้จดรายงานการประชุม
+const SHARED_MAP_3REC = { g_recName: "recName", g_recPos: "recPos" };
+// เอกสาร 5: รายละเอียดเพิ่มเติม (กำหนดเวลา/ประเภทงาน/สูตรค่า K)
+const SHARED_MAP_5EXTRA = {
+  g_workDays: "workDays", g_constrType: "constrType",
+  g_kWorkType: "kWorkType", g_kSubWork: "kSubWork", g_kFormula: "kFormula",
 };
 
 // รวมค่าที่กรอกไว้จริง (เว้นว่าง = ไม่ส่ง จะได้ไม่ไปทับค่าเดิมในเอกสาร)
@@ -747,7 +830,7 @@ document.getElementById("pushShared").addEventListener("click", async () => {
     // เอกสาร 2 และ 3: ใช้คณะกรรมการแบบรูปรายการตรงๆ (ชื่อในตารางต้องมียศนำหน้าถ้ามี เช่น "ว่าที่ ร.ต.")
     const dataCommittee = collectShared(SHARED_MAP_234, true);
     const data2 = { ...dataCommittee };
-    const data3 = { ...dataCommittee };
+    const data3 = { ...dataCommittee, ...collectShared(SHARED_MAP_3REC, false) };
     if (moneyVal) data3.moneyNum = moneyVal;
     if (monthVal) { data2.docMonth = monthVal; data3.docMonth = monthVal; }
     if (yearVal) { data2.docYear = yearVal; data3.docYear = yearVal; }
@@ -762,8 +845,8 @@ document.getElementById("pushShared").addEventListener("click", async () => {
     if (monthVal) data4.docMonth = monthVal;
     if (yearVal) data4.docYear = yearVal;
 
-    // เอกสาร 5: คณะกรรมการอีก 3 ชุด + งบประมาณ + อ้างอิงแผนพัฒนาท้องถิ่น
-    const data5 = collectShared(SHARED_MAP_5, true);
+    // เอกสาร 5: คณะกรรมการอีก 3 ชุด + งบประมาณ + อ้างอิงแผนพัฒนาท้องถิ่น + รายละเอียดเพิ่มเติม
+    const data5 = { ...collectShared(SHARED_MAP_5, true), ...collectShared(SHARED_MAP_5EXTRA, false) };
     if (priorMatterVal) data5.priorMatter = priorMatterVal;
     if (factsVal) data5.facts = factsVal;
     if (moneyVal) data5.moneyNum = moneyVal;
@@ -871,8 +954,8 @@ async function buildDoc3(data3, projectName, monthG, yearG) {
     "[ตำแหน่งกรรมการ2]": val("g_pos2") || (data3 && data3.pos2) || "",
     "[ชื่อกรรมการ3]": val("g_name3") || (data3 && data3.name3) || "",
     "[ตำแหน่งกรรมการ3]": val("g_pos3") || (data3 && data3.pos3) || "",
-    "[ชื่อผู้จดรายงานการประชุม]": (data3 && data3.recName) || "",
-    "[ตำแหน่งผู้จดรายงานการประชุม]": (data3 && data3.recPos) || "",
+    "[ชื่อผู้จดรายงานการประชุม]": val("g_recName") || (data3 && data3.recName) || "",
+    "[ตำแหน่งผู้จดรายงานการประชุม]": val("g_recPos") || (data3 && data3.recPos) || "",
     // ผู้ตรวจรายงานการประชุมคือประธานคณะกรรมการจัดทำแบบรูปรายการเสมอ (ตัดยศ "ว่าที่ ร.ต." ออก
     // เพราะบรรทัดลงชื่อในเอกสารมีคำนี้เป็นข้อความคงที่อยู่แล้ว)
     "[ชื่อผู้ตรวจรายงานการประชุม]": stripActingRank(chair3Name),
@@ -911,11 +994,11 @@ async function buildDoc5(data5, projectName, monthG, yearG) {
     "[ข้อเท็จจริง]": val("g_facts") || (data5 && data5.facts) || DEFAULT_FACTS,
     "[จำนวนเงินตัวเลข]": formatComma(money5),
     "[จำนวนเงินตัวอักษร]": bahtText(money5),
-    "[จำนวนวันแล้วเสร็จ]": (data5 && data5.workDays) || "",
-    "[ประเภทงานก่อสร้าง]": (data5 && data5.constrType) || "",
-    "[ประเภทงานค่าK]": (data5 && data5.kWorkType) || "",
-    "[ลักษณะงานที่ใช้สูตรค่าK]": (data5 && data5.kSubWork) || "",
-    "[สูตรค่าK]": (data5 && data5.kFormula) || "",
+    "[จำนวนวันแล้วเสร็จ]": val("g_workDays") || (data5 && data5.workDays) || "",
+    "[ประเภทงานก่อสร้าง]": val("g_constrType") || (data5 && data5.constrType) || "",
+    "[ประเภทงานค่าK]": val("g_kWorkType") || (data5 && data5.kWorkType) || "",
+    "[ลักษณะงานที่ใช้สูตรค่าK]": val("g_kSubWork") || (data5 && data5.kSubWork) || "",
+    "[สูตรค่าK]": val("g_kFormula") || (data5 && data5.kFormula) || "",
     "[ชื่อกรรมการราคากลาง1]": val("g_rc1name") || (data5 && data5.rc1name) || "",
     "[ตำแหน่งกรรมการราคากลาง1]": val("g_rc1pos") || (data5 && data5.rc1pos) || "",
     "[ชื่อกรรมการราคากลาง2]": val("g_rc2name") || (data5 && data5.rc2name) || "",
@@ -1063,6 +1146,8 @@ if (cameBackFromDoc) {
     fillFrom(SHARED_MAP_234, d2);
     fillFrom(SHARED_MAP_234, d3);
     fillFrom(SHARED_MAP_5, d5);
+    fillFrom(SHARED_MAP_3REC, d3);
+    fillFrom(SHARED_MAP_5EXTRA, d5);
 
     // งบประมาณ: เอาจากเอกสาร 3, 4 หรือ 5 (ตัวไหนมีค่าก็ใช้ตัวนั้น) เติมเฉพาะถ้าช่องยังว่าง
     const moneyEl = document.getElementById("g_moneyNum");
@@ -1189,6 +1274,98 @@ document.getElementById("rosterAddBtn").addEventListener("click", () => {
 });
 
 renderRosterUI();
+
+// ---- สูตรค่า K มาตรฐาน ตาม "หลักเกณฑ์ เงื่อนไข ประเภทงานก่อสร้าง สูตรและวิธีการคำนวณที่ใช้กับ
+// สัญญาแบบปรับราคาได้" (มติคณะรัฐมนตรี ว 109) — ไม่รวมหมวด 5.7-5.9 เพราะระบุไว้ในเอกสารต้นฉบับว่า
+// ใช้เฉพาะงานก่อสร้างของการไฟฟ้าฝ่ายผลิต/การไฟฟ้าส่วนภูมิภาคเท่านั้น ไม่เกี่ยวกับงาน อบต./เทศบาลทั่วไป
+// constrTypeSuggest = คำแนะนำช่อง "ประเภทงานก่อสร้าง (ข้อ ๕)" ให้ต่อหมวด (ยังแก้เองได้เสมอ)
+const K_FORMULA_DATA = {
+  "งานอาคาร": {
+    constrTypeSuggest: "งานก่อสร้างอาคาร",
+    items: [
+      { name: "งานอาคาร (ตัวอาคาร รวมไฟฟ้า/ประปา/ทางระบายน้ำของอาคาร และทางเท้ารอบอาคารไม่เกิน 3 เมตร)", formula: "K = 0.25 + 0.15 It/Io + 0.10 Ct/Co + 0.40 Mt/Mo + 0.10 St/So" },
+    ],
+  },
+  "งานดิน": {
+    constrTypeSuggest: "งานก่อสร้างงานดิน",
+    items: [
+      { name: "งานดิน (ขุด ตัก บดอัด ถม คันดิน คันคลอง คันทาง)", formula: "K = 0.30 + 0.10 It/Io + 0.40 Et/Eo + 0.20 Ft/Fo" },
+      { name: "งานหินเรียง", formula: "K = 0.40 + 0.20 It/Io + 0.20 Mt/Mo + 0.20 Ft/Fo" },
+      { name: "งานเจาะระเบิดหิน", formula: "K = 0.45 + 0.15 It/Io + 0.10 Mt/Mo + 0.20 Et/Eo + 0.10 Ft/Fo" },
+    ],
+  },
+  "งานทาง": {
+    constrTypeSuggest: "งานก่อสร้างทาง",
+    items: [
+      { name: "งานผิวทาง PRIME COAT, TACK COAT, SEAL COAT", formula: "K = 0.30 + 0.40 At/Ao + 0.20 Et/Eo + 0.10 Ft/Fo" },
+      { name: "งานผิวทาง SURFACE TREATMENT, SLURRY SEAL", formula: "K = 0.30 + 0.10 Mt/Mo + 0.30 At/Ao + 0.20 Et/Eo + 0.10 Ft/Fo" },
+      { name: "งานผิวทาง ASPHALTIC CONCRETE, PENETRATION MACADAM", formula: "K = 0.30 + 0.10 Mt/Mo + 0.40 At/Ao + 0.10 Et/Eo + 0.10 Ft/Fo" },
+      { name: "งานผิวถนนคอนกรีตเสริมเหล็ก", formula: "K = 0.30 + 0.10 It/Io + 0.35 Ct/Co + 0.10 Mt/Mo + 0.15 St/So" },
+      { name: "งานท่อระบายน้ำคอนกรีตเสริมเหล็กและงานบ่อพัก", formula: "K = 0.35 + 0.20 It/Io + 0.15 Ct/Co + 0.15 Mt/Mo + 0.15 St/So" },
+      { name: "งานโครงสร้างคอนกรีตเสริมเหล็กและงานเขื่อนกันตลิ่ง", formula: "K = 0.30 + 0.10 It/Io + 0.15 Ct/Co + 0.20 Mt/Mo + 0.25 St/So" },
+      { name: "งานโครงสร้างเหล็ก", formula: "K = 0.25 + 0.10 It/Io + 0.05 Ct/Co + 0.20 Mt/Mo + 0.40 St/So" },
+    ],
+  },
+  "งานชลประทาน": {
+    constrTypeSuggest: "งานก่อสร้างชลประทาน",
+    items: [
+      { name: "งานอาคารชลประทานไม่รวมบานเหล็ก", formula: "K = 0.40 + 0.20 It/Io + 0.10 Ct/Co + 0.10 Mt/Mo + 0.20 St/So" },
+      { name: "งานอาคารชลประทานรวมบานเหล็ก", formula: "K = 0.35 + 0.20 It/Io + 0.10 Ct/Co + 0.10 Mt/Mo + 0.25 St/So" },
+      { name: "งานบานระบาย TRASHRACK และ STEEL LINER", formula: "K = 0.35 + 0.20 It/Io + 0.45 Gt/Go" },
+      { name: "งานเหล็กเสริมคอนกรีต และ ANCHOR BAR", formula: "K = 0.25 + 0.15 It/Io + 0.60 St/So" },
+      { name: "งานคอนกรีตไม่รวมเหล็กและคอนกรีตดาดคลอง", formula: "K = 0.40 + 0.15 It/Io + 0.25 Ct/Co + 0.20 Mt/Mo" },
+      { name: "งานเจาะ (อัดฉีดน้ำปูน)", formula: "K = 0.40 + 0.20 It/Io + 0.10 Mt/Mo + 0.20 Et/Eo + 0.10 Ft/Fo" },
+    ],
+  },
+  "งานระบบสาธารณูปโภค": {
+    constrTypeSuggest: "งานก่อสร้างระบบสาธารณูปโภค",
+    items: [
+      { name: "งานวางท่อ AC/PVC (กรณีผู้ว่าจ้างเป็นผู้จัดหาท่อ/อุปกรณ์)", formula: "K = 0.50 + 0.25 It/Io + 0.25 Mt/Mo" },
+      { name: "งานวางท่อ AC (กรณีผู้รับจ้างเป็นผู้จัดหาท่อ)", formula: "K = 0.40 + 0.10 It/Io + 0.10 Mt/Mo + 0.40 ACt/ACo" },
+      { name: "งานวางท่อ PVC (กรณีผู้รับจ้างเป็นผู้จัดหาท่อ)", formula: "K = 0.40 + 0.10 It/Io + 0.10 Mt/Mo + 0.40 PVCt/PVCo" },
+      { name: "งานวางท่อเหล็กเหนียว/HDPE (กรณีผู้ว่าจ้างเป็นผู้จัดหาท่อ)", formula: "K = 0.40 + 0.10 It/Io + 0.15 Mt/Mo + 0.20 Et/Eo + 0.15 Ft/Fo" },
+      { name: "งานวางท่อเหล็กเหนียว (กรณีผู้รับจ้างเป็นผู้จัดหาท่อ)", formula: "K = 0.40 + 0.10 It/Io + 0.10 Mt/Mo + 0.10 Et/Eo + 0.30 GIPt/GIPo" },
+      { name: "งานวางท่อ HDPE (กรณีผู้รับจ้างเป็นผู้จัดหาท่อ)", formula: "K = 0.50 + 0.10 It/Io + 0.10 Mt/Mo + 0.30 PEt/PEo" },
+      { name: "งานปรับปรุงระบบอุโมงค์ส่งน้ำ (SECONDARY LINING)", formula: "K = 0.40 + 0.10 It/Io + 0.15 Et/Eo + 0.35 GIPt/GIPo" },
+      { name: "งานวางท่อ PVC หุ้มด้วยคอนกรีต", formula: "K = 0.30 + 0.10 It/Io + 0.20 Ct/Co + 0.05 Mt/Mo + 0.05 St/So + 0.30 PVCt/PVCo" },
+      { name: "งานวางท่อ PVC กลบทราย", formula: "K = 0.25 + 0.05 It/Io + 0.05 Mt/Mo + 0.65 PVCt/PVCo" },
+      { name: "งานวางท่อเหล็กอาบสังกะสี", formula: "K = 0.25 + 0.25 It/Io + 0.50 GIPt/GIPo" },
+    ],
+  },
+};
+
+(function setupKFormulaDropdown() {
+  const catSel = document.getElementById("g_kCategorySelect");
+  const itemSel = document.getElementById("g_kItemSelect");
+  Object.keys(K_FORMULA_DATA).forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    catSel.appendChild(opt);
+  });
+  catSel.addEventListener("change", () => {
+    itemSel.innerHTML = "";
+    const cat = K_FORMULA_DATA[catSel.value];
+    if (!cat) {
+      itemSel.appendChild(new Option("— เลือกหมวดงานก่อน —", ""));
+      return;
+    }
+    itemSel.appendChild(new Option("— เลือกลักษณะงาน —", ""));
+    cat.items.forEach((item, i) => itemSel.appendChild(new Option(item.name, String(i))));
+    const constrTypeEl = document.getElementById("g_constrType");
+    if (!constrTypeEl.value.trim()) constrTypeEl.value = cat.constrTypeSuggest;
+    document.getElementById("g_kWorkType").value = catSel.value;
+    saveAutosave();
+  });
+  itemSel.addEventListener("change", () => {
+    const cat = K_FORMULA_DATA[catSel.value];
+    if (!cat || itemSel.value === "") return;
+    const item = cat.items[Number(itemSel.value)];
+    document.getElementById("g_kSubWork").value = item.name;
+    document.getElementById("g_kFormula").value = item.formula;
+    saveAutosave();
+  });
+})();
 </script>
 
 </body>

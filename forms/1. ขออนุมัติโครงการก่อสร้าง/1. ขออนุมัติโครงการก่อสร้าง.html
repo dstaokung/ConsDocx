@@ -291,21 +291,62 @@ function getParaText(para) {
     .map(t => t.replace(/<[^>]+>/g, '')).join('');
 }
 
-// Merge split [PM#] placeholders: Word may store as 3 runs ([, PM#, ]) or 4 runs ([, PM, #, ])
-function normalizePMRuns(xml) {
-  const R = `(?:<w:r[^>]*>(?:<w:rPr>[\\s\\S]*?<\\/w:rPr>)?<w:t[^>]*>)`;
-  const E = `<\\/w:t><\\/w:r>`;
-  for (let n = 1; n <= 4; n++) {
-    const head = `(<w:t(?:[^>]*)?>)((?:[^<]*)\\[)${E}`;
-    const tail = `${R}\\]((?:[^<]*)<\\/w:t>)`;
-    // 3-run: [ / PM# / ]
-    xml = xml.replace(new RegExp(`${head}${R}PM${n}${E}${tail}`, 'g'),
-      (_, tOpen, before, after) => `${tOpen}${before}PM${n}]${after}`);
-    // 4-run: [ / PM / # / ]
-    xml = xml.replace(new RegExp(`${head}${R}PM${E}${R}${n}${E}${tail}`, 'g'),
-      (_, tOpen, before, after) => `${tOpen}${before}PM${n}]${after}`);
+// Merge any "[placeholder]" text that Word split across multiple <w:r> runs (happens on
+// save whenever a run's language/font boundary falls inside the brackets — e.g. mixed Thai/English
+// text like "[สูตรค่าK]", or the "[PM1]" style placeholders). <w:proofErr/> spell-check markers
+// (purely cosmetic, safe to drop) are stripped first so the runs become directly adjacent.
+function normalizePlaceholderRuns(xml) {
+  xml = xml.replace(/<w:proofErr[^>]*\/>/g, "");
+  const runRe = /<w:r(?:\s[^>]*)?>(?:(?!<\/w:r>)[\s\S])*?<\/w:r>/g;
+  const rPrRe = /<w:rPr>[\s\S]*?<\/w:rPr>/;
+  const textRe = /<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/;
+
+  let result = "";
+  let lastIndex = 0;
+  let pending = null; // { rPr, text, raw } — accumulating a "[...]" placeholder split across runs
+  let m;
+  while ((m = runRe.exec(xml)) !== null) {
+    const gap = xml.slice(lastIndex, m.index);
+    lastIndex = runRe.lastIndex;
+    const runXml = m[0];
+
+    if (pending && gap.includes("</w:p>")) {
+      // paragraph ended before the "]" showed up — not a real split placeholder, leave untouched
+      result += pending.raw;
+      pending = null;
+    }
+    result += gap;
+
+    const textMatch = runXml.match(textRe);
+    if (!textMatch) {
+      if (pending) { result += pending.raw; pending = null; }
+      result += runXml;
+      continue;
+    }
+
+    const text = textMatch[1];
+    if (pending) {
+      pending.text += text;
+      pending.raw += runXml;
+      if (text.includes("]")) {
+        result += `<w:r>${pending.rPr}<w:t xml:space="preserve">${pending.text}</w:t></w:r>`;
+        pending = null;
+      }
+      continue;
+    }
+
+    const bracketIdx = text.indexOf("[");
+    if (bracketIdx !== -1 && !text.slice(bracketIdx).includes("]")) {
+      const rPrMatch = runXml.match(rPrRe);
+      pending = { rPr: rPrMatch ? rPrMatch[0] : "", text, raw: runXml };
+      continue;
+    }
+
+    result += runXml;
   }
-  return xml;
+  result += xml.slice(lastIndex);
+  if (pending) result += pending.raw;
+  return result;
 }
 
 function replacePlaceholder(xml, placeholder, value) {
@@ -365,7 +406,7 @@ async function buildDocx() {
     "[เดือน]": val("docMonth"),
     "[ปี]": val("docYear"),
   };
-  xml = normalizePMRuns(xml);
+  xml = normalizePlaceholderRuns(xml);
   for (const [ph, value] of Object.entries(fields)) {
     if (value === null) {
       xml = xml.replace(/<w:p[ >][\s\S]*?<\/w:p>/g, para => getParaText(para).includes(ph) ? "" : para);
