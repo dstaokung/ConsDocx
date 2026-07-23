@@ -269,6 +269,13 @@
         <input type="text" id="g_name3" placeholder="นายวิเชษฐ์  สุพัฒศร"></div>
       <div><label>3. ตำแหน่ง</label>
         <input type="text" id="g_pos3" placeholder="นายช่างโยธาปฏิบัติงาน"></div>
+      <div><label>ประเภทงบประมาณ <span class="hint">(ใช้ในเอกสาร 2 เท่านั้น)</span></label>
+        <select id="g_budgetType">
+          <option value="ordinance">ตามข้อบัญญัติงบประมาณ</option>
+          <option value="saving">ตามโครงการใช้จ่ายเงินสะสม</option>
+        </select></div>
+      <div><label>ปีงบประมาณ (พ.ศ.)</label>
+        <select id="g_budgetYear"></select></div>
     </div>
   </div>
 
@@ -494,6 +501,7 @@ const AUTOSAVE_KEY = "consdocx_autosave_main";
 const AUTOSAVE_FIELDS = [
   "projectName", "g_month", "g_year", "g_priorMatter", "g_facts", "g_moneyNum",
   "g_name1", "g_pos1", "g_name2", "g_pos2", "g_name3", "g_pos3",
+  "g_budgetType", "g_budgetYear",
   "g_recName", "g_recPos", "g_meetStart", "g_meetEnd",
   "g_workDays", "g_constrType", "g_kWorkType", "g_kSubWork", "g_kFormula",
   "g_rc1name", "g_rc1pos", "g_rc2name", "g_rc2pos", "g_rc3name", "g_rc3pos",
@@ -520,6 +528,7 @@ function restoreAutosave() {
 if (window.ConsDocxMonthYear) {
   ConsDocxMonthYear.populateMonthSelect(document.getElementById("g_month"));
   ConsDocxMonthYear.populateYearSelect(document.getElementById("g_year"));
+  ConsDocxMonthYear.populateYearSelect(document.getElementById("g_budgetYear"));
 }
 
 // เปิดหน้า main ตรงๆ หรือกลับมาจากเอกสารย่อย: คืนค่าที่เคยกรอกไว้เสมอ (ไม่ล้างข้อมูลอัตโนมัติแล้ว)
@@ -748,6 +757,8 @@ const SHARED_MAP_234 = {
   g_name2: "name2", g_pos2: "pos2",
   g_name3: "name3", g_pos3: "pos3",
 };
+// เอกสาร 2: ประเภทงบประมาณ + ปีงบประมาณ (ใช้เอกสาร 2 เท่านั้น)
+const SHARED_MAP_2BUDGET = { g_budgetType: "budgetType", g_budgetYear: "budgetYear" };
 // เอกสาร 5: ราคากลาง (rc) / ตรวจรับ (ic) / ผู้ควบคุมงาน (sv)
 const SHARED_MAP_5 = {
   g_rc1name: "rc1name", g_rc1pos: "rc1pos", g_rc2name: "rc2name", g_rc2pos: "rc2pos", g_rc3name: "rc3name", g_rc3pos: "rc3pos",
@@ -833,7 +844,7 @@ document.getElementById("pushShared").addEventListener("click", async () => {
 
     // เอกสาร 2 และ 3: ใช้คณะกรรมการแบบรูปรายการตรงๆ (ชื่อในตารางต้องมียศนำหน้าถ้ามี เช่น "ว่าที่ ร.ต.")
     const dataCommittee = collectShared(SHARED_MAP_234, true);
-    const data2 = { ...dataCommittee };
+    const data2 = { ...dataCommittee, ...collectShared(SHARED_MAP_2BUDGET, false) };
     const data3 = { ...dataCommittee, ...collectShared(SHARED_MAP_3REC, false) };
     if (moneyVal) data3.moneyNum = moneyVal;
     if (monthVal) { data2.docMonth = monthVal; data3.docMonth = monthVal; }
@@ -930,9 +941,18 @@ async function buildDoc1(data1, projectName, monthG, yearG) {
   });
 }
 
+// อ้างอิงงบประมาณในเอกสาร 2 — เลือกได้ทั้งที่ช่องร่วมหน้า main (g_budgetType/g_budgetYear) หรือในหน้าเอกสาร 2 เอง
+function budgetRefText2(data2) {
+  const budgetType = val("g_budgetType") || (data2 && data2.budgetType) || "ordinance";
+  const budgetYear = val("g_budgetYear") || (data2 && data2.budgetYear) || (window.ConsDocxMonthYear ? ConsDocxMonthYear.currentYearThai() : "");
+  const prefix = budgetType === "saving" ? "ตามโครงการใช้จ่ายเงินสะสม" : "ตามข้อบัญญัติงบประมาณ";
+  return `${prefix} ประจำปีงบประมาณ พ.ศ. ${budgetYear}`;
+}
+
 async function buildDoc2(data2, projectName, monthG, yearG) {
   return buildOneDocx(window.TEMPLATE_2_BASE64, {
     "[ชื่อโครงการ]": projectName,
+    "[อ้างอิงงบประมาณ]": budgetRefText2(data2),
     "[ชื่อกรรมการ1]": val("g_name1") || (data2 && data2.name1) || "",
     "[ตำแหน่งกรรมการ1]": val("g_pos1") || (data2 && data2.pos1) || "",
     "[ชื่อกรรมการ2]": val("g_name2") || (data2 && data2.name2) || "",
@@ -1151,6 +1171,7 @@ if (cameBackFromDoc) {
     // เอกสาร 4 ตัดยศ "ว่าที่ ร.ต." ออกไปแล้ว จะทำให้ช่องที่ main ขาดยศไปด้วย)
     fillFrom(SHARED_MAP_234, d2);
     fillFrom(SHARED_MAP_234, d3);
+    fillFrom(SHARED_MAP_2BUDGET, d2);
     fillFrom(SHARED_MAP_5, d5);
     fillFrom(SHARED_MAP_3REC, d3);
     fillFrom(SHARED_MAP_5EXTRA, d5);

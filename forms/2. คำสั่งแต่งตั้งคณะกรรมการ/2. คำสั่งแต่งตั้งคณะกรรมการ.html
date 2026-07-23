@@ -123,6 +123,16 @@
         <select id="docYear"></select>
       </div>
 
+      <h3>งบประมาณ</h3>
+      <label>ประเภทงบประมาณ <span class="hint">(อ้างอิงในย่อหน้า "ด้วยกองช่าง...")</span></label>
+      <div class="row2">
+        <select id="budgetType">
+          <option value="ordinance">ตามข้อบัญญัติงบประมาณ</option>
+          <option value="saving">ตามโครงการใช้จ่ายเงินสะสม</option>
+        </select>
+        <select id="budgetYear"></select>
+      </div>
+
       <h3>คณะกรรมการ 3 คน</h3>
 
       <label>1. ชื่อ-สกุล (ประธานกรรมการ)</label>
@@ -152,13 +162,20 @@
 <script>
 function val(id) { return document.getElementById(id).value.trim(); }
 
+// อ้างอิงงบประมาณในย่อหน้า "ด้วยกองช่าง..." — เลือกได้ว่าเป็นข้อบัญญัติงบประมาณหรือเงินสะสม
+function budgetRefText() {
+  const prefix = val("budgetType") === "saving" ? "ตามโครงการใช้จ่ายเงินสะสม" : "ตามข้อบัญญัติงบประมาณ";
+  return `${prefix} ประจำปีงบประมาณ พ.ศ. ${val("budgetYear")}`;
+}
+
 // ---- จำข้อมูลที่กรอกไว้ในฟอร์มนี้ (เก็บใน localStorage ของหน้านี้เอง) กันหายตอนกด
 // "กลับไปหน้าแรก" แล้วย้อนกลับเข้ามาใหม่ ----
 const AUTOSAVE_KEY = "consdocx_autosave_2_คำสั่งแต่งตั้งคณะกรรมการ";
-const AUTOSAVE_FIELDS = ["projectName","docMonth","docYear","name1","pos1","name2","pos2","name3","pos3"];
+const AUTOSAVE_FIELDS = ["projectName","docMonth","docYear","budgetType","budgetYear","name1","pos1","name2","pos2","name3","pos3"];
 if (window.ConsDocxMonthYear) {
   ConsDocxMonthYear.populateMonthSelect(document.getElementById("docMonth"));
   ConsDocxMonthYear.populateYearSelect(document.getElementById("docYear"));
+  ConsDocxMonthYear.populateYearSelect(document.getElementById("budgetYear"));
 }
 function saveAutosave() {
   const data = {};
@@ -281,6 +298,7 @@ async function buildDocx() {
 
   const fields = {
     "[ชื่อโครงการ]": val("projectName"),
+    "[อ้างอิงงบประมาณ]": budgetRefText(),
     "[ชื่อกรรมการ1]": val("name1"),
     "[ตำแหน่งกรรมการ1]": val("pos1"),
     "[ชื่อกรรมการ2]": val("name2"),
