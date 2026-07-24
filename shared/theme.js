@@ -6,35 +6,21 @@
 
   var THEMES = {
     blue: {
-      label: "ฟ้า (ค่าเริ่มต้น)",
+      label: "Light Mode",
       accent: "#2563eb", accentDark: "#1d4ed8", accentLight: "#93c5fd", accentBg: "#eff6ff", accentText: "#1e40af",
       pageBg: "#f2f4f7", cardBg: "#ffffff", border: "#e5e7eb", inputBorder: "#d1d5db",
       text: "#1f2937", textMuted: "#6b7280", textFaint: "#9ca3af",
       surface: "#f9fafb", inputBg: "#ffffff", inputText: "#1f2937",
     },
-    green: {
-      label: "เขียว",
-      accent: "#16a34a", accentDark: "#15803d", accentLight: "#86efac", accentBg: "#f0fdf4", accentText: "#166534",
-      pageBg: "#f2f4f7", cardBg: "#ffffff", border: "#e5e7eb", inputBorder: "#d1d5db",
-      text: "#1f2937", textMuted: "#6b7280", textFaint: "#9ca3af",
-      surface: "#f9fafb", inputBg: "#ffffff", inputText: "#1f2937",
-    },
-    purple: {
-      label: "ม่วง",
-      accent: "#7c3aed", accentDark: "#6d28d9", accentLight: "#c4b5fd", accentBg: "#f5f3ff", accentText: "#5b21b6",
-      pageBg: "#f2f4f7", cardBg: "#ffffff", border: "#e5e7eb", inputBorder: "#d1d5db",
-      text: "#1f2937", textMuted: "#6b7280", textFaint: "#9ca3af",
-      surface: "#f9fafb", inputBg: "#ffffff", inputText: "#1f2937",
-    },
     dark: {
-      label: "มืด (Dark)",
+      label: "Dark Mode",
       accent: "#60a5fa", accentDark: "#3b82f6", accentLight: "#3b5a8a", accentBg: "#17233c", accentText: "#bfdbfe",
       pageBg: "#0f172a", cardBg: "#1e293b", border: "#334155", inputBorder: "#334155",
       text: "#e2e8f0", textMuted: "#94a3b8", textFaint: "#64748b",
       surface: "#243144", inputBg: "#1e293b", inputText: "#e2e8f0",
     },
   };
-  var THEME_ORDER = ["blue", "green", "purple", "dark"];
+  var THEME_ORDER = ["blue", "dark"];
   var currentTheme = "blue";
 
   function getQueryTheme() {

@@ -1,13 +1,17 @@
-// ---- รายชื่อเดือนไทย + แปลงเลขอารบิกเป็นเลขไทย ใช้ร่วมกันทุกหน้า (main + เอกสาร 1-5) ----
+// ---- รายชื่อเดือนไทย + ปี พ.ศ. ใช้ร่วมกันทุกหน้า (main + เอกสาร 1-5) ----
+// หมายเหตุ: เดิมฟังก์ชันนี้แปลงเลขปีเป็น "เลขไทย" (๐-๙) ก่อนใส่ลงเอกสาร แต่เอกสารทุกฉบับใช้ฟอนต์
+// "TH SarabunIT๙" ซึ่งจะแปลงตัวเลขอารบิก (0-9) ที่พิมพ์ไปเป็นตัวเลขไทยให้อัตโนมัติตอนแสดงผล/พิมพ์อยู่แล้ว
+// เพื่อกันความผิดพลาด (เลขไทยจริงกับเลขอารบิกที่ฟอนต์แปลงให้ ปนกันแล้วแก้ยาก) จึงเปลี่ยนให้เก็บ/ส่งออก
+// เป็น "เลขอารบิก" เสมอทั้งระบบ แล้วปล่อยให้ฟอนต์เป็นผู้แปลงเป็นเลขไทยตอนแสดงผลแทน — คง key `toThaiDigits`
+// ไว้เผื่อโค้ดอื่นเรียกใช้ชื่อนี้อยู่ แต่เปลี่ยนพฤติกรรมเป็น "คืนค่าเป็นเลขอารบิกเดิม" (ไม่แปลงแล้ว)
 window.ConsDocxMonthYear = (function () {
   var MONTHS = [
     "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
     "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
   ];
-  var THAI_DIGITS = "๐๑๒๓๔๕๖๗๘๙";
 
   function toThaiDigits(n) {
-    return String(n).replace(/[0-9]/g, function (d) { return THAI_DIGITS[+d]; });
+    return String(n);
   }
 
   function currentMonth() {
@@ -16,16 +20,16 @@ window.ConsDocxMonthYear = (function () {
 
   function currentYearThai() {
     var beYear = new Date().getFullYear() + 543;
-    return toThaiDigits(beYear);
+    return String(beYear);
   }
 
-  // รายการปี พ.ศ. (เลขไทย) รอบๆ ปีปัจจุบัน ให้เลือกล่วงหน้า/ย้อนหลังได้
+  // รายการปี พ.ศ. (เลขอารบิก) รอบๆ ปีปัจจุบัน ให้เลือกล่วงหน้า/ย้อนหลังได้
   function yearOptionsThai(spread) {
     spread = spread || 3;
     var centerBE = new Date().getFullYear() + 543;
     var out = [];
     for (var i = -spread; i <= spread; i++) {
-      out.push(toThaiDigits(centerBE + i));
+      out.push(String(centerBE + i));
     }
     return out;
   }

@@ -129,11 +129,11 @@
       <select id="kCategorySelect"><option value="">— เลือกหมวดงาน —</option></select>
       <select id="kItemSelect" style="margin-top:8px;"><option value="">— เลือกหมวดงานก่อน —</option></select>
 
-      <label>ประเภทงานก่อสร้าง (ข้อ ๕)</label>
+      <label>ประเภทงานก่อสร้าง (ข้อ 5)</label>
       <input type="text" id="constrType" placeholder="งานก่อสร้างทาง">
-      <label>ประเภทงานตามเงื่อนไขค่า K (ข้อ ๗)</label>
+      <label>ประเภทงานตามเงื่อนไขค่า K (ข้อ 7)</label>
       <input type="text" id="kWorkType" placeholder="งานทาง">
-      <label>ลักษณะงานที่ใช้สูตร (ข้อ ๗.๑)</label>
+      <label>ลักษณะงานที่ใช้สูตร (ข้อ 7.1)</label>
       <input type="text" id="kSubWork" placeholder="งานผิวถนนคอนกรีตเสริมเหล็ก">
       <label>สูตรค่า K <span class="hint">(พิมพ์ทั้งสูตร ขึ้นต้นด้วย K = )</span></label>
       <input type="text" id="kFormula" placeholder="K = 0.30 + 0.10 It/Io + 0.35 Ct/Co + 0.10 Mt/Mo + 0.15 St/So">
@@ -244,7 +244,7 @@ function updateMoneyText() {
 // ---- สูตรค่า K มาตรฐาน ตาม "หลักเกณฑ์ เงื่อนไข ประเภทงานก่อสร้าง สูตรและวิธีการคำนวณที่ใช้กับ
 // สัญญาแบบปรับราคาได้" (มติคณะรัฐมนตรี ว 109) — ไม่รวมหมวด 5.7-5.9 เพราะระบุไว้ในเอกสารต้นฉบับว่า
 // ใช้เฉพาะงานก่อสร้างของการไฟฟ้าฝ่ายผลิต/การไฟฟ้าส่วนภูมิภาคเท่านั้น ไม่เกี่ยวกับงาน อบต./เทศบาลทั่วไป
-// constrTypeSuggest = คำแนะนำช่อง "ประเภทงานก่อสร้าง (ข้อ ๕)" ให้ต่อหมวด (ยังแก้เองได้เสมอ)
+// constrTypeSuggest = คำแนะนำช่อง "ประเภทงานก่อสร้าง (ข้อ 5)" ให้ต่อหมวด (ยังแก้เองได้เสมอ)
 const K_FORMULA_DATA = {
   "งานอาคาร": {
     constrTypeSuggest: "งานก่อสร้างอาคาร",
@@ -503,23 +503,26 @@ function replacePlaceholder(xml, placeholder, value) {
     result += xml.slice(lastIndex, match.index);
     const rPrMatch = preRunXml.match(/<w:rPr>[\s\S]*?<\/w:rPr>/);
     const rPr = rPrMatch ? rPrMatch[0] : "";
-    const idx = textContent.indexOf(placeholder);
-    const prefix = textContent.slice(0, idx);
-    const suffix = textContent.slice(idx + placeholder.length);
+    // แยกข้อความในรันนี้ด้วย placeholder ทุกจุดที่เจอ (ไม่ใช่แค่จุดแรก) เผื่อ placeholder
+    // เดียวกันโผล่ซ้ำมากกว่า 1 ครั้งในรันเดียวกัน (เช่น "...ลงวันที่ [เดือน] [ปี] ...ลงวันที่ [เดือน] [ปี]"
+    // ที่ถูก Word รวมเป็นรันเดียว) — ถ้าแทนแค่จุดแรกจุดเดียว จุดที่เหลือจะค้างเป็น "[...]" ในไฟล์จริง
+    const segments = textContent.split(placeholder);
     const lines = String(value).split(/\n+/);
-    let replacement;
-    if (lines.length <= 1) {
-      replacement = `<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(prefix + value + suffix)}</w:t></w:r>`;
-    } else {
-      const parts = [];
-      parts.push(`<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(prefix + lines[0])}</w:t></w:r>`);
-      for (let i = 1; i < lines.length - 1; i++) {
-        parts.push(`<w:r>${rPr}<w:br/><w:t xml:space="preserve">${xmlEscape(lines[i])}</w:t></w:r>`);
+    const parts = [];
+    segments.forEach((seg, i) => {
+      if (i > 0) {
+        if (lines.length <= 1) {
+          parts.push(`<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(value)}</w:t></w:r>`);
+        } else {
+          parts.push(`<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(lines[0])}</w:t></w:r>`);
+          for (let j = 1; j < lines.length; j++) {
+            parts.push(`<w:r>${rPr}<w:br/><w:t xml:space="preserve">${xmlEscape(lines[j])}</w:t></w:r>`);
+          }
+        }
       }
-      parts.push(`<w:r>${rPr}<w:br/><w:t xml:space="preserve">${xmlEscape(lines[lines.length - 1] + suffix)}</w:t></w:r>`);
-      replacement = parts.join("");
-    }
-    result += replacement;
+      if (seg) parts.push(`<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(seg)}</w:t></w:r>`);
+    });
+    result += parts.join("");
     lastIndex = match.index + fullMatch.length;
     runRegex.lastIndex = lastIndex;
   }
@@ -535,7 +538,7 @@ async function buildDocx() {
   const DEFAULT_PM_1 = "ตามข้อบัญญัติองค์การบริหารส่วนตำบลคลองด่าน งบประมาณรายจ่ายประจำปี พ.ศ.2569 งานก่อสร้าง งบลงทุน ค่าที่ดินและสิ่งก่อสร้าง ค่าที่ปรับปรุงที่ดินและสิ่งก่อสร้าง หน้า 243 (แผนงานอุตสาหกรรมและการโยธา)";
   const DEFAULT_PM_2 = "โครงการปรับปรุงทางเท้าคอนกรีตเสริมเหล็กทางชมนกกุฏิหลวงปู่ หมู่ที่ 12 (กองช่าง) ตำบลคลองด่าน เพื่อจ่ายเป็นค่าปรับปรุงทางเท้าคอนกรีตเสริมเหล็ก กว้าง 1.40 เมตร ยาว 230 เมตรรายละเอียดตามประมาณการงานก่อสร้าง และตามแบบแปลนที่องค์การบริหารส่วนตำบลคองด่านกำหนด จำนวนเงินงบประมาณ 1,384,600.-บาท (หนึ่งล้านสามแสนแปดหมื่นสี่พันหกร้อยบาทถ้วน)";
   const DEFAULT_PM_3 = "- เป็นไปตามพระราชบัญญัติสภาตำบลและองค์การบริหารส่วนตำบล พ.ศ. 2537 และที่แก้ไขเพิ่มเติมถึง (ฉบับที่ 7) พ.ศ. 2569";
-  const DEFAULT_PM_4 = "- เป็นไปตามแผนพัฒนาท้องถิ่น พ.ศ. ๒๕๖๖-๒๕๗๐ เพิ่มเติมฉบับที่ 1 ประจำปี 2568 หน้าที่ 20 ลำดับที่ 30 (กองช่าง)";
+  const DEFAULT_PM_4 = "- เป็นไปตามแผนพัฒนาท้องถิ่น พ.ศ. 2566-2570 เพิ่มเติมฉบับที่ 1 ประจำปี 2568 หน้าที่ 20 ลำดับที่ 30 (กองช่าง)";
   const pm = val("priorMatter");
   const fields = {
     "[ชื่อโครงการ]": val("projectName"),

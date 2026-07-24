@@ -314,23 +314,26 @@ function replacePlaceholder(xml, placeholder, value) {
     result += xml.slice(lastIndex, match.index);
     const rPrMatch = preRunXml.match(/<w:rPr>[\s\S]*?<\/w:rPr>/);
     const rPr = rPrMatch ? rPrMatch[0] : "";
-    const idx = textContent.indexOf(placeholder);
-    const prefix = textContent.slice(0, idx);
-    const suffix = textContent.slice(idx + placeholder.length);
+    // แยกข้อความในรันนี้ด้วย placeholder ทุกจุดที่เจอ (ไม่ใช่แค่จุดแรก) เผื่อ placeholder
+    // เดียวกันโผล่ซ้ำมากกว่า 1 ครั้งในรันเดียวกัน (เช่น "...ลงวันที่ [เดือน] [ปี] ...ลงวันที่ [เดือน] [ปี]"
+    // ที่ถูก Word รวมเป็นรันเดียว) — ถ้าแทนแค่จุดแรกจุดเดียว จุดที่เหลือจะค้างเป็น "[...]" ในไฟล์จริง
+    const segments = textContent.split(placeholder);
     const lines = String(value).split(/\n+/);
-    let replacement;
-    if (lines.length <= 1) {
-      replacement = `<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(prefix + value + suffix)}</w:t></w:r>`;
-    } else {
-      const parts = [];
-      parts.push(`<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(prefix + lines[0])}</w:t></w:r>`);
-      for (let i = 1; i < lines.length - 1; i++) {
-        parts.push(`<w:r>${rPr}<w:br/><w:t xml:space="preserve">${xmlEscape(lines[i])}</w:t></w:r>`);
+    const parts = [];
+    segments.forEach((seg, i) => {
+      if (i > 0) {
+        if (lines.length <= 1) {
+          parts.push(`<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(value)}</w:t></w:r>`);
+        } else {
+          parts.push(`<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(lines[0])}</w:t></w:r>`);
+          for (let j = 1; j < lines.length; j++) {
+            parts.push(`<w:r>${rPr}<w:br/><w:t xml:space="preserve">${xmlEscape(lines[j])}</w:t></w:r>`);
+          }
+        }
       }
-      parts.push(`<w:r>${rPr}<w:br/><w:t xml:space="preserve">${xmlEscape(lines[lines.length - 1] + suffix)}</w:t></w:r>`);
-      replacement = parts.join("");
-    }
-    result += replacement;
+      if (seg) parts.push(`<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(seg)}</w:t></w:r>`);
+    });
+    result += parts.join("");
     lastIndex = match.index + fullMatch.length;
     runRegex.lastIndex = lastIndex;
   }
