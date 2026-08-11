@@ -897,7 +897,7 @@ document.getElementById("pushShared").addEventListener("click", async () => {
     // เอกสาร 2 และ 3: ใช้คณะกรรมการแบบรูปรายการตรงๆ (ชื่อในตารางต้องมียศนำหน้าถ้ามี เช่น "ว่าที่ ร.ต.")
     const dataCommittee = collectShared(SHARED_MAP_234, true);
     const data2 = { ...dataCommittee, ...collectShared(SHARED_MAP_2BUDGET, false) };
-    const data3 = { ...dataCommittee, ...collectShared(SHARED_MAP_3REC, false) };
+    const data3 = { ...dataCommittee, ...collectShared(SHARED_MAP_3REC, false), ...collectShared(SHARED_MAP_2BUDGET, false) };
     if (moneyVal) data3.moneyNum = moneyVal;
     if (monthVal) { data2.docMonth = monthVal; data3.docMonth = monthVal; }
     if (yearVal) { data2.docYear = yearVal; data3.docYear = yearVal; }
@@ -1055,6 +1055,7 @@ async function buildDoc3(data3, projectName, monthG, yearG) {
   const chair3Pos = val("g_pos1") || (data3 && data3.pos1) || "";
   return buildOneDocx(window.TEMPLATE_3_BASE64, {
     ...sharedProjectFields(data3, projectName, monthG, yearG),
+    "[อ้างอิงงบประมาณ]": budgetRefText2(data3),
     "[จำนวนเงินตัวเลข]": formatComma(money3),
     "[จำนวนเงินตัวอักษร]": bahtText(money3),
     "[ชื่อกรรมการ1]": chair3Name,

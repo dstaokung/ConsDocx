@@ -113,6 +113,7 @@
       <input type="hidden" id="letter1No"><input type="hidden" id="letter1Date">
       <input type="hidden" id="letter2No"><input type="hidden" id="letter2Date">
       <input type="hidden" id="letter3No"><input type="hidden" id="letter3Date">
+      <input type="hidden" id="budgetType"><input type="hidden" id="budgetYear">
 
       <label>เดือน/ปี ประชุม/คำสั่ง <span class="hint">(กรอกที่หน้าแรกแล้วกด "บันทึกข้อมูลร่วมลงทุกเอกสาร" จะมาเติมให้อัตโนมัติ)</span></label>
       <div class="row2">
@@ -246,7 +247,7 @@ function stripActingRank(name) {
 // ---- จำข้อมูลที่กรอกไว้ในฟอร์มนี้ (เก็บใน localStorage ของหน้านี้เอง) กันหายตอนกด
 // "กลับไปหน้าแรก" แล้วย้อนกลับเข้ามาใหม่ ----
 const AUTOSAVE_KEY = "consdocx_autosave_3_รายงานการประชุมแบบรูปรายการ";
-const AUTOSAVE_FIELDS = ["projectName","docMonth","docYear","moneyNum","moneyText","name1","pos1","name2","pos2","name3","pos3","recName","recPos","meetStart","meetEnd","projectDetail","orderNo","orderDate","letter1No","letter1Date","letter2No","letter2Date","letter3No","letter3Date"];
+const AUTOSAVE_FIELDS = ["projectName","docMonth","docYear","moneyNum","moneyText","name1","pos1","name2","pos2","name3","pos3","recName","recPos","meetStart","meetEnd","projectDetail","orderNo","orderDate","letter1No","letter1Date","letter2No","letter2Date","letter3No","letter3Date","budgetType","budgetYear"];
 if (window.ConsDocxMonthYear) {
   ConsDocxMonthYear.populateMonthSelect(document.getElementById("docMonth"));
   ConsDocxMonthYear.populateYearSelect(document.getElementById("docYear"));
@@ -391,9 +392,15 @@ async function buildDocx() {
   function docRefNoWithYear(raw) { return raw || (DOC_REF_BLANK + "/" + docRefYear); }
   function docRefNoOnly(raw) { return raw || DOC_REF_BLANK; }
   function docRefDate(raw) { return raw || (DOC_REF_BLANK + docRefMonth + " " + docRefYear); }
+  // อ้างอิงงบประมาณ — เงื่อนไขเดียวกับเอกสาร 2 (ตามข้อบัญญัติงบประมาณ / ตามโครงการใช้จ่ายเงินสะสม)
+  function budgetRefText() {
+    const prefix = val("budgetType") === "saving" ? "ตามโครงการใช้จ่ายเงินสะสม" : "ตามข้อบัญญัติงบประมาณ";
+    return `${prefix} ประจำปีงบประมาณ พ.ศ. ${val("budgetYear")}`;
+  }
   const fields = {
     "[ชื่อโครงการ]": val("projectName"),
     "[รายละเอียดโครงการ]": val("projectDetail"),
+    "[อ้างอิงงบประมาณ]": budgetRefText(),
     "[เลขที่คำสั่งคณะกรรมการจัดทำแบบรูปรายการงานก่อสร้าง]": docRefNoWithYear(val("orderNo")),
     "[วันที่คำสั่งคณะกรรมการจัดทำแบบรูปรายการงานก่อสร้าง]": docRefDate(val("orderDate")),
     "[เลขที่หนังสือขออนุมัติโครงการ]": docRefNoOnly(val("letter1No")),
