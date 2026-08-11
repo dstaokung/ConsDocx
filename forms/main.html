@@ -222,12 +222,46 @@
     <label>ชื่อโครงการ</label>
     <input type="text" id="projectName" placeholder="ก่อสร้างถนน คสล.ซอยบ้านเจ๊จิตร หมู่ที่ 8">
 
+    <label>รายละเอียดโครงการ</label>
+    <textarea id="g_projectDetail" rows="4" style="resize:none; line-height:1.5;" placeholder="รายละเอียดโครงการ เช่น ขนาด ปริมาณงาน สถานที่ก่อสร้าง ฯลฯ"></textarea>
+
     <h3>เดือน/ปี ที่ใช้ในเอกสาร</h3>
     <div class="row2">
       <div><label>เดือน</label>
         <select id="g_month"></select></div>
       <div><label>ปี (พ.ศ.)</label>
         <select id="g_year"></select></div>
+    </div>
+
+    <h3>งบประมาณ</h3>
+    <div class="row2">
+      <div><label>ประเภทงบประมาณ <span class="hint">(ใช้ในเอกสาร 2 เท่านั้น)</span></label>
+        <select id="g_budgetType">
+          <option value="ordinance">ตามข้อบัญญัติงบประมาณ</option>
+          <option value="saving">ตามโครงการใช้จ่ายเงินสะสม</option>
+        </select></div>
+      <div><label>ปีงบประมาณ (พ.ศ.)</label>
+        <select id="g_budgetYear"></select></div>
+    </div>
+
+    <h3>เลขที่/วันที่หนังสือที่เกี่ยวข้อง <span class="hint">(เว้นว่างได้ — ถ้าไม่กรอกจะเว้นช่องว่าง 8 ตัวอักษรแทนเลขที่/วันที่ในเอกสาร แล้วเติมเดือน/ปีจากด้านบนให้อัตโนมัติ)</span></h3>
+    <div class="row2">
+      <div><label>เลขที่คำสั่งคณะกรรมการจัดทำแบบรูปรายการงานก่อสร้าง</label>
+        <input type="text" id="g_orderNo" placeholder="เว้นว่างได้"></div>
+      <div><label>วันที่ของคำสั่ง</label>
+        <input type="text" id="g_orderDate" placeholder="เว้นว่างได้"></div>
+      <div><label>เลขที่หนังสือขออนุมัติโครงการ</label>
+        <input type="text" id="g_letter1No" placeholder="เว้นว่างได้"></div>
+      <div><label>วันที่ออกหนังสือขออนุมัติโครงการ</label>
+        <input type="text" id="g_letter1Date" placeholder="เว้นว่างได้"></div>
+      <div><label>เลขที่หนังสือรายงานการจัดทำแบบรูปรายการ</label>
+        <input type="text" id="g_letter2No" placeholder="เว้นว่างได้"></div>
+      <div><label>วันที่ออกหนังสือรายงานการจัดทำแบบรูปรายการ</label>
+        <input type="text" id="g_letter2Date" placeholder="เว้นว่างได้"></div>
+      <div><label>เลขที่หนังสือขอนำส่งเอกสารการจัดทำโครงการ</label>
+        <input type="text" id="g_letter3No" placeholder="เว้นว่างได้"></div>
+      <div><label>วันที่ออกหนังสือขอนำส่งเอกสารการจัดทำโครงการ</label>
+        <input type="text" id="g_letter3Date" placeholder="เว้นว่างได้"></div>
     </div>
   </div>
 
@@ -269,13 +303,6 @@
         <input type="text" id="g_name3" placeholder="นายวิเชษฐ์  สุพัฒศร"></div>
       <div><label>3. ตำแหน่ง</label>
         <input type="text" id="g_pos3" placeholder="นายช่างโยธาปฏิบัติงาน"></div>
-      <div><label>ประเภทงบประมาณ <span class="hint">(ใช้ในเอกสาร 2 เท่านั้น)</span></label>
-        <select id="g_budgetType">
-          <option value="ordinance">ตามข้อบัญญัติงบประมาณ</option>
-          <option value="saving">ตามโครงการใช้จ่ายเงินสะสม</option>
-        </select></div>
-      <div><label>ปีงบประมาณ (พ.ศ.)</label>
-        <select id="g_budgetYear"></select></div>
     </div>
   </div>
 
@@ -499,7 +526,8 @@ const DEFAULT_FACTS = "นายกองค์การบริหารส่
 // "บันทึกข้อมูลร่วมลงทุกเอกสาร" ค่าที่พิมพ์ไว้ในหน้า main จะหายเพราะไม่เคยถูกจำที่ไหนเลย ตอนนี้จำเองไว้ด้วย
 const AUTOSAVE_KEY = "consdocx_autosave_main";
 const AUTOSAVE_FIELDS = [
-  "projectName", "g_month", "g_year", "g_priorMatter", "g_facts", "g_moneyNum",
+  "projectName", "g_projectDetail", "g_month", "g_year", "g_priorMatter", "g_facts", "g_moneyNum",
+  "g_orderNo", "g_orderDate", "g_letter1No", "g_letter1Date", "g_letter2No", "g_letter2Date", "g_letter3No", "g_letter3Date",
   "g_name1", "g_pos1", "g_name2", "g_pos2", "g_name3", "g_pos3",
   "g_budgetType", "g_budgetYear",
   "g_recName", "g_recPos", "g_meetStart", "g_meetEnd",
@@ -786,6 +814,18 @@ function collectShared(map, includeProject) {
   if (includeProject) {
     const pj = val("projectName");
     if (pj) out.projectName = pj;
+    const pd = val("g_projectDetail");
+    if (pd) out.projectDetail = pd;
+    const docRefMap = {
+      g_orderNo: "orderNo", g_orderDate: "orderDate",
+      g_letter1No: "letter1No", g_letter1Date: "letter1Date",
+      g_letter2No: "letter2No", g_letter2Date: "letter2Date",
+      g_letter3No: "letter3No", g_letter3Date: "letter3Date",
+    };
+    for (const [gid, fid] of Object.entries(docRefMap)) {
+      const v = val(gid);
+      if (v) out[fid] = v;
+    }
   }
   return out;
 }
@@ -830,20 +870,29 @@ document.getElementById("pushShared").addEventListener("click", async () => {
   statusEl.textContent = "กำลังบันทึกลงเอกสาร...";
   try {
     const projectNameVal = val("projectName");
+    const projectDetailVal = val("g_projectDetail");
     const moneyVal = val("g_moneyNum");
     const priorMatterVal = val("g_priorMatter");
     const factsVal = val("g_facts");
     const monthVal = val("g_month");
     const yearVal = val("g_year");
+    const docRefVals = {
+      orderNo: val("g_orderNo"), orderDate: val("g_orderDate"),
+      letter1No: val("g_letter1No"), letter1Date: val("g_letter1Date"),
+      letter2No: val("g_letter2No"), letter2Date: val("g_letter2Date"),
+      letter3No: val("g_letter3No"), letter3Date: val("g_letter3Date"),
+    };
 
     // เอกสาร 1
     const data1 = {};
     if (projectNameVal) data1.projectName = projectNameVal;
+    if (projectDetailVal) data1.projectDetail = projectDetailVal;
     if (priorMatterVal) data1.priorMatter = priorMatterVal;
     if (factsVal) data1.facts = factsVal;
     if (moneyVal) data1.moneyNum = moneyVal;
     if (monthVal) data1.docMonth = monthVal;
     if (yearVal) data1.docYear = yearVal;
+    for (const [fid, v] of Object.entries(docRefVals)) { if (v) data1[fid] = v; }
 
     // เอกสาร 2 และ 3: ใช้คณะกรรมการแบบรูปรายการตรงๆ (ชื่อในตารางต้องมียศนำหน้าถ้ามี เช่น "ว่าที่ ร.ต.")
     const dataCommittee = collectShared(SHARED_MAP_234, true);
@@ -927,11 +976,44 @@ function fetchFormDataFromDoc(src, docId, timeoutMs = 4000) {
   });
 }
 
+// เลขที่/วันที่หนังสืออ้างอิง — เว้นว่างได้ ถ้าไม่กรอกจะเว้นช่องว่าง 8 ตัวอักษรแทน แล้วเติมเดือน/ปีที่ใช้ในเอกสารให้อัตโนมัติ
+const DOC_REF_BLANK = "        "; // 8 spaces
+function docRefNoWithYear(raw, yearG) {
+  const v = (raw || "").trim();
+  return v || (DOC_REF_BLANK + "/" + (yearG || ""));
+}
+function docRefNoOnly(raw) {
+  const v = (raw || "").trim();
+  return v || DOC_REF_BLANK;
+}
+function docRefDate(raw, monthG, yearG) {
+  const v = (raw || "").trim();
+  return v || (DOC_REF_BLANK + (monthG || "") + " " + (yearG || ""));
+}
+// รวม placeholder ชุด "ข้อมูลโครงการ" ที่ใช้ร่วมกันทุกเอกสาร (ชื่อ/รายละเอียดโครงการ + เลขที่-วันที่หนังสืออ้างอิงทั้ง 4 คู่)
+function sharedProjectFields(data, projectName, monthG, yearG) {
+  return {
+    "[ชื่อโครงการ]": projectName,
+    "[รายละเอียดโครงการ]": val("g_projectDetail") || (data && data.projectDetail) || "",
+    // ฟิลด์เลขที่/วันที่หนังสือ 4 คู่นี้มีอยู่จุดเดียวคือ card "ข้อมูลโครงการ" หน้า main —
+    // ไม่มีช่องกรอกตรงในเอกสารย่อยเลย จึงใช้ค่าจาก val() เท่านั้น (ไม่ fallback ไปที่ data ของ
+    // เอกสารย่อย เพราะอาจเป็นค่าเก่าที่เคย push ไว้ตอนทดสอบ ทำให้ค่าที่เว้นว่างไว้ตอนนี้โผล่ค่าเก่ากลับมา)
+    "[เลขที่คำสั่งคณะกรรมการจัดทำแบบรูปรายการงานก่อสร้าง]": docRefNoWithYear(val("g_orderNo"), yearG),
+    "[วันที่คำสั่งคณะกรรมการจัดทำแบบรูปรายการงานก่อสร้าง]": docRefDate(val("g_orderDate"), monthG, yearG),
+    "[เลขที่หนังสือขออนุมัติโครงการ]": docRefNoOnly(val("g_letter1No")),
+    "[วันที่หนังสือขออนุมัติโครงการ]": docRefDate(val("g_letter1Date"), monthG, yearG),
+    "[เลขที่หนังสือรายงานการจัดทำแบบรูปรายการ]": docRefNoOnly(val("g_letter2No")),
+    "[วันที่หนังสือรายงานการจัดทำแบบรูปรายการ]": docRefDate(val("g_letter2Date"), monthG, yearG),
+    "[เลขที่หนังสือขอนำส่งเอกสารการจัดทำโครงการ]": docRefNoOnly(val("g_letter3No")),
+    "[วันที่หนังสือขอนำส่งเอกสารการจัดทำโครงการ]": docRefDate(val("g_letter3Date"), monthG, yearG),
+  };
+}
+
 async function buildDoc1(data1, projectName, monthG, yearG) {
   const money1 = val("g_moneyNum") || (data1 && data1.moneyNum) || "";
   const pm1 = val("g_priorMatter") || (data1 && data1.priorMatter) || "";
   return buildOneDocx(window.TEMPLATE_1_BASE64, {
-    "[ชื่อโครงการ]": projectName,
+    ...sharedProjectFields(data1, projectName, monthG, yearG),
     "[PM1]": pm1 || DEFAULT_PM_1,
     "[PM2]": pm1 ? null : DEFAULT_PM_2,
     "[PM3]": pm1 ? null : DEFAULT_PM_3,
@@ -954,7 +1036,7 @@ function budgetRefText2(data2) {
 
 async function buildDoc2(data2, projectName, monthG, yearG) {
   return buildOneDocx(window.TEMPLATE_2_BASE64, {
-    "[ชื่อโครงการ]": projectName,
+    ...sharedProjectFields(data2, projectName, monthG, yearG),
     "[อ้างอิงงบประมาณ]": budgetRefText2(data2),
     "[ชื่อกรรมการ1]": val("g_name1") || (data2 && data2.name1) || "",
     "[ตำแหน่งกรรมการ1]": val("g_pos1") || (data2 && data2.pos1) || "",
@@ -972,7 +1054,7 @@ async function buildDoc3(data3, projectName, monthG, yearG) {
   const chair3Name = val("g_name1") || (data3 && data3.name1) || "";
   const chair3Pos = val("g_pos1") || (data3 && data3.pos1) || "";
   return buildOneDocx(window.TEMPLATE_3_BASE64, {
-    "[ชื่อโครงการ]": projectName,
+    ...sharedProjectFields(data3, projectName, monthG, yearG),
     "[จำนวนเงินตัวเลข]": formatComma(money3),
     "[จำนวนเงินตัวอักษร]": bahtText(money3),
     "[ชื่อกรรมการ1]": chair3Name,
@@ -997,7 +1079,7 @@ async function buildDoc3(data3, projectName, monthG, yearG) {
 async function buildDoc4(data4, projectName, monthG, yearG) {
   const money4 = val("g_moneyNum") || (data4 && data4.moneyNum) || "";
   return buildOneDocx(window.TEMPLATE_4_BASE64, {
-    "[ชื่อโครงการ]": projectName,
+    ...sharedProjectFields(data4, projectName, monthG, yearG),
     "[จำนวนเงินตัวเลข]": formatComma(money4),
     "[จำนวนเงินตัวอักษร]": bahtText(money4),
     "[ชื่อกรรมการ1]": stripActingRank(val("g_name1") || (data4 && data4.name1) || ""),
@@ -1015,7 +1097,7 @@ async function buildDoc5(data5, projectName, monthG, yearG) {
   const money5 = val("g_moneyNum") || (data5 && data5.moneyNum) || "";
   const pm5 = val("g_priorMatter") || (data5 && data5.priorMatter) || "";
   return buildOneDocx(window.TEMPLATE_5_BASE64, {
-    "[ชื่อโครงการ]": projectName,
+    ...sharedProjectFields(data5, projectName, monthG, yearG),
     "[PM1]": pm5 || DEFAULT_PM_1,
     "[PM2]": pm5 ? null : DEFAULT_PM_2,
     "[PM3]": pm5 ? null : DEFAULT_PM_3,

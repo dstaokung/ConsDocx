@@ -127,6 +127,11 @@
 
       <textarea id="priorMatter" style="display:none"></textarea>
       <textarea id="facts" style="display:none"></textarea>
+      <textarea id="projectDetail" style="display:none"></textarea>
+      <input type="hidden" id="orderNo"><input type="hidden" id="orderDate">
+      <input type="hidden" id="letter1No"><input type="hidden" id="letter1Date">
+      <input type="hidden" id="letter2No"><input type="hidden" id="letter2Date">
+      <input type="hidden" id="letter3No"><input type="hidden" id="letter3Date">
 
       <button type="button" id="gen">สร้างไฟล์ Word (.docx)</button>
       <div class="status" id="status"></div>
@@ -143,7 +148,7 @@ function val(id) { return document.getElementById(id).value.trim(); }
 // ---- จำข้อมูลที่กรอกไว้ในฟอร์มนี้ (เก็บใน localStorage ของหน้านี้เอง) กันหายตอนกด
 // "กลับไปหน้าแรก" แล้วย้อนกลับเข้ามาใหม่ ----
 const AUTOSAVE_KEY = "consdocx_autosave_1_ขออนุมัติโครงการก่อสร้าง";
-const AUTOSAVE_FIELDS = ["projectName", "docMonth", "docYear", "moneyNum", "priorMatter", "facts"];
+const AUTOSAVE_FIELDS = ["projectName", "docMonth", "docYear", "moneyNum", "priorMatter", "facts", "projectDetail", "orderNo", "orderDate", "letter1No", "letter1Date", "letter2No", "letter2Date", "letter3No", "letter3Date"];
 if (window.ConsDocxMonthYear) {
   ConsDocxMonthYear.populateMonthSelect(document.getElementById("docMonth"));
   ConsDocxMonthYear.populateYearSelect(document.getElementById("docYear"));
@@ -397,8 +402,22 @@ async function buildDocx() {
   const DEFAULT_PM_3 = "- เป็นไปตามพระราชบัญญัติสภาตำบลและองค์การบริหารส่วนตำบล พ.ศ. 2537 และที่แก้ไขเพิ่มเติมถึง (ฉบับที่ 7) พ.ศ. 2569";
   const DEFAULT_PM_4 = "- เป็นไปตามแผนพัฒนาท้องถิ่น พ.ศ. 2566-2570 เพิ่มเติมฉบับที่ 1 ประจำปี 2568 หน้าที่ 20 ลำดับที่ 30 (กองช่าง)";
   const pm = val("priorMatter");
+  const docRefMonth = val("docMonth"), docRefYear = val("docYear");
+  const DOC_REF_BLANK = "        "; // 8 spaces — ใช้แทนเลขที่/วันที่ที่ไม่ได้กรอก
+  function docRefNoWithYear(raw) { return raw || (DOC_REF_BLANK + "/" + docRefYear); }
+  function docRefNoOnly(raw) { return raw || DOC_REF_BLANK; }
+  function docRefDate(raw) { return raw || (DOC_REF_BLANK + docRefMonth + " " + docRefYear); }
   const fields = {
     "[ชื่อโครงการ]": val("projectName"),
+    "[รายละเอียดโครงการ]": val("projectDetail"),
+    "[เลขที่คำสั่งคณะกรรมการจัดทำแบบรูปรายการงานก่อสร้าง]": docRefNoWithYear(val("orderNo")),
+    "[วันที่คำสั่งคณะกรรมการจัดทำแบบรูปรายการงานก่อสร้าง]": docRefDate(val("orderDate")),
+    "[เลขที่หนังสือขออนุมัติโครงการ]": docRefNoOnly(val("letter1No")),
+    "[วันที่หนังสือขออนุมัติโครงการ]": docRefDate(val("letter1Date")),
+    "[เลขที่หนังสือรายงานการจัดทำแบบรูปรายการ]": docRefNoOnly(val("letter2No")),
+    "[วันที่หนังสือรายงานการจัดทำแบบรูปรายการ]": docRefDate(val("letter2Date")),
+    "[เลขที่หนังสือขอนำส่งเอกสารการจัดทำโครงการ]": docRefNoOnly(val("letter3No")),
+    "[วันที่หนังสือขอนำส่งเอกสารการจัดทำโครงการ]": docRefDate(val("letter3Date")),
     "[PM1]": pm || DEFAULT_PM_1,
     "[PM2]": pm ? null : DEFAULT_PM_2,
     "[PM3]": pm ? null : DEFAULT_PM_3,
