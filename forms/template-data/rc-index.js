@@ -1,0 +1,12 @@
+// สารบัญชุดเอกสารราคากลาง (สร้างโดย tools/gen-template-data.py — อย่าแก้มือ)
+window.RC_INDEX = {
+  "building/ebidding": { work: "อาคาร", method: "ebidding", file: "rc-building-ebidding.js", docs: [{ n: 8, name: "8. รายงานการประชุม" }, { n: 9, name: "9. บันทึกรายงานราคากลาง" }, { n: 10, name: "10. บันทึกนำส่งเอกสารราคากลาง" }, { n: 11, name: "11. แบบ บก" }] },
+  "building/egp": { work: "อาคาร", method: "egp", file: "rc-building-egp.js", docs: [{ n: 8, name: "8. รายงานการประชุม" }, { n: 9, name: "9. บันทึกรายงานราคากลาง" }, { n: 10, name: "10. บันทึกนำส่งเอกสารราคากลาง" }] },
+  "building/specific": { work: "อาคาร", method: "เฉพาะเจาะจง", file: "rc-building-specific.js", docs: [{ n: 8, name: "8.รายงานการประชุมคณะกรรมการกำหนดราคากลาง" }, { n: 9, name: "9. รายงานการคำนวณราคากลาง" }, { n: 10, name: "10. ขอนำส่งเอกสารโครงการ" }, { n: 11, name: "11. แบบ บก" }] },
+  "irrigation/ebidding": { work: "ชลประทาน", method: "ebidding", file: "rc-irrigation-ebidding.js", docs: [{ n: 8, name: "8. รายงานการประชุม" }, { n: 9, name: "9. บันทึกรายงานราคากลาง" }, { n: 10, name: "10. บันทึกนำส่งเอกสารราคากลาง" }, { n: 11, name: "11. แบบ บก" }] },
+  "irrigation/egp": { work: "ชลประทาน", method: "egp", file: "rc-irrigation-egp.js", docs: [{ n: 8, name: "8. รายงานการประชุม" }, { n: 9, name: "9. บันทึกรายงานราคากลาง" }, { n: 10, name: "10. บันทึกนำส่งเอกสารราคากลาง" }] },
+  "irrigation/specific": { work: "ชลประทาน", method: "เฉพาะเจาะจง", file: "rc-irrigation-specific.js", docs: [{ n: 8, name: "8.รายงานการประชุมคณะกรรมการกำหนดราคากลาง" }, { n: 9, name: "9. รายงานการคำนวณราคากลาง" }, { n: 10, name: "10. ขอนำส่งเอกสารโครงการ" }, { n: 11, name: "11. แบบ บก" }] },
+  "road/ebidding": { work: "ทาง", method: "ebidding", file: "rc-road-ebidding.js", docs: [{ n: 8, name: "8. รายงานการประชุม" }, { n: 9, name: "9. บันทึกรายงานราคากลาง" }, { n: 10, name: "10. บันทึกนำส่งเอกสารราคากลาง" }, { n: 11, name: "11. แบบ บก" }] },
+  "road/egp": { work: "ทาง", method: "egp", file: "rc-road-egp.js", docs: [{ n: 8, name: "8. รายงานการประชุม" }, { n: 9, name: "9. บันทึกรายงานราคากลาง" }, { n: 10, name: "10. บันทึกนำส่งเอกสารราคากลาง" }] },
+  "road/specific": { work: "ทาง", method: "เฉพาะเจาะจง", file: "rc-road-specific.js", docs: [{ n: 8, name: "8.รายงานการประชุมคณะกรรมการกำหนดราคากลาง" }, { n: 9, name: "9. รายงานการคำนวณราคากลาง" }, { n: 10, name: "10. ขอนำส่งเอกสารโครงการ" }, { n: 11, name: "11. แบบ บก" }] },
+};

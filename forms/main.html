@@ -35,6 +35,22 @@
     line-height: 1.5;
   }
   .wrap { max-width: 1100px; margin: 0 auto; }
+  .tabbar { display: flex; gap: 8px; margin-bottom: 18px; border-bottom: 2px solid var(--border); }
+  .tabbar .tab {
+    padding: 12px 22px;
+    border: none;
+    background: none;
+    color: var(--text-faint);
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+  }
+  .tabbar .tab span { font-size: 14px; font-weight: 400; }
+  .tabbar .tab:hover { color: var(--text); }
+  .tabbar .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
   .layout { display: grid; grid-template-columns: 1fr 440px; gap: 20px; align-items: start; }
   .col-right { position: sticky; top: 24px; }
   @media (max-width: 900px) {
@@ -91,7 +107,7 @@
     min-width: 0;
   }
   .doclink .title { font-weight: 600; font-size: 18px; }
-  button.gen-one {
+  button.gen-one, button.gen-rc {
     flex: 0 0 auto;
     padding: 0 16px;
     border: 1px solid var(--border);
@@ -104,9 +120,9 @@
     cursor: pointer;
     white-space: nowrap;
   }
-  button.gen-one:hover { background: var(--accent-bg); border-color: var(--accent-light); }
-  button.gen-one:disabled { opacity: .5; cursor: default; }
-  button#genAll {
+  button.gen-one:hover, button.gen-rc:hover { background: var(--accent-bg); border-color: var(--accent-light); }
+  button.gen-one:disabled, button.gen-rc:disabled { opacity: .5; cursor: default; }
+  button#genAll, button#genAllRc {
     width: 100%;
     padding: 14px;
     background: #16a34a;
@@ -118,8 +134,8 @@
     cursor: pointer;
     font-family: inherit;
   }
-  button#genAll:hover { background: #15803d; }
-  button#genAll:disabled { background: #86efac; cursor: default; }
+  button#genAll:hover, button#genAllRc:hover { background: #15803d; }
+  button#genAll:disabled, button#genAllRc:disabled { background: #86efac; cursor: default; }
   .status { margin-top: 10px; font-size: 15px; color: #16a34a; min-height: 18px; }
   .status.err { color: #dc2626; }
   .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
@@ -177,10 +193,16 @@
     <button id="newProject" type="button">เริ่มโครงการใหม่ (ล้างข้อมูลทั้งหมด)</button>
   </div>
 
+  <div class="tabbar">
+    <button type="button" class="tab" data-tabbtn="approve">ขออนุมัติโครงการ <span>(เอกสาร 1–7)</span></button>
+    <button type="button" class="tab" data-tabbtn="rc">ราคากลาง <span>(เอกสาร 8–11)</span></button>
+    <button type="button" class="tab" data-tabbtn="roster">รายชื่อที่ใช้บ่อย</button>
+  </div>
+
   <div class="layout">
   <div class="col-left">
 
-  <div class="card">
+  <div class="card" data-tab="roster">
     <h2>รายชื่อที่ใช้บ่อย <span class="hint">(เพิ่มไว้ครั้งเดียว แล้วเลือกจาก dropdown ได้เลยทุกช่องกรรมการด้านล่าง)</span></h2>
     <div class="roster-manage">
       <div class="rlist" id="rosterList"></div>
@@ -192,7 +214,7 @@
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" data-tab="approve">
     <h2>ข้อมูลโครงการ <span class="hint">(ใช้ในเอกสารทุกฉบับ)</span></h2>
 
     <label>ชื่อโครงการ</label>
@@ -238,12 +260,10 @@
         <input type="text" id="g_letter3No" placeholder="เว้นว่างได้"></div>
       <div><label>วันที่ออกหนังสือขอนำส่งเอกสารการจัดทำโครงการ</label>
         <input type="text" id="g_letter3Date" class="date-field" placeholder="เว้นว่างได้ / 1-2-2569"></div>
-      <div><label>เลขที่คำสั่งคณะกรรมการกำหนดราคากลาง <span class="hint">(ใช้ในเอกสาร 7)</span></label>
-        <input type="text" id="g_rcOrderNo" placeholder="เว้นว่างได้"></div>
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" data-tab="approve">
     <h2>เรื่องเดิม และข้อเท็จจริง <span class="hint">(ใช้ในเอกสาร 1 และ 5)</span></h2>
 
     <h3>เรื่องเดิม <span class="hint">(หากไม่ใส่ข้อความในช่องนี้จะมีข้อความตัวอย่างในเอกสาร สามารถเข้าไปแก้ได้ในไฟล์ docx ครับ)</span></h3>
@@ -253,7 +273,7 @@
     <textarea id="g_facts" rows="4" style="resize:none; line-height:1.5;" placeholder="นายกองค์การบริหารส่วนตำบลคลองด่านได้สั่งการให้กองช่างดำเนินการจัดทำโครงการดังกล่าวเพื่อแก้ไขปัญหาความเดือดร้อนของประชาชน เนื่องจากถนนเดิมอยู่ในระดับต่ำ เป็นเหตุให้น้ำทะเลท่วมถนนอยู่เป็นประจำ ทำให้ประชาชนใช้เส้นทางสัญจรด้วยความลำบากและอาจก่อให้เกิดอันตรายแก่ประชาชนในการใช้สัญจร ไป – มา ได้ ซึ่งเมื่อจัดทำโครงการดังกล่าวเสร็จสิ้นจะก่อให้เกิดประโยชน์แก่ประชาชนเป็นอย่างมาก"></textarea>
   </div>
 
-  <div class="card">
+  <div class="card" data-tab="approve">
     <h2>ราคาค่าก่อสร้างเบื้องต้น (งบประมาณ) <span class="hint">(ใช้ในเอกสาร 3, 4 และ 5)</span></h2>
     <div class="row2">
       <div><label>จำนวนเงิน (ตัวเลข) <span class="hint">(พิมพ์เฉพาะตัวเลข)</span></label>
@@ -261,9 +281,67 @@
       <div><label>จำนวนเงิน (ตัวอักษร) <span class="hint">(แปลงให้อัตโนมัติ)</span></label>
         <input type="text" id="g_moneyText" placeholder="สองล้านสองแสนห้าหมื่นหกพันบาทถ้วน" readonly style="background:var(--surface); color:var(--text);"></div>
     </div>
+
+    <h3>วิธีจัดซื้อจัดจ้าง <span class="hint">(ใช้ในเอกสาร 7 — คิดจากงบประมาณให้อัตโนมัติ ต่ำกว่า 5 แสน = เฉพาะเจาะจง, 5 แสนถึงต่ำกว่า 1 ล้าน = e-bidding, 1 ล้านขึ้นไป = e-GP)</span></h3>
+    <select id="g_procMethod">
+      <option value="">คิดจากงบประมาณให้อัตโนมัติ</option>
+      <option value="specific">วิธีเฉพาะเจาะจง</option>
+      <option value="ebidding">e-bidding</option>
+      <option value="egp">e-GP</option>
+    </select>
+    <div class="note" id="procMethodNote"></div>
   </div>
 
-  <div class="card">
+  <div class="card" data-tab="rc">
+    <h2>งานราคากลาง <span class="hint">(ทำตอนคณะกรรมการคำนวณราคากลางเสร็จแล้ว)</span></h2>
+    <div>
+      <div class="row2">
+        <div><label>ประเภทงาน <span class="hint">(กำหนดชุดเทมเพลตที่ใช้)</span></label>
+          <select id="g_rcWorkCat">
+            <option value="">— เลือกประเภทงาน —</option>
+            <option value="building">อาคาร</option>
+            <option value="road">ทาง</option>
+            <option value="irrigation">ชลประทาน</option>
+          </select></div>
+        <div><label>ชุดเอกสารที่จะใช้ <span class="hint">(ประเภทงาน × วิธีจัดซื้อจัดจ้าง)</span></label>
+          <input type="text" id="rcSetText" readonly style="background:var(--surface); color:var(--text);"></div>
+        <div><label>เลขที่คำสั่งแต่งตั้งคณะกรรมการกำหนดราคากลาง <span class="hint">(ใช้ในเอกสาร 7 และ 8 — เว้นว่างได้ จะเว้นช่องว่างพร้อมปี พ.ศ. ให้เขียนมือ)</span></label>
+          <input type="text" id="g_rcOrderNo" placeholder="เว้นว่างได้"></div>
+      </div>
+
+      <h3>ราคากลางที่คณะกรรมการคำนวณได้</h3>
+      <div class="row2">
+        <div><label>จำนวนเงิน (ตัวเลข) <span class="hint">(พิมพ์เฉพาะตัวเลข)</span></label>
+          <input type="text" id="g_rcPrice" placeholder="2100000" inputmode="decimal"></div>
+        <div><label>จำนวนเงิน (ตัวอักษร) <span class="hint">(แปลงให้อัตโนมัติ)</span></label>
+          <input type="text" id="g_rcPriceText" readonly style="background:var(--surface); color:var(--text);"></div>
+      </div>
+      <div class="note" id="rcDiffNote"></div>
+
+      <h3>เดือน/ปีที่ใช้ราคาวัสดุก่อสร้าง <span class="hint">(เอกสาร 8 ข้อ 6.1 — เดือนที่คำนวณราคากลาง)</span></h3>
+      <div class="row2">
+        <div><label>เดือน</label>
+          <select id="g_rcMatMonth"></select></div>
+        <div><label>ปี (พ.ศ.)</label>
+          <select id="g_rcMatYear"></select></div>
+      </div>
+
+      <h3>ผู้จดรายงานการประชุมราคากลาง <span class="hint">(ผู้ตรวจรายงานใช้ประธานคณะกรรมการกำหนดราคากลางให้อัตโนมัติ)</span></h3>
+      <div class="row2">
+        <div><label>ชื่อ-สกุล</label>
+          <select class="roster-select" data-name="g_rcRecName" data-pos="g_rcRecPos"></select>
+          <input type="text" id="g_rcRecName" placeholder="นายวิเชษฐ์  สุพัฒศร"></div>
+        <div><label>ตำแหน่ง</label>
+          <input type="text" id="g_rcRecPos" placeholder="นายช่างโยธาปฏิบัติงาน"></div>
+        <div><label>เวลาเริ่มประชุม</label>
+          <input type="text" id="g_rcMeetStart" placeholder="10.00"></div>
+        <div><label>เวลาเลิกประชุม</label>
+          <input type="text" id="g_rcMeetEnd" placeholder="11.00"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-tab="approve">
     <h2>คณะกรรมการจัดทำแบบรูปรายการงานก่อสร้าง <span class="hint">(ใช้ในเอกสาร 2, 3 และ 4)</span></h2>
     <div class="row2">
       <div><label>1. ชื่อ-สกุล (ประธานกรรมการ)</label>
@@ -284,7 +362,7 @@
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" data-tab="approve">
     <h2>ผู้จดรายงานการประชุม <span class="hint">(ใช้ในเอกสาร 3 เท่านั้น)</span></h2>
     <div class="row2">
       <div><label>ชื่อ-สกุล</label>
@@ -299,7 +377,7 @@
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" data-tab="approve">
     <h2>รายละเอียดเพิ่มเติม <span class="hint">(ใช้ในเอกสาร 5 เท่านั้น)</span></h2>
     <label>จำนวนวันแล้วเสร็จตามสัญญา</label>
     <input type="text" id="g_workDays" placeholder="120" inputmode="numeric">
@@ -319,7 +397,7 @@
     <input type="text" id="g_kFormula" placeholder="K = 0.30 + 0.10 It/Io + 0.35 Ct/Co + 0.10 Mt/Mo + 0.15 St/So">
   </div>
 
-  <div class="card">
+  <div class="card" data-tab="approve">
     <h2>คณะกรรมการกำหนดราคากลางงานก่อสร้าง <span class="hint">(ใช้ในเอกสาร 5 ข้อ 8.1 และเอกสาร 7)</span></h2>
     <div class="row2">
       <div><label>1. ชื่อ-สกุล (ประธานกรรมการ)</label>
@@ -340,7 +418,7 @@
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" data-tab="approve">
     <h2>คณะกรรมการตรวจรับพัสดุในงานจ้างก่อสร้าง <span class="hint">(ใช้ในเอกสาร 5 ข้อ 8.2)</span></h2>
     <div class="row2">
       <div><label>1. ชื่อ-สกุล (ประธานกรรมการ)</label>
@@ -361,7 +439,7 @@
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" data-tab="approve">
     <h2>ผู้ควบคุมงานก่อสร้าง <span class="hint">(ใช้ในเอกสาร 5 ข้อ 8.3)</span></h2>
     <div class="row2">
       <div><label>1. ชื่อ-สกุล (หัวหน้าผู้ควบคุมงาน)</label>
@@ -377,7 +455,7 @@
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" data-tab="approve">
     <div class="note">
       กรอกทุกอย่างที่หน้านี้หน้าเดียว แล้วกดสร้างไฟล์ได้เลย (รวมฟิลด์เฉพาะของแต่ละเอกสาร เช่น
       ผู้จด/ผู้ตรวจรายงานการประชุม, กำหนดเวลาแล้วเสร็จ, สูตรค่า K) — ข้อมูลถูกจำไว้ในเครื่องอัตโนมัติ
@@ -391,8 +469,8 @@
   </div>
   <div class="col-right">
 
-  <div class="card">
-    <h2>รายการเอกสาร</h2>
+  <div class="card" data-tab="approve">
+    <h2>รายการเอกสาร <span class="hint">(ขออนุมัติโครงการ)</span></h2>
     <ul class="doclist">
       <li>
         <span class="doclink"><span class="title">1. ขออนุมัติจัดทำโครงการก่อสร้าง</span></span>
@@ -426,13 +504,28 @@
     <div class="status" id="status-onedoc"></div>
   </div>
 
-  <div class="card">
+  <div class="card" data-tab="rc">
+    <h2>รายการเอกสารราคากลาง <span class="hint" id="rcListSetHint"></span></h2>
+    <ul class="doclist" id="rcDoclist"></ul>
+    <div class="status" id="status-rcdoc"></div>
+  </div>
+
+  <div class="card" data-tab="approve">
     <h2>สร้างไฟล์ทั้งหมดพร้อมกัน</h2>
-    <button id="genAll">สร้างไฟล์ทั้งหมด (.zip)</button>
+    <button id="genAll">สร้างเอกสารขออนุมัติโครงการ 1–7 (.zip)</button>
     <div class="status" id="status"></div>
     <div class="note">
-      สร้างเอกสาร 1–7 พร้อมกันจากข้อมูลที่กรอกไว้ในหน้านี้ แล้วรวมเป็นไฟล์ .zip เดียว
-      ไม่ต้องเปิดหน้าเอกสารย่อยก่อน — ฟิลด์ไหนเว้นว่างไว้ก็จะว่างในไฟล์ที่ได้
+      สร้างเอกสาร 1–7 พร้อมกันจากข้อมูลที่กรอกไว้ แล้วรวมเป็นไฟล์ .zip เดียว
+      ฟิลด์ไหนเว้นว่างไว้ก็จะว่างในไฟล์ที่ได้
+    </div>
+  </div>
+
+  <div class="card" data-tab="rc">
+    <h2>สร้างไฟล์ทั้งหมดพร้อมกัน</h2>
+    <button id="genAllRc">สร้างเอกสารราคากลาง 8–11 (.zip)</button>
+    <div class="status" id="status-rcall"></div>
+    <div class="note">
+      สร้างเอกสารราคากลางทั้งชุดที่เลือกไว้ (ตามประเภทงาน × วิธีจัดซื้อจัดจ้าง) รวมเป็นไฟล์ .zip เดียว
     </div>
   </div>
 
@@ -446,6 +539,8 @@
 <script src="../shared/jszip.lib.js"></script>
 <script src="../shared/monthyear.js"></script>
 <script src="./main-template-data.js"></script>
+<!-- สารบัญชุดเอกสารราคากลาง (ไฟล์เล็ก ไม่มี base64) — ตัว base64 ของแต่ละชุดโหลดตอนกดสร้างเท่านั้น -->
+<script src="./template-data/rc-index.js"></script>
 <script>
 function val(id) { return document.getElementById(id).value.trim(); }
 
@@ -483,7 +578,9 @@ const AUTOSAVE_KEY = "consdocx_autosave_main";
 const AUTOSAVE_FIELDS = [
   "projectName", "g_projectDetail", "g_month", "g_year", "g_priorMatter", "g_facts", "g_moneyNum",
   "g_orderNo", "g_orderDate", "g_letter1No", "g_letter1Date", "g_letter2No", "g_letter2Date", "g_letter3No", "g_letter3Date",
-  "g_rcOrderNo",
+  "g_rcOrderNo", "g_procMethod",
+  "g_rcWorkCat", "g_rcPrice", "g_rcRecName", "g_rcRecPos", "g_rcMeetStart", "g_rcMeetEnd",
+  "g_rcMatMonth", "g_rcMatYear",
   "g_name1", "g_pos1", "g_name2", "g_pos2", "g_name3", "g_pos3",
   "g_budgetType", "g_budgetYear",
   "g_recName", "g_recPos", "g_meetStart", "g_meetEnd",
@@ -508,11 +605,50 @@ function restoreAutosave() {
   } catch (e) {}
 }
 
+// ---- วิธีจัดซื้อจัดจ้าง ----
+// คิดจากงบประมาณเบื้องต้น (g_moneyNum) ตามวงเงิน: ต่ำกว่า 5 แสน = เฉพาะเจาะจง / 5 แสนถึงต่ำกว่า 1 ล้าน =
+// e-bidding / 1 ล้านขึ้นไป = e-GP (5 แสนพอดี = e-bidding, 1 ล้านพอดี = e-GP) — ราคากลางที่คำนวณได้
+// ทีหลังไม่มีผลกับการเลือกวิธี แม้จะข้ามเส้นแบ่งก็ยังใช้วิธีที่คิดจากงบประมาณ
+// ผู้ใช้เลือกทับเองได้ที่ช่อง g_procMethod (เผื่อกรณียกเว้น)
+// หมายเหตุถ้อยคำ: ตอนนี้ e-bidding กับ e-GP ใช้ข้อความเดียวกัน (ตามกฎหมายเป็นวิธีเดียวกัน ต่างกันแค่ชุด
+// เอกสารราคากลางที่ต้องแนบ) ถ้าต้องการถ้อยคำต่างกัน แก้ที่ PROC_METHOD_TEXT ตรงนี้จุดเดียว
+// ต้องประกาศไว้ก่อน restoreAutosave() ข้างล่าง เพราะ updateGMoneyText() ที่เรียกตอนโหลดหน้าใช้ค่าพวกนี้
+const PROC_METHOD_TEXT = {
+  specific: "วิธีเฉพาะเจาะจง",
+  ebidding: "วิธีประกวดราคาอิเล็กทรอนิกส์ (e-bidding)",
+  egp: "วิธีประกวดราคาอิเล็กทรอนิกส์ (e-bidding)",
+};
+const PROC_METHOD_LABEL = { specific: "เฉพาะเจาะจง", ebidding: "e-bidding", egp: "e-GP" };
+// คืนรหัสวิธี ("specific" / "ebidding" / "egp") — ถ้าไม่ได้เลือกทับ จะคิดจากงบประมาณให้
+function procMethodCode() {
+  const picked = val("g_procMethod");
+  if (picked) return picked;
+  const money = Number(String(val("g_moneyNum")).replace(/[^0-9.]/g, ""));
+  if (!money) return "";
+  if (money < 500000) return "specific";
+  if (money < 1000000) return "ebidding";
+  return "egp";
+}
+function procMethodText() {
+  return PROC_METHOD_TEXT[procMethodCode()] || "";
+}
+function updateProcMethodNote() {
+  const el = document.getElementById("procMethodNote");
+  if (!el) return;
+  const code = procMethodCode();
+  if (!code) { el.textContent = "กรอกงบประมาณด้านบนก่อน หรือเลือกวิธีเองจากช่องนี้"; return; }
+  const how = val("g_procMethod") ? "เลือกเอง" : "คิดจากงบประมาณ";
+  el.textContent = `${how}: ${PROC_METHOD_LABEL[code]} → ข้อความในเอกสาร "${PROC_METHOD_TEXT[code]}"`;
+}
+document.getElementById("g_procMethod").addEventListener("change", updateProcMethodNote);
+
 // เติมตัวเลือกเดือน/ปี ก่อน restoreAutosave() จะได้ set ค่าที่เคยเลือกไว้ทับค่าเริ่มต้น (เดือน/ปีปัจจุบัน) ได้
 if (window.ConsDocxMonthYear) {
   ConsDocxMonthYear.populateMonthSelect(document.getElementById("g_month"));
   ConsDocxMonthYear.populateYearSelect(document.getElementById("g_year"));
   ConsDocxMonthYear.populateYearSelect(document.getElementById("g_budgetYear"));
+  ConsDocxMonthYear.populateMonthSelect(document.getElementById("g_rcMatMonth"));
+  ConsDocxMonthYear.populateYearSelect(document.getElementById("g_rcMatYear"));
 }
 
 // เปิดหน้านี้ครั้งไหนก็คืนค่าที่เคยกรอกไว้เสมอ (ไม่ล้างข้อมูลอัตโนมัติ)
@@ -682,6 +818,7 @@ function stripActingRank(name) {
 
 function updateGMoneyText() {
   document.getElementById("g_moneyText").value = bahtText(val("g_moneyNum"));
+  updateProcMethodNote();
 }
 document.getElementById("g_moneyNum").addEventListener("input", updateGMoneyText);
 document.getElementById("g_moneyNum").addEventListener("blur", () => {
@@ -836,6 +973,8 @@ function sharedProjectFields(data, projectName, monthG, yearG) {
     "[วันที่หนังสือขอนำส่งเอกสารการจัดทำโครงการ]": docRefDate(val("g_letter3Date"), monthG, yearG),
     // เลขที่คำสั่งแต่งตั้งคณะกรรมการกำหนดราคากลาง (เอกสาร 7) — รูปแบบเดียวกับเลขที่คำสั่งของเอกสาร 2 คือเติมปี พ.ศ. ต่อท้ายให้
     "[เลขที่คำสั่งคณะกรรมการราคากลาง]": docRefNoWithYear(val("g_rcOrderNo"), yearG),
+    // วิธีจัดซื้อจัดจ้าง — เอกสาร 7 ใช้ (เดิมพิมพ์ "โดยวิธีเฉพาะเจาะจง" ตายตัวไว้ในเทมเพลต)
+    "[วิธีจัดซื้อจัดจ้าง]": procMethodText(),
   };
 }
 
@@ -1082,6 +1221,266 @@ document.getElementById("genAll").addEventListener("click", async () => {
     btn.disabled = false;
   }
 });
+
+// ================= งานราคากลาง (เอกสาร 8–11) =================
+// เทมเพลตราคากลางมี 9 ชุด (ประเภทงาน × วิธีจัดซื้อจัดจ้าง) โครงการหนึ่งใช้แค่ชุดเดียว จึงไม่ฝัง base64
+// ไว้ในหน้าเลย — โหลดสารบัญ (rc-index.js) ตอนเปิดหน้า ส่วนตัว base64 ของชุดที่เลือกค่อยโหลดตอนกดสร้าง
+// ด้วยการแทรก <script src> (ไม่ใช้ fetch เพื่อให้เปิดจาก file:// ในเครื่องได้ด้วย)
+
+function rcSetKey() {
+  const work = val("g_rcWorkCat");
+  const method = procMethodCode();
+  return work && method ? `${work}/${method}` : "";
+}
+function rcSetInfo() {
+  const key = rcSetKey();
+  return key && window.RC_INDEX ? window.RC_INDEX[key] : null;
+}
+
+// โหลดไฟล์ base64 ของชุดที่เลือก (ครั้งเดียวต่อชุด) — คืน Promise ที่ resolve เมื่อ RC_TEMPLATES พร้อมใช้
+const rcLoading = {};
+function ensureRcSet(key) {
+  if (window.RC_TEMPLATES && window.RC_TEMPLATES[key]) return Promise.resolve();
+  if (rcLoading[key]) return rcLoading[key];
+  const info = window.RC_INDEX && window.RC_INDEX[key];
+  if (!info) return Promise.reject(new Error("ไม่พบชุดเทมเพลต " + key));
+  rcLoading[key] = new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = "./template-data/" + info.file;
+    s.onload = () => (window.RC_TEMPLATES && window.RC_TEMPLATES[key])
+      ? resolve() : reject(new Error("ไฟล์ " + info.file + " ไม่มีข้อมูลชุด " + key));
+    s.onerror = () => reject(new Error("โหลดไฟล์เทมเพลตไม่สำเร็จ: " + info.file));
+    document.head.appendChild(s);
+  });
+  return rcLoading[key];
+}
+
+function rcPriceNum() { return String(val("g_rcPrice")).replace(/[^0-9.]/g, ""); }
+function budgetNum() { return String(val("g_moneyNum")).replace(/[^0-9.]/g, ""); }
+// ราคากลางเทียบงบประมาณ: เท่ากันพอดีนับเป็น "ไม่สูงกว่างบประมาณ"
+function rcIsOverBudget() {
+  const p = Number(rcPriceNum()), b = Number(budgetNum());
+  return !!(p && b && p > b);
+}
+function rcDiffNum() {
+  const p = Number(rcPriceNum()), b = Number(budgetNum());
+  if (!p || !b) return "";
+  return String(Math.abs(p - b));
+}
+
+// placeholder ชุดของเอกสารราคากลาง (8–11) — ใช้ร่วมกันทุกฉบับในชุด
+function rcFields(projectName, monthG, yearG) {
+  const chairName = val("g_rc1name");
+  const chairPos = val("g_rc1pos");
+  const money = val("g_moneyNum");
+  const price = rcPriceNum();
+  const diff = rcDiffNum();
+  return {
+    ...sharedProjectFields(null, projectName, monthG, yearG),
+    "[เดือน]": monthG,
+    "[ปี]": yearG,
+    // งบประมาณเบื้องต้น (คนละตัวกับราคากลางที่คำนวณได้)
+    "[จำนวนเงินตัวเลข]": formatComma(money),
+    "[จำนวนเงินตัวอักษร]": bahtText(money),
+    "[ราคากลางตัวเลข]": formatComma(price),
+    "[ราคากลางตัวอักษร]": bahtText(price),
+    "[ผลต่างราคากลางตัวเลข]": formatComma(diff),
+    "[ผลต่างราคากลางตัวอักษร]": bahtText(diff),
+    "[ชื่อกรรมการราคากลาง1]": chairName,
+    "[ตำแหน่งกรรมการราคากลาง1]": chairPos,
+    "[ชื่อกรรมการราคากลาง2]": val("g_rc2name"),
+    "[ตำแหน่งกรรมการราคากลาง2]": val("g_rc2pos"),
+    "[ชื่อกรรมการราคากลาง3]": val("g_rc3name"),
+    "[ตำแหน่งกรรมการราคากลาง3]": val("g_rc3pos"),
+    "[ชื่อผู้จดรายงานการประชุมราคากลาง]": val("g_rcRecName"),
+    "[ตำแหน่งผู้จดรายงานการประชุมราคากลาง]": val("g_rcRecPos"),
+    // ผู้ตรวจรายงานการประชุม = ประธานคณะกรรมการกำหนดราคากลาง (ตัดยศ "ว่าที่ ร.ต." ออกเพราะเทมเพลต
+    // พิมพ์คำนี้ไว้คงที่ตรงบรรทัดลงชื่ออยู่แล้ว เหมือนเอกสาร 3)
+    "[ชื่อผู้ตรวจรายงานการประชุมราคากลาง]": stripActingRank(chairName),
+    "[ตำแหน่งผู้ตรวจรายงานการประชุมราคากลาง]": chairPos,
+    // เดือน/ปีที่ใช้ราคาวัสดุก่อสร้าง (เอกสาร 8 ข้อ 6.1) — คนละตัวกับเดือน/ปีที่ออกเอกสาร
+    "[เดือนราคาวัสดุ]": val("g_rcMatMonth"),
+    "[ปีราคาวัสดุ]": val("g_rcMatYear"),
+    "[เวลาเริ่มประชุมราคากลาง]": val("g_rcMeetStart"),
+    "[เวลาเลิกประชุมราคากลาง]": val("g_rcMeetEnd"),
+    // ย่อหน้าที่ใช้เฉพาะกรณี — ส่ง null ให้อันที่ไม่ตรงเงื่อนไข ย่อหน้านั้นจะถูกลบทั้งย่อหน้า
+    "[กรณีราคากลางไม่สูงกว่างบประมาณ]": rcIsOverBudget() ? null : "",
+    "[กรณีราคากลางสูงกว่างบประมาณ]": rcIsOverBudget() ? "" : null,
+  };
+}
+
+async function buildRcDoc(n, projectName, monthG, yearG) {
+  const key = rcSetKey();
+  if (!key) throw new Error("ยังไม่ได้เลือกประเภทงาน หรือยังไม่ได้กรอกงบประมาณ/เลือกวิธีจัดซื้อจัดจ้าง");
+  await ensureRcSet(key);
+  const doc = window.RC_TEMPLATES[key][String(n)];
+  if (!doc) throw new Error(`ชุดนี้ไม่มีเอกสาร ${n}`);
+  const bytes = await buildOneDocx(doc.b64, rcFields(projectName, monthG, yearG));
+  return { bytes, name: doc.name };
+}
+
+function downloadBlob(data, filename, mime) {
+  const blob = new Blob([data], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+// ---- UI ของการ์ด "งานราคากลาง" ----
+function updateRcPriceText() {
+  document.getElementById("g_rcPriceText").value = bahtText(rcPriceNum());
+}
+function updateRcDiffNote() {
+  const el = document.getElementById("rcDiffNote");
+  const p = Number(rcPriceNum()), b = Number(budgetNum());
+  if (!p || !b) { el.textContent = "กรอกราคากลางและงบประมาณเบื้องต้นให้ครบ เพื่อให้โปรแกรมเลือกข้อความในเอกสารให้ถูกกรณี"; return; }
+  const diff = Math.abs(p - b);
+  const pct = b ? (diff / b * 100).toFixed(1) : "0";
+  if (p > b) el.textContent = `ราคากลางสูงกว่างบประมาณ ${formatComma(String(diff))} บาท (${pct}%)`;
+  else if (p < b) el.textContent = `ราคากลางต่ำกว่างบประมาณ ${formatComma(String(diff))} บาท (${pct}%)`;
+  else el.textContent = "ราคากลางเท่ากับงบประมาณพอดี (ใช้ข้อความชุดเดียวกับกรณีไม่สูงกว่างบประมาณ)";
+}
+function renderRcDoclist() {
+  const ul = document.getElementById("rcDoclist");
+  const hint = document.getElementById("rcListSetHint");
+  const setText = document.getElementById("rcSetText");
+  const info = rcSetInfo();
+  const methodCode = procMethodCode();
+  setText.value = info ? `${info.work} × ${info.method}`
+    : (val("g_rcWorkCat") ? "เลือกวิธีจัดซื้อจัดจ้าง/กรอกงบประมาณก่อน" : "เลือกประเภทงานก่อน");
+  ul.innerHTML = "";
+  if (!info) {
+    hint.textContent = "";
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="doclink"><span class="title" style="color:var(--text-faint);">${
+      methodCode ? "เลือกประเภทงานในการ์ด «งานราคากลาง» ก่อน" : "กรอกงบประมาณ หรือเลือกวิธีจัดซื้อจัดจ้างก่อน"
+    }</span></span>`;
+    ul.appendChild(li);
+    return;
+  }
+  hint.textContent = `(${info.work} × ${info.method})`;
+  info.docs.forEach(d => {
+    const li = document.createElement("li");
+    const span = document.createElement("span");
+    span.className = "doclink";
+    const title = document.createElement("span");
+    title.className = "title";
+    title.textContent = d.name;
+    span.appendChild(title);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "gen-rc";
+    btn.dataset.doc = String(d.n);
+    btn.textContent = "สร้างไฟล์";
+    li.appendChild(span);
+    li.appendChild(btn);
+    ul.appendChild(li);
+  });
+  if (!info.docs.some(d => d.n === 11)) {
+    const li = document.createElement("li");
+    li.innerHTML = '<span class="doclink"><span class="title" style="color:var(--text-faint);">(ชุดนี้ไม่มีเอกสาร 11 แบบ บก.)</span></span>';
+    ul.appendChild(li);
+  }
+}
+
+document.getElementById("rcDoclist").addEventListener("click", async (ev) => {
+  const btn = ev.target.closest(".gen-rc");
+  if (!btn) return;
+  const n = Number(btn.dataset.doc);
+  const statusEl = document.getElementById("status-rcdoc");
+  statusEl.className = "status";
+  btn.disabled = true;
+  const oldText = btn.textContent;
+  btn.textContent = "กำลังสร้าง...";
+  try {
+    const projectName = val("projectName") || "โครงการ";
+    const nameSafe = projectName.replace(/[\\/:*?"<>|]/g, "-").slice(0, 40);
+    const { bytes, name } = await buildRcDoc(n, projectName, val("g_month"), val("g_year"));
+    downloadBlob(bytes, `${name}_${nameSafe}.docx`, DOCX_MIME);
+    statusEl.textContent = `สร้างไฟล์เอกสาร ${n} สำเร็จ — ดาวน์โหลดแล้ว`;
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "เกิดข้อผิดพลาด: " + err.message;
+    statusEl.className = "status err";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = oldText;
+  }
+});
+
+document.getElementById("genAllRc").addEventListener("click", async () => {
+  const btn = document.getElementById("genAllRc");
+  const statusEl = document.getElementById("status-rcall");
+  statusEl.className = "status";
+  btn.disabled = true;
+  try {
+    const info = rcSetInfo();
+    if (!info) throw new Error("ยังเลือกชุดเอกสารไม่ครบ (ประเภทงาน + วิธีจัดซื้อจัดจ้าง)");
+    const projectName = val("projectName") || "โครงการ";
+    const nameSafe = projectName.replace(/[\\/:*?"<>|]/g, "-").slice(0, 40);
+    const monthG = val("g_month"), yearG = val("g_year");
+    statusEl.textContent = "กำลังสร้างไฟล์...";
+    const zip = new JSZip();
+    for (const d of info.docs) {
+      const { bytes, name } = await buildRcDoc(d.n, projectName, monthG, yearG);
+      zip.file(`${name}_${nameSafe}.docx`, bytes);
+    }
+    const blob = await zip.generateAsync({ type: "blob" });
+    downloadBlob(blob, `เอกสารราคากลาง_${nameSafe}.zip`, "application/zip");
+    statusEl.textContent = `สร้างเอกสารราคากลาง ${info.docs.length} ฉบับสำเร็จ — ดาวน์โหลด .zip แล้ว`;
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "เกิดข้อผิดพลาด: " + err.message;
+    statusEl.className = "status err";
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+// ---- แท็บ "ขออนุมัติโครงการ" / "ราคากลาง" ----
+// การ์ดแต่ละใบติด data-tab="approve" | "rc" | "roster" (หรือ "both" ถ้าอยากให้เห็นทุกแท็บ)
+// ช่องที่ถูกซ่อนอยู่คนละแท็บยังถูกอ่านค่าตอนสร้างไฟล์ตามปกติ (แค่ไม่แสดงผล) เช่น เอกสารราคากลาง
+// ยังใช้ชื่อโครงการ/งบประมาณ/คณะกรรมการราคากลาง ที่กรอกไว้ในแท็บ "ขออนุมัติโครงการ"
+// จำแท็บล่าสุดไว้ เพราะงานราคากลางทำคนละช่วงเวลากับตอนขออนุมัติ เปิดหน้ามาจะได้อยู่ที่เดิม
+const TAB_KEY = "consdocx_tab";
+function setTab(name) {
+  document.querySelectorAll("[data-tab]").forEach(el => {
+    el.style.display = (el.dataset.tab === name || el.dataset.tab === "both") ? "" : "none";
+  });
+  document.querySelectorAll("[data-tabbtn]").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.tabbtn === name);
+  });
+  try { localStorage.setItem(TAB_KEY, name); } catch (e) {}
+}
+document.querySelectorAll("[data-tabbtn]").forEach(btn => {
+  btn.addEventListener("click", () => setTab(btn.dataset.tabbtn));
+});
+setTab((() => {
+  try {
+    const saved = localStorage.getItem(TAB_KEY);
+    return ["approve", "rc", "roster"].includes(saved) ? saved : "approve";
+  } catch (e) { return "approve"; }
+})());
+
+document.getElementById("g_rcWorkCat").addEventListener("change", renderRcDoclist);
+document.getElementById("g_procMethod").addEventListener("change", renderRcDoclist);
+document.getElementById("g_rcPrice").addEventListener("input", () => { updateRcPriceText(); updateRcDiffNote(); });
+document.getElementById("g_rcPrice").addEventListener("blur", () => {
+  const el = document.getElementById("g_rcPrice");
+  if (el.value.trim()) el.value = formatComma(el.value);
+  updateRcPriceText();
+  updateRcDiffNote();
+});
+document.getElementById("g_moneyNum").addEventListener("input", () => { updateRcDiffNote(); renderRcDoclist(); });
+updateRcPriceText();
+updateRcDiffNote();
+renderRcDoclist();
 
 // ดึงค่าที่ผู้ใช้เคยกรอกไว้ในหน้าเอกสารย่อย (เวอร์ชันเก่า) ขึ้นมาเติมในช่องของหน้านี้
 // อ่านจาก localStorage ตรงๆ เพราะหน้าเอกสารย่อยไม่มีอยู่แล้ว (เดิมเปิด iframe ไปคุยผ่าน postMessage)
