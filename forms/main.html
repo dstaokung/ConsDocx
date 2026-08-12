@@ -238,6 +238,8 @@
         <input type="text" id="g_letter3No" placeholder="เว้นว่างได้"></div>
       <div><label>วันที่ออกหนังสือขอนำส่งเอกสารการจัดทำโครงการ</label>
         <input type="text" id="g_letter3Date" class="date-field" placeholder="เว้นว่างได้ / 1-2-2569"></div>
+      <div><label>เลขที่คำสั่งคณะกรรมการกำหนดราคากลาง <span class="hint">(ใช้ในเอกสาร 7)</span></label>
+        <input type="text" id="g_rcOrderNo" placeholder="เว้นว่างได้"></div>
     </div>
   </div>
 
@@ -318,7 +320,7 @@
   </div>
 
   <div class="card">
-    <h2>คณะกรรมการกำหนดราคากลางงานก่อสร้าง <span class="hint">(ใช้ในเอกสาร 5 ข้อ 8.1)</span></h2>
+    <h2>คณะกรรมการกำหนดราคากลางงานก่อสร้าง <span class="hint">(ใช้ในเอกสาร 5 ข้อ 8.1 และเอกสาร 7)</span></h2>
     <div class="row2">
       <div><label>1. ชื่อ-สกุล (ประธานกรรมการ)</label>
         <select class="roster-select" data-name="g_rc1name" data-pos="g_rc1pos"></select>
@@ -412,6 +414,14 @@
         <span class="doclink"><span class="title">5. บันทึกนำส่งเอกสารการขออนุมัติจัดทำโครงการ</span></span>
         <button type="button" class="gen-one" data-doc="5">สร้างไฟล์</button>
       </li>
+      <li>
+        <span class="doclink"><span class="title">6. บันทึกขออนุมัติแต่งตั้งคณะกรรมการกำหนดราคากลาง</span></span>
+        <button type="button" class="gen-one" data-doc="6">สร้างไฟล์</button>
+      </li>
+      <li>
+        <span class="doclink"><span class="title">7. คำสั่งแต่งตั้งคณะกรรมการกำหนดราคากลาง</span></span>
+        <button type="button" class="gen-one" data-doc="7">สร้างไฟล์</button>
+      </li>
     </ul>
     <div class="status" id="status-onedoc"></div>
   </div>
@@ -421,7 +431,7 @@
     <button id="genAll">สร้างไฟล์ทั้งหมด (.zip)</button>
     <div class="status" id="status"></div>
     <div class="note">
-      สร้างเอกสาร 1–5 พร้อมกันจากข้อมูลที่กรอกไว้ในหน้านี้ แล้วรวมเป็นไฟล์ .zip เดียว
+      สร้างเอกสาร 1–7 พร้อมกันจากข้อมูลที่กรอกไว้ในหน้านี้ แล้วรวมเป็นไฟล์ .zip เดียว
       ไม่ต้องเปิดหน้าเอกสารย่อยก่อน — ฟิลด์ไหนเว้นว่างไว้ก็จะว่างในไฟล์ที่ได้
     </div>
   </div>
@@ -473,6 +483,7 @@ const AUTOSAVE_KEY = "consdocx_autosave_main";
 const AUTOSAVE_FIELDS = [
   "projectName", "g_projectDetail", "g_month", "g_year", "g_priorMatter", "g_facts", "g_moneyNum",
   "g_orderNo", "g_orderDate", "g_letter1No", "g_letter1Date", "g_letter2No", "g_letter2Date", "g_letter3No", "g_letter3Date",
+  "g_rcOrderNo",
   "g_name1", "g_pos1", "g_name2", "g_pos2", "g_name3", "g_pos3",
   "g_budgetType", "g_budgetYear",
   "g_recName", "g_recPos", "g_meetStart", "g_meetEnd",
@@ -823,6 +834,8 @@ function sharedProjectFields(data, projectName, monthG, yearG) {
     "[วันที่หนังสือรายงานการจัดทำแบบรูปรายการ]": docRefDate(val("g_letter2Date"), monthG, yearG),
     "[เลขที่หนังสือขอนำส่งเอกสารการจัดทำโครงการ]": docRefNoOnly(val("g_letter3No")),
     "[วันที่หนังสือขอนำส่งเอกสารการจัดทำโครงการ]": docRefDate(val("g_letter3Date"), monthG, yearG),
+    // เลขที่คำสั่งแต่งตั้งคณะกรรมการกำหนดราคากลาง (เอกสาร 7) — รูปแบบเดียวกับเลขที่คำสั่งของเอกสาร 2 คือเติมปี พ.ศ. ต่อท้ายให้
+    "[เลขที่คำสั่งคณะกรรมการราคากลาง]": docRefNoWithYear(val("g_rcOrderNo"), yearG),
   };
 }
 
@@ -949,12 +962,39 @@ async function buildDoc5(data5, projectName, monthG, yearG) {
   });
 }
 
+// เอกสาร 6: บันทึกขออนุมัติแต่งตั้งคณะกรรมการกำหนดราคากลาง — ใช้ placeholder ชุดร่วมล้วนๆ
+// (ชื่อ/รายละเอียดโครงการ + เลขที่-วันที่หนังสือขอนำส่งเอกสารการจัดทำโครงการ)
+async function buildDoc6(data6, projectName, monthG, yearG) {
+  return buildOneDocx(window.TEMPLATE_6_BASE64, {
+    ...sharedProjectFields(data6, projectName, monthG, yearG),
+    "[เดือน]": monthG || (data6 && data6.docMonth) || "",
+    "[ปี]": yearG || (data6 && data6.docYear) || "",
+  });
+}
+
+// เอกสาร 7: คำสั่งแต่งตั้งคณะกรรมการกำหนดราคากลาง — ใช้คณะกรรมการราคากลางชุดเดียวกับเอกสาร 5 ข้อ 8.1
+async function buildDoc7(data7, projectName, monthG, yearG) {
+  return buildOneDocx(window.TEMPLATE_7_BASE64, {
+    ...sharedProjectFields(data7, projectName, monthG, yearG),
+    "[ชื่อกรรมการราคากลาง1]": val("g_rc1name") || (data7 && data7.rc1name) || "",
+    "[ตำแหน่งกรรมการราคากลาง1]": val("g_rc1pos") || (data7 && data7.rc1pos) || "",
+    "[ชื่อกรรมการราคากลาง2]": val("g_rc2name") || (data7 && data7.rc2name) || "",
+    "[ตำแหน่งกรรมการราคากลาง2]": val("g_rc2pos") || (data7 && data7.rc2pos) || "",
+    "[ชื่อกรรมการราคากลาง3]": val("g_rc3name") || (data7 && data7.rc3name) || "",
+    "[ตำแหน่งกรรมการราคากลาง3]": val("g_rc3pos") || (data7 && data7.rc3pos) || "",
+    "[เดือน]": monthG || (data7 && data7.docMonth) || "",
+    "[ปี]": yearG || (data7 && data7.docYear) || "",
+  });
+}
+
 const DOC_INFO = {
   1: { build: buildDoc1, filename: "1. ขออนุมัติโครงการก่อสร้าง" },
   2: { build: buildDoc2, filename: "2. คำสั่งแต่งตั้งคณะกรรมการ" },
   3: { build: buildDoc3, filename: "3. รายงานการประชุมแบบรูปรายการ" },
   4: { build: buildDoc4, filename: "4. บันทึกรายงานแบบรูปรายการ" },
   5: { build: buildDoc5, filename: "5. นำส่งเอกสารการขออนุมัติ" },
+  6: { build: buildDoc6, filename: "6. บันทึกแต่งตั้งคณะกรรมการกำหนดราคากลาง" },
+  7: { build: buildDoc7, filename: "7. คำสั่งแต่งตั้งคณะกรรมการกำหนดราคากลาง" },
 };
 
 document.querySelectorAll(".gen-one").forEach((btn) => {
@@ -1012,6 +1052,8 @@ document.getElementById("genAll").addEventListener("click", async () => {
     const doc3 = await buildDoc3(null, projectName, monthG, yearG);
     const doc4 = await buildDoc4(null, projectName, monthG, yearG);
     const doc5 = await buildDoc5(null, projectName, monthG, yearG);
+    const doc6 = await buildDoc6(null, projectName, monthG, yearG);
+    const doc7 = await buildDoc7(null, projectName, monthG, yearG);
 
     const outerZip = new JSZip();
     outerZip.file(`1. ขออนุมัติโครงการก่อสร้าง_${nameSafe}.docx`, doc1);
@@ -1019,6 +1061,8 @@ document.getElementById("genAll").addEventListener("click", async () => {
     outerZip.file(`3. รายงานการประชุมแบบรูปรายการ_${nameSafe}.docx`, doc3);
     outerZip.file(`4. บันทึกรายงานแบบรูปรายการ_${nameSafe}.docx`, doc4);
     outerZip.file(`5. นำส่งเอกสารการขออนุมัติ_${nameSafe}.docx`, doc5);
+    outerZip.file(`6. บันทึกแต่งตั้งคณะกรรมการกำหนดราคากลาง_${nameSafe}.docx`, doc6);
+    outerZip.file(`7. คำสั่งแต่งตั้งคณะกรรมการกำหนดราคากลาง_${nameSafe}.docx`, doc7);
 
     const blob = await outerZip.generateAsync({ type: "blob" });
     const url = URL.createObjectURL(blob);
