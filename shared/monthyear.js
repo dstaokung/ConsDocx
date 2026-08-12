@@ -63,8 +63,62 @@ window.ConsDocxMonthYear = (function () {
     sel.value = currentYearThai();
   }
 
+  // ---- แปลงวันที่ที่ผู้ใช้พิมพ์แบบย่อ ให้เป็นวันที่เต็มภาษาไทย ----
+  // "1/2/2569", "1-2-69", "01.02.2026", "2569-02-01", "1 ก.พ. 69", "1 กุมภา 2569" -> "1 กุมภาพันธ์ 2569"
+  // ถ้าแกะไม่ออก (เช่น พิมพ์ข้อความอื่นปนมา) จะคืนค่าที่พิมพ์มาเดิม ไม่ไปแก้ให้เพี้ยน
+  var MONTH_ABBR = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
+                    "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+
+  function arabicDigits(s) {
+    return String(s).replace(/[๐-๙]/g, function (d) { return String("๐๑๒๓๔๕๖๗๘๙".indexOf(d)); });
+  }
+
+  // ปีที่พิมพ์มาอาจเป็น พ.ศ. เต็ม (2569), พ.ศ. ย่อ 2 หลัก (69) หรือ ค.ศ. (2026)
+  function normalizeYear(y, fallbackYear) {
+    if (y === undefined || y === null || y === "") return String(fallbackYear || "").trim();
+    var n = parseInt(y, 10);
+    if (isNaN(n)) return String(fallbackYear || "").trim();
+    if (n < 100) return String(2500 + n);          // 69 -> 2569
+    if (n >= 1900 && n <= 2200) return String(n + 543); // ค.ศ. -> พ.ศ.
+    return String(n);
+  }
+
+  // หาเลขเดือนจากคำที่พิมพ์ (รับได้ทั้งชื่อเต็ม ชื่อย่อ มีจุด/ไม่มีจุด และพิมพ์ไม่ครบคำ)
+  function monthIndexFromText(word) {
+    var w = String(word).replace(/[.\s]/g, "");
+    if (!w) return -1;
+    for (var i = 0; i < MONTHS.length; i++) {
+      if (MONTHS[i].indexOf(w) === 0) return i;                       // "กุมภา" -> กุมภาพันธ์
+      if (MONTH_ABBR[i].replace(/\./g, "") === w) return i;           // "กพ" -> ก.พ.
+    }
+    return -1;
+  }
+
+  function formatThaiDate(raw, fallbackYear) {
+    var s = arabicDigits(String(raw == null ? "" : raw)).trim().replace(/\s+/g, " ");
+    if (!s) return "";
+    var day = null, monthIdx = -1, year = "";
+
+    var m = s.match(/^(\d{1,2})\s*[\/\-.]\s*(\d{1,2})(?:\s*[\/\-.]\s*(\d{1,4}))?$/);
+    if (m) {                                   // 1/2/2569, 1-2-69, 1.2
+      day = parseInt(m[1], 10); monthIdx = parseInt(m[2], 10) - 1; year = m[3];
+    } else if ((m = s.match(/^(\d{4})\s*[\/\-.]\s*(\d{1,2})\s*[\/\-.]\s*(\d{1,2})$/))) {
+      day = parseInt(m[3], 10); monthIdx = parseInt(m[2], 10) - 1; year = m[1]; // 2569-02-01
+    } else if ((m = s.match(/^(\d{1,2})\s+([฀-๿. ]+?)(?:\s+(\d{1,4}))?$/))) {
+      day = parseInt(m[1], 10); monthIdx = monthIndexFromText(m[2]); year = m[3]; // 1 ก.พ. 69
+    } else {
+      return s;
+    }
+
+    if (!(day >= 1 && day <= 31) || monthIdx < 0 || monthIdx > 11) return s;
+    var y = normalizeYear(year, fallbackYear);
+    return day + " " + MONTHS[monthIdx] + (y ? " " + y : "");
+  }
+
   return {
     MONTHS: MONTHS,
+    MONTH_ABBR: MONTH_ABBR,
+    formatThaiDate: formatThaiDate,
     toThaiDigits: toThaiDigits,
     currentMonth: currentMonth,
     currentYearThai: currentYearThai,

@@ -77,7 +77,7 @@
   }
   ul.doclist { list-style: none; margin: 0; padding: 0; }
   ul.doclist li { margin-bottom: 10px; display: flex; gap: 8px; }
-  a.doclink {
+  .doclink {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -85,21 +85,12 @@
     padding: 14px 16px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    text-decoration: none;
     color: var(--text);
     background: var(--surface);
-    transition: background .15s, border-color .15s;
     flex: 1;
     min-width: 0;
   }
-  a.doclink:hover { background: var(--accent-bg); border-color: var(--accent-light); }
-  a.doclink .title { font-weight: 600; font-size: 18px; }
-  a.doclink .badge {
-    font-size: 14px;
-    color: var(--text-muted);
-    white-space: nowrap;
-  }
-  a.doclink.linked .badge { color: var(--accent); font-weight: 600; }
+  .doclink .title { font-weight: 600; font-size: 18px; }
   button.gen-one {
     flex: 0 0 auto;
     padding: 0 16px;
@@ -129,21 +120,6 @@
   }
   button#genAll:hover { background: #15803d; }
   button#genAll:disabled { background: #86efac; cursor: default; }
-  button#pushShared {
-    margin-top: 16px;
-    width: 100%;
-    padding: 12px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 17px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-  }
-  button#pushShared:hover { background: var(--accent-dark); }
-  button#pushShared:disabled { background: var(--accent-light); cursor: default; }
   .status { margin-top: 10px; font-size: 15px; color: #16a34a; min-height: 18px; }
   .status.err { color: #dc2626; }
   .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
@@ -244,24 +220,24 @@
         <select id="g_budgetYear"></select></div>
     </div>
 
-    <h3>เลขที่/วันที่หนังสือที่เกี่ยวข้อง <span class="hint">(เว้นว่างได้ — ถ้าไม่กรอกจะเว้นช่องว่าง 8 ตัวอักษรแทนเลขที่/วันที่ในเอกสาร แล้วเติมเดือน/ปีจากด้านบนให้อัตโนมัติ)</span></h3>
+    <h3>เลขที่/วันที่หนังสือที่เกี่ยวข้อง <span class="hint">(เว้นว่างได้ — ถ้าไม่กรอกจะเว้นช่องว่าง 8 ตัวอักษรแทนเลขที่/วันที่ในเอกสาร แล้วเติมเดือน/ปีจากด้านบนให้อัตโนมัติ) — ช่องวันที่พิมพ์ย่อได้ เช่น 1/2/2569 หรือ 1 ก.พ. 69 โปรแกรมจะแปลงเป็น "1 กุมภาพันธ์ 2569" ให้เอง</span></h3>
     <div class="row2">
       <div><label>เลขที่คำสั่งคณะกรรมการจัดทำแบบรูปรายการงานก่อสร้าง</label>
         <input type="text" id="g_orderNo" placeholder="เว้นว่างได้"></div>
       <div><label>วันที่ของคำสั่ง</label>
-        <input type="text" id="g_orderDate" placeholder="เว้นว่างได้"></div>
+        <input type="text" id="g_orderDate" class="date-field" placeholder="เว้นว่างได้ / 1-2-2569"></div>
       <div><label>เลขที่หนังสือขออนุมัติโครงการ</label>
         <input type="text" id="g_letter1No" placeholder="เว้นว่างได้"></div>
       <div><label>วันที่ออกหนังสือขออนุมัติโครงการ</label>
-        <input type="text" id="g_letter1Date" placeholder="เว้นว่างได้"></div>
+        <input type="text" id="g_letter1Date" class="date-field" placeholder="เว้นว่างได้ / 1-2-2569"></div>
       <div><label>เลขที่หนังสือรายงานการจัดทำแบบรูปรายการ</label>
         <input type="text" id="g_letter2No" placeholder="เว้นว่างได้"></div>
       <div><label>วันที่ออกหนังสือรายงานการจัดทำแบบรูปรายการ</label>
-        <input type="text" id="g_letter2Date" placeholder="เว้นว่างได้"></div>
+        <input type="text" id="g_letter2Date" class="date-field" placeholder="เว้นว่างได้ / 1-2-2569"></div>
       <div><label>เลขที่หนังสือขอนำส่งเอกสารการจัดทำโครงการ</label>
         <input type="text" id="g_letter3No" placeholder="เว้นว่างได้"></div>
       <div><label>วันที่ออกหนังสือขอนำส่งเอกสารการจัดทำโครงการ</label>
-        <input type="text" id="g_letter3Date" placeholder="เว้นว่างได้"></div>
+        <input type="text" id="g_letter3Date" class="date-field" placeholder="เว้นว่างได้ / 1-2-2569"></div>
     </div>
   </div>
 
@@ -400,15 +376,13 @@
   </div>
 
   <div class="card">
-    <h2>บันทึกข้อมูลร่วมลงทุกเอกสาร</h2>
-    <button id="pushShared" type="button">บันทึกข้อมูลร่วมลงทุกเอกสาร</button>
-    <div class="status" id="shareStatus"></div>
-
     <div class="note">
-      พิมพ์ชื่อโครงการแล้วลิงก์ด้านล่างจะพาไปเปิดเอกสารพร้อมกรอกให้อัตโนมัติ ส่วนงบประมาณ/อ้างอิงแผนพัฒนา/
-      คณะกรรมการ ให้กด "บันทึกข้อมูลร่วมลงทุกเอกสาร" — โปรแกรมจะส่งค่าลงไปเก็บในทุกเอกสารที่ใช้ (ช่องที่เว้นว่าง
-      จะไม่ไปทับค่าเดิมในเอกสาร) ฟิลด์เฉพาะของเอกสารนั้น ๆ ที่ไม่มีในหน้านี้ (เช่น ผู้จด/ผู้ตรวจรายงานการประชุม,
-      กำหนดเวลาแล้วเสร็จ, สูตรค่า K) ยังไปกรอกในหน้าของเอกสารนั้นโดยตรง
+      กรอกทุกอย่างที่หน้านี้หน้าเดียว แล้วกดสร้างไฟล์ได้เลย (รวมฟิลด์เฉพาะของแต่ละเอกสาร เช่น
+      ผู้จด/ผู้ตรวจรายงานการประชุม, กำหนดเวลาแล้วเสร็จ, สูตรค่า K) — ข้อมูลถูกจำไว้ในเครื่องอัตโนมัติ
+      ทุกครั้งที่พิมพ์ ปิดหน้าไปแล้วเปิดใหม่ก็ยังอยู่ ถ้าจะเริ่มโครงการใหม่ให้กดปุ่ม "เริ่มโครงการใหม่" ด้านบน
+      <br><br>
+      ช่องที่เว้นว่างไว้ โปรแกรมจะใส่ข้อความตั้งต้น/ช่องว่างให้แทน แล้วทำเป็น<b style="color:#c0392b">ตัวอักษรสีแดง</b>
+      ในไฟล์ที่ได้ เพื่อให้เห็นชัดว่าตรงไหนต้องกลับมาแก้หรือเขียนเติมด้วยมือ
     </div>
   </div>
 
@@ -419,33 +393,23 @@
     <h2>รายการเอกสาร</h2>
     <ul class="doclist">
       <li>
-        <a class="doclink linked" id="link-1" href="./1. ขออนุมัติโครงการก่อสร้าง/1. ขออนุมัติโครงการก่อสร้าง.html">
-          <span class="title">1. ขออนุมัติจัดทำโครงการก่อสร้าง</span>
-        </a>
+        <span class="doclink"><span class="title">1. ขออนุมัติจัดทำโครงการก่อสร้าง</span></span>
         <button type="button" class="gen-one" data-doc="1">สร้างไฟล์</button>
       </li>
       <li>
-        <a class="doclink linked" id="link-2" href="./2. คำสั่งแต่งตั้งคณะกรรมการ/2. คำสั่งแต่งตั้งคณะกรรมการ.html">
-          <span class="title">2. คำสั่งแต่งตั้งคณะกรรมการจัดทำแบบรูปรายการ</span>
-        </a>
+        <span class="doclink"><span class="title">2. คำสั่งแต่งตั้งคณะกรรมการจัดทำแบบรูปรายการ</span></span>
         <button type="button" class="gen-one" data-doc="2">สร้างไฟล์</button>
       </li>
       <li>
-        <a class="doclink linked" id="link-3" href="./3. รายงานการประชุมแบบรูปรายการ/3. รายงานการประชุมแบบรูปรายการ.html">
-          <span class="title">3. รายงานการประชุมคณะกรรมการจัดทำแบบรูปรายการ</span>
-        </a>
+        <span class="doclink"><span class="title">3. รายงานการประชุมคณะกรรมการจัดทำแบบรูปรายการ</span></span>
         <button type="button" class="gen-one" data-doc="3">สร้างไฟล์</button>
       </li>
       <li>
-        <a class="doclink linked" id="link-4" href="./4. บันทึกรายงานแบบรูปรายการ/4. บันทึกรายงานแบบรูปรายการ.html">
-          <span class="title">4. บันทึกรายงานการจัดทำแบบรูปรายการงานก่อสร้าง</span>
-        </a>
+        <span class="doclink"><span class="title">4. บันทึกรายงานการจัดทำแบบรูปรายการงานก่อสร้าง</span></span>
         <button type="button" class="gen-one" data-doc="4">สร้างไฟล์</button>
       </li>
       <li>
-        <a class="doclink linked" id="link-5" href="./5. นำส่งเอกสารการขออนุมัติ/5. นำส่งเอกสารการขออนุมัติ.html">
-          <span class="title">5. บันทึกนำส่งเอกสารการขออนุมัติจัดทำโครงการ</span>
-        </a>
+        <span class="doclink"><span class="title">5. บันทึกนำส่งเอกสารการขออนุมัติจัดทำโครงการ</span></span>
         <button type="button" class="gen-one" data-doc="5">สร้างไฟล์</button>
       </li>
     </ul>
@@ -457,10 +421,8 @@
     <button id="genAll">สร้างไฟล์ทั้งหมด (.zip)</button>
     <div class="status" id="status"></div>
     <div class="note">
-      สร้างเอกสาร 1–5 พร้อมกัน โดยดึงข้อมูลที่กรอกไว้จริงในแต่ละหน้าเอกสาร (ชื่อโครงการ,
-      อ้างอิงแผนพัฒนาท้องถิ่น, รายชื่อกรรมการ ฯลฯ) มาใส่ให้ครบอัตโนมัติ แล้วรวมเป็นไฟล์ .zip เดียว —
-      ต้องเคยเปิดกรอกข้อมูลในหน้าเอกสารนั้นอย่างน้อยครั้งหนึ่งก่อน (ข้อมูลจะถูกจำไว้ในเครื่อง)
-      ถ้าฟิลด์ไหนยังไม่เคยกรอกจะปล่อยว่างไว้ในไฟล์ที่ได้
+      สร้างเอกสาร 1–5 พร้อมกันจากข้อมูลที่กรอกไว้ในหน้านี้ แล้วรวมเป็นไฟล์ .zip เดียว
+      ไม่ต้องเปิดหน้าเอกสารย่อยก่อน — ฟิลด์ไหนเว้นว่างไว้ก็จะว่างในไฟล์ที่ได้
     </div>
   </div>
 
@@ -469,49 +431,32 @@
 
 </div>
 
-<p style="text-align:center; color:var(--text-faint); font-size:12px; margin-top:24px;">อัปเดตล่าสุด: 21 กรกฎาคม 2569</p>
+<p style="text-align:center; color:var(--text-faint); font-size:12px; margin-top:24px;">อัปเดตล่าสุด: 12 สิงหาคม 2569</p>
 
 <script src="../shared/jszip.lib.js"></script>
 <script src="../shared/monthyear.js"></script>
 <script src="./main-template-data.js"></script>
 <script>
-const DOC1_PATH = "./1. ขออนุมัติโครงการก่อสร้าง/1. ขออนุมัติโครงการก่อสร้าง.html";
-const DOC2_PATH = "./2. คำสั่งแต่งตั้งคณะกรรมการ/2. คำสั่งแต่งตั้งคณะกรรมการ.html";
-const DOC3_PATH = "./3. รายงานการประชุมแบบรูปรายการ/3. รายงานการประชุมแบบรูปรายการ.html";
-const DOC4_PATH = "./4. บันทึกรายงานแบบรูปรายการ/4. บันทึกรายงานแบบรูปรายการ.html";
-const DOC5_PATH = "./5. นำส่งเอกสารการขออนุมัติ/5. นำส่งเอกสารการขออนุมัติ.html";
-const MEMO_PATH = "./บันทึกข้อความ/บันทึกข้อความ.html";
-
 function val(id) { return document.getElementById(id).value.trim(); }
 
-function withTheme(url) {
-  return window.ConsDocxTheme ? window.ConsDocxTheme.withTheme(url) : url;
+// ---- ข้อมูลเก่าจากหน้าเอกสารย่อย (เวอร์ชันก่อนหน้า ตอนที่ยังแยกหน้ากรอกทีละเอกสาร) ----
+// หน้าเอกสารย่อยถูกยุบมารวมที่หน้านี้หมดแล้ว เหลือแค่ key ใน localStorage ของเครื่องผู้ใช้เดิม
+// ที่ยังต้องอ่านมาใช้ครั้งแรกครั้งเดียว (migration ด้านล่าง) และล้างทิ้งตอนกด "เริ่มโครงการใหม่"
+const LEGACY_DOC_KEYS = [
+  "consdocx_autosave_1_ขออนุมัติโครงการก่อสร้าง",
+  "consdocx_autosave_2_คำสั่งแต่งตั้งคณะกรรมการ",
+  "consdocx_autosave_3_รายงานการประชุมแบบรูปรายการ",
+  "consdocx_autosave_4_บันทึกรายงานแบบรูปรายการ",
+  "consdocx_autosave_5_นำส่งเอกสารการขออนุมัติ",
+];
+function readLegacyDocData(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
 }
-
-function updateLinks() {
-  const projectName = val("projectName");
-  const q = projectName ? ("?projectName=" + encodeURIComponent(projectName)) : "";
-
-  document.getElementById("link-1").href = withTheme(DOC1_PATH + q);
-  document.getElementById("link-2").href = withTheme(DOC2_PATH + q);
-  document.getElementById("link-3").href = withTheme(DOC3_PATH + q);
-  document.getElementById("link-4").href = withTheme(DOC4_PATH + q);
-  document.getElementById("link-5").href = withTheme(DOC5_PATH + q);
-}
-window.addEventListener("consdocx:themechange", updateLinks);
-
-// ส่งคำสั่งล้างข้อมูล (localStorage) ไปให้ทุกเอกสารย่อยผ่าน iframe ซ่อน
 function clearAllDocsData() {
-  [DOC1_PATH, DOC2_PATH, DOC3_PATH, DOC4_PATH, DOC5_PATH, MEMO_PATH].forEach((src) => {
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.addEventListener("load", () => {
-      iframe.contentWindow.postMessage({ type: "consdocx:clearFormData" }, "*");
-      setTimeout(() => iframe.remove(), 300);
-    });
-    iframe.src = src;
-    document.body.appendChild(iframe);
-  });
+  LEGACY_DOC_KEYS.forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
 }
 
 const DEFAULT_PM_1 = "ตามข้อบัญญัติองค์การบริหารส่วนตำบลคลองด่าน งบประมาณรายจ่ายประจำปี พ.ศ.2569 งานก่อสร้าง งบลงทุน ค่าที่ดินและสิ่งก่อสร้าง ค่าที่ปรับปรุงที่ดินและสิ่งก่อสร้าง หน้า 243 (แผนงานอุตสาหกรรมและการโยธา)";
@@ -559,30 +504,37 @@ if (window.ConsDocxMonthYear) {
   ConsDocxMonthYear.populateYearSelect(document.getElementById("g_budgetYear"));
 }
 
-// เปิดหน้า main ตรงๆ หรือกลับมาจากเอกสารย่อย: คืนค่าที่เคยกรอกไว้เสมอ (ไม่ล้างข้อมูลอัตโนมัติแล้ว)
+// เปิดหน้านี้ครั้งไหนก็คืนค่าที่เคยกรอกไว้เสมอ (ไม่ล้างข้อมูลอัตโนมัติ)
 // ถ้าอยากเริ่มโครงการใหม่จริงๆ ให้กดปุ่ม "เริ่มโครงการใหม่" แทน
+// (จำไว้ก่อนว่าเครื่องนี้เคยมีข้อมูลของหน้านี้หรือยัง — migration ด้านล่างต้องใช้)
+const HAD_MAIN_AUTOSAVE = !!localStorage.getItem(AUTOSAVE_KEY);
 restoreAutosave();
 if (typeof updateGMoneyText === "function") updateGMoneyText();
 
-// รับชื่อโครงการกลับมาจากหน้าเอกสาร (เวลากด "กลับไปหน้าแรก") — ถือว่าใหม่กว่า ให้ทับค่าที่จำไว้เดิมได้
+// รองรับลิงก์เก่าที่ยังส่ง ?projectName=... มา (เช่น bookmark จากเวอร์ชันที่ยังมีหน้าเอกสารย่อย)
 const paramsOnLoad = new URLSearchParams(location.search);
-const cameBackFromDoc = paramsOnLoad.has("projectName");
-if (cameBackFromDoc) {
+if (paramsOnLoad.has("projectName")) {
   document.getElementById("projectName").value = paramsOnLoad.get("projectName");
 }
 
-updateLinks();
 saveAutosave();
 AUTOSAVE_FIELDS.forEach(id => document.getElementById(id).addEventListener("input", saveAutosave));
-document.getElementById("projectName").addEventListener("input", updateLinks);
 
+// ช่องวันที่: พิมพ์ย่อได้ (1/2/2569, 1-2-69, 1 ก.พ. 69) พอออกจากช่องจะแปลงเป็นวันที่เต็มให้เห็นทันที
+// (ตอนสร้างไฟล์ก็แปลงซ้ำอีกชั้นใน docRefDate() เผื่อผู้ใช้กดสร้างทั้งที่ยังไม่ได้ออกจากช่อง)
+document.querySelectorAll("input.date-field").forEach(el => {
+  el.addEventListener("blur", () => {
+    const formatted = window.ConsDocxMonthYear
+      ? ConsDocxMonthYear.formatThaiDate(el.value, val("g_year")) : el.value.trim();
+    if (formatted !== el.value) { el.value = formatted; saveAutosave(); }
+  });
+});
 document.getElementById("newProject").addEventListener("click", () => {
-  if (!confirm("ล้างข้อมูลที่กรอกไว้ทั้งหมด (ทั้งหน้านี้และทุกเอกสาร 1-5) เพื่อเริ่มโครงการใหม่?")) return;
+  if (!confirm("ล้างข้อมูลที่กรอกไว้ทั้งหมดเพื่อเริ่มโครงการใหม่?")) return;
   AUTOSAVE_FIELDS.forEach(id => { document.getElementById(id).value = ""; });
   document.getElementById("g_moneyText").value = "";
   try { localStorage.removeItem(AUTOSAVE_KEY); } catch (e) {}
   clearAllDocsData();
-  updateLinks();
   history.replaceState(null, "", location.pathname);
 });
 
@@ -727,7 +679,23 @@ document.getElementById("g_moneyNum").addEventListener("blur", () => {
   updateGMoneyText();
 });
 
-function replacePlaceholder(xml, placeholder, value) {
+// ---- ข้อความ "ค่าตั้งต้น" ที่โปรแกรมใส่ให้เอง (ช่องที่ผู้ใช้ไม่ได้กรอก) ----
+// ห่อค่าด้วย asDefault() แล้วตอนแทนลงเอกสารจะได้ตัวอักษรสีแดง เพื่อให้เห็นชัดว่าต้องกลับมาตรวจ/แก้
+const DEFAULT_TEXT_COLOR = "FF0000";
+function asDefault(text) { return { text: String(text), isDefault: true }; }
+
+// ใส่ <w:color> สีแดงลงใน <w:rPr> ของรันที่จะสร้างใหม่ (คงรูปแบบเดิมของรันไว้ทั้งหมด เปลี่ยนแค่สี)
+function rPrAsDefault(rPr) {
+  const colorTag = `<w:color w:val="${DEFAULT_TEXT_COLOR}"/>`;
+  if (!rPr) return `<w:rPr>${colorTag}</w:rPr>`;
+  const out = rPr.replace(/<w:color[^>]*\/>/g, "");
+  // ลำดับของ element ใน <w:rPr> มีผลกับ Word — w:color ต้องมาก่อน w:spacing/w:sz/w:u/w:lang ฯลฯ
+  const anchor = out.match(/<w:(spacing|w|kern|position|sz|szCs|highlight|u|effect|bdr|shd|vertAlign|rtl|cs|lang)[ />]/);
+  if (anchor) return out.slice(0, anchor.index) + colorTag + out.slice(anchor.index);
+  return out.replace("</w:rPr>", colorTag + "</w:rPr>");
+}
+
+function replacePlaceholder(xml, placeholder, value, isDefault) {
   const escapedPh = placeholder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const runRegex = new RegExp(`<w:r(?:\\s[^>]*)?>((?:(?!</w:r>)[\\s\\S])*?)<w:t([^>]*)>([^<]*${escapedPh}[^<]*)</w:t></w:r>`, "g");
   let match;
@@ -743,15 +711,17 @@ function replacePlaceholder(xml, placeholder, value) {
     // ที่ถูก Word รวมเป็นรันเดียว) — ถ้าแทนแค่จุดแรกจุดเดียว จุดที่เหลือจะค้างเป็น "[...]" ในไฟล์จริง
     const segments = textContent.split(placeholder);
     const lines = String(value).split(/\n+/);
+    // เฉพาะ "ค่าที่แทนลงไป" เท่านั้นที่เปลี่ยนสี ข้อความเดิมรอบๆ ในรันเดียวกันยังใช้รูปแบบเดิม
+    const rPrVal = isDefault ? rPrAsDefault(rPr) : rPr;
     const parts = [];
     segments.forEach((seg, i) => {
       if (i > 0) {
         if (lines.length <= 1) {
-          parts.push(`<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(value)}</w:t></w:r>`);
+          parts.push(`<w:r>${rPrVal}<w:t xml:space="preserve">${xmlEscape(value)}</w:t></w:r>`);
         } else {
-          parts.push(`<w:r>${rPr}<w:t xml:space="preserve">${xmlEscape(lines[0])}</w:t></w:r>`);
+          parts.push(`<w:r>${rPrVal}<w:t xml:space="preserve">${xmlEscape(lines[0])}</w:t></w:r>`);
           for (let j = 1; j < lines.length; j++) {
-            parts.push(`<w:r>${rPr}<w:br/><w:t xml:space="preserve">${xmlEscape(lines[j])}</w:t></w:r>`);
+            parts.push(`<w:r>${rPrVal}<w:br/><w:t xml:space="preserve">${xmlEscape(lines[j])}</w:t></w:r>`);
           }
         }
       }
@@ -770,18 +740,22 @@ async function buildOneDocx(base64, fieldsMap) {
   const zip = await JSZip.loadAsync(buf);
   let xml = await zip.file("word/document.xml").async("string");
   xml = normalizePlaceholderRuns(xml);
-  for (const [ph, value] of Object.entries(fieldsMap)) {
-    if (value === null) {
+  for (const [ph, raw] of Object.entries(fieldsMap)) {
+    if (raw === null) {
       xml = xml.replace(/<w:p[ >][\s\S]*?<\/w:p>/g, para => getParaText(para).includes(ph) ? "" : para);
     } else {
-      xml = replacePlaceholder(xml, ph, value || "");
+      // ค่าอาจมาเป็น { text, isDefault } (ข้อความที่โปรแกรมใส่ให้เอง → แทนด้วยตัวอักษรสีแดง)
+      const isDefault = !!(raw && typeof raw === "object" && raw.isDefault);
+      const value = isDefault ? raw.text : raw;
+      xml = replacePlaceholder(xml, ph, value || "", isDefault);
     }
   }
   zip.file("word/document.xml", xml);
   return await zip.generateAsync({ type: "uint8array" });
 }
 
-// ---- ฟิลด์ร่วมคณะกรรมการ: mapping ช่องที่ main → id ฟิลด์ในเอกสารปลายทาง ----
+// ---- mapping ช่องในหน้านี้ ← ชื่อฟิลด์ของหน้าเอกสารย่อยเวอร์ชันเก่า ----
+// ใช้ตอน migration ครั้งแรกเท่านั้น (ดึงข้อมูลที่ผู้ใช้เคยกรอกไว้ในหน้าเอกสารย่อยขึ้นมาที่หน้านี้)
 // เอกสาร 2, 3, 4 ใช้คณะกรรมการจัดทำแบบรูปรายการชุดเดียวกัน (id name1..pos3 ตรงกันทุกหน้า)
 const SHARED_MAP_234 = {
   g_name1: "name1", g_pos1: "pos1",
@@ -804,191 +778,34 @@ const SHARED_MAP_5EXTRA = {
   g_kWorkType: "kWorkType", g_kSubWork: "kSubWork", g_kFormula: "kFormula",
 };
 
-// รวมค่าที่กรอกไว้จริง (เว้นว่าง = ไม่ส่ง จะได้ไม่ไปทับค่าเดิมในเอกสาร)
-function collectShared(map, includeProject) {
-  const out = {};
-  for (const [gid, fid] of Object.entries(map)) {
-    const v = document.getElementById(gid).value.trim();
-    if (v) out[fid] = v;
-  }
-  if (includeProject) {
-    const pj = val("projectName");
-    if (pj) out.projectName = pj;
-    const pd = val("g_projectDetail");
-    if (pd) out.projectDetail = pd;
-    const docRefMap = {
-      g_orderNo: "orderNo", g_orderDate: "orderDate",
-      g_letter1No: "letter1No", g_letter1Date: "letter1Date",
-      g_letter2No: "letter2No", g_letter2Date: "letter2Date",
-      g_letter3No: "letter3No", g_letter3Date: "letter3Date",
-    };
-    for (const [gid, fid] of Object.entries(docRefMap)) {
-      const v = val(gid);
-      if (v) out[fid] = v;
-    }
-  }
-  return out;
-}
-
-// ส่งข้อมูลเข้าไปเก็บในเอกสาร (ผ่าน iframe ซ่อน + postMessage แบบเดียวกับ getFormData/clearFormData)
-function pushDataToDoc(src, docId, data, timeoutMs = 4000) {
-  return new Promise((resolve) => {
-    let done = false;
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-
-    function cleanup() {
-      window.removeEventListener("message", onMessage);
-      iframe.remove();
-    }
-    function onMessage(event) {
-      if (event.data && event.data.type === "consdocx:setFormDataDone" && event.data.docId === docId) {
-        done = true;
-        cleanup();
-        resolve(true);
-      }
-    }
-    window.addEventListener("message", onMessage);
-
-    iframe.addEventListener("load", () => {
-      iframe.contentWindow.postMessage({ type: "consdocx:setFormData", data }, "*");
-    });
-    iframe.src = src;
-    document.body.appendChild(iframe);
-
-    setTimeout(() => {
-      if (!done) { cleanup(); resolve(false); }
-    }, timeoutMs);
-  });
-}
-
-document.getElementById("pushShared").addEventListener("click", async () => {
-  const btn = document.getElementById("pushShared");
-  const statusEl = document.getElementById("shareStatus");
-  statusEl.className = "status";
-  btn.disabled = true;
-  statusEl.textContent = "กำลังบันทึกลงเอกสาร...";
-  try {
-    const projectNameVal = val("projectName");
-    const projectDetailVal = val("g_projectDetail");
-    const moneyVal = val("g_moneyNum");
-    const priorMatterVal = val("g_priorMatter");
-    const factsVal = val("g_facts");
-    const monthVal = val("g_month");
-    const yearVal = val("g_year");
-    const docRefVals = {
-      orderNo: val("g_orderNo"), orderDate: val("g_orderDate"),
-      letter1No: val("g_letter1No"), letter1Date: val("g_letter1Date"),
-      letter2No: val("g_letter2No"), letter2Date: val("g_letter2Date"),
-      letter3No: val("g_letter3No"), letter3Date: val("g_letter3Date"),
-    };
-
-    // เอกสาร 1
-    const data1 = {};
-    if (projectNameVal) data1.projectName = projectNameVal;
-    if (projectDetailVal) data1.projectDetail = projectDetailVal;
-    if (priorMatterVal) data1.priorMatter = priorMatterVal;
-    if (factsVal) data1.facts = factsVal;
-    if (moneyVal) data1.moneyNum = moneyVal;
-    if (monthVal) data1.docMonth = monthVal;
-    if (yearVal) data1.docYear = yearVal;
-    for (const [fid, v] of Object.entries(docRefVals)) { if (v) data1[fid] = v; }
-
-    // เอกสาร 2 และ 3: ใช้คณะกรรมการแบบรูปรายการตรงๆ (ชื่อในตารางต้องมียศนำหน้าถ้ามี เช่น "ว่าที่ ร.ต.")
-    const dataCommittee = collectShared(SHARED_MAP_234, true);
-    const data2 = { ...dataCommittee, ...collectShared(SHARED_MAP_2BUDGET, false) };
-    const data3 = { ...dataCommittee, ...collectShared(SHARED_MAP_3REC, false), ...collectShared(SHARED_MAP_2BUDGET, false) };
-    if (moneyVal) data3.moneyNum = moneyVal;
-    if (monthVal) { data2.docMonth = monthVal; data3.docMonth = monthVal; }
-    if (yearVal) { data2.docYear = yearVal; data3.docYear = yearVal; }
-
-    // เอกสาร 4: คณะกรรมการชุดเดียวกัน แต่บรรทัดลงชื่อมีคำว่า "ว่าที่ ร.ต." เป็นข้อความคงที่อยู่แล้ว
-    // ต้องตัดยศออกจากชื่อก่อนส่ง ไม่งั้นจะซ้ำกัน 2 ที่
-    const data4 = {};
-    for (const [fid, v] of Object.entries(dataCommittee)) {
-      data4[fid] = fid.startsWith("name") ? stripActingRank(v) : v;
-    }
-    if (moneyVal) data4.moneyNum = moneyVal;
-    if (monthVal) data4.docMonth = monthVal;
-    if (yearVal) data4.docYear = yearVal;
-
-    // เอกสาร 5: คณะกรรมการอีก 3 ชุด + งบประมาณ + อ้างอิงแผนพัฒนาท้องถิ่น + รายละเอียดเพิ่มเติม
-    const data5 = { ...collectShared(SHARED_MAP_5, true), ...collectShared(SHARED_MAP_5EXTRA, false) };
-    if (priorMatterVal) data5.priorMatter = priorMatterVal;
-    if (factsVal) data5.facts = factsVal;
-    if (moneyVal) data5.moneyNum = moneyVal;
-    if (monthVal) data5.docMonth = monthVal;
-    if (yearVal) data5.docYear = yearVal;
-
-    const results = await Promise.all([
-      pushDataToDoc(DOC1_PATH, "doc1", data1),
-      pushDataToDoc(DOC2_PATH, "doc2", data2),
-      pushDataToDoc(DOC3_PATH, "doc3", data3),
-      pushDataToDoc(DOC4_PATH, "doc4", data4),
-      pushDataToDoc(DOC5_PATH, "doc5", data5),
-    ]);
-    const failedDocs = results.map((r, i) => r ? null : i + 1).filter(Boolean);
-    if (failedDocs.length === 0) {
-      statusEl.textContent = "บันทึกลงเอกสาร 1–5 เรียบร้อย — เปิดเอกสารไหนก็จะเห็นค่ากรอกไว้ให้แล้ว";
-    } else {
-      statusEl.textContent = `บันทึกไม่สำเร็จ: เอกสาร ${failedDocs.join(", ")} — ลองกดอีกครั้ง`;
-      statusEl.className = "status err";
-    }
-  } catch (err) {
-    console.error(err);
-    statusEl.textContent = "เกิดข้อผิดพลาด: " + err.message;
-    statusEl.className = "status err";
-  } finally {
-    btn.disabled = false;
-  }
-});
-
-// เปิดไฟล์เอกสารในหน้าที่ซ่อนไว้ (iframe) เพื่อไปดึงข้อมูลจริงที่กรอกไว้ในฟอร์มนั้น
-// (แต่ละหน้าจะโหลดค่าที่จำไว้ใน localStorage ของตัวเองก่อน แล้วส่งกลับมาให้ผ่าน postMessage)
-function fetchFormDataFromDoc(src, docId, timeoutMs = 4000) {
-  return new Promise((resolve) => {
-    let done = false;
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-
-    function cleanup() {
-      window.removeEventListener("message", onMessage);
-      iframe.remove();
-    }
-    function onMessage(event) {
-      if (event.data && event.data.type === "consdocx:formData" && event.data.docId === docId) {
-        done = true;
-        cleanup();
-        resolve(event.data.data);
-      }
-    }
-    window.addEventListener("message", onMessage);
-
-    iframe.addEventListener("load", () => {
-      iframe.contentWindow.postMessage({ type: "consdocx:getFormData" }, "*");
-    });
-    iframe.src = src;
-    document.body.appendChild(iframe);
-
-    setTimeout(() => {
-      if (!done) { cleanup(); resolve(null); }
-    }, timeoutMs);
-  });
-}
+// ใช้ตอนดึงข้อมูลเก่ากลับมาจากหน้าเอกสารย่อยเท่านั้น (ฝั่งส่งออกไม่ต้องใช้ เพราะช่องพวกนี้อยู่ที่หน้า main อยู่แล้ว)
+const SHARED_MAP_TEXTS = {
+  projectName: "projectName", g_month: "docMonth", g_year: "docYear",
+  g_projectDetail: "projectDetail", g_priorMatter: "priorMatter", g_facts: "facts",
+  g_orderNo: "orderNo", g_orderDate: "orderDate",
+  g_letter1No: "letter1No", g_letter1Date: "letter1Date",
+  g_letter2No: "letter2No", g_letter2Date: "letter2Date",
+  g_letter3No: "letter3No", g_letter3Date: "letter3Date",
+};
 
 // เลขที่/วันที่หนังสืออ้างอิง — เว้นว่างได้ ถ้าไม่กรอกจะเว้นช่องว่าง 8 ตัวอักษรแทน แล้วเติมเดือน/ปีที่ใช้ในเอกสารให้อัตโนมัติ
 const DOC_REF_BLANK = "        "; // 8 spaces
 function docRefNoWithYear(raw, yearG) {
   const v = (raw || "").trim();
-  return v || (DOC_REF_BLANK + "/" + (yearG || ""));
+  return v || asDefault(DOC_REF_BLANK + "/" + (yearG || ""));
 }
 function docRefNoOnly(raw) {
   const v = (raw || "").trim();
-  return v || DOC_REF_BLANK;
+  return v || asDefault(DOC_REF_BLANK);
+}
+// วันที่: รับได้ทั้งแบบเต็ม ("1 กุมภาพันธ์ 2569") และแบบย่อ ("1/2/2569", "1-2-69", "1 ก.พ. 69")
+// แล้วแปลงเป็นแบบเต็มเสมอก่อนใส่ลงเอกสาร (ดู formatThaiDate ใน shared/monthyear.js)
+function thaiDate(raw, yearG) {
+  return window.ConsDocxMonthYear ? ConsDocxMonthYear.formatThaiDate(raw, yearG) : (raw || "").trim();
 }
 function docRefDate(raw, monthG, yearG) {
-  const v = (raw || "").trim();
-  return v || (DOC_REF_BLANK + (monthG || "") + " " + (yearG || ""));
+  const v = thaiDate(raw, yearG);
+  return v || asDefault(DOC_REF_BLANK + (monthG || "") + " " + (yearG || ""));
 }
 // รวม placeholder ชุด "ข้อมูลโครงการ" ที่ใช้ร่วมกันทุกเอกสาร (ชื่อ/รายละเอียดโครงการ + เลขที่-วันที่หนังสืออ้างอิงทั้ง 4 คู่)
 function sharedProjectFields(data, projectName, monthG, yearG) {
@@ -1014,11 +831,11 @@ async function buildDoc1(data1, projectName, monthG, yearG) {
   const pm1 = val("g_priorMatter") || (data1 && data1.priorMatter) || "";
   return buildOneDocx(window.TEMPLATE_1_BASE64, {
     ...sharedProjectFields(data1, projectName, monthG, yearG),
-    "[PM1]": pm1 || DEFAULT_PM_1,
-    "[PM2]": pm1 ? null : DEFAULT_PM_2,
-    "[PM3]": pm1 ? null : DEFAULT_PM_3,
-    "[PM4]": pm1 ? null : DEFAULT_PM_4,
-    "[ข้อเท็จจริง]": val("g_facts") || (data1 && data1.facts) || DEFAULT_FACTS,
+    "[PM1]": pm1 || asDefault(DEFAULT_PM_1),
+    "[PM2]": pm1 ? null : asDefault(DEFAULT_PM_2),
+    "[PM3]": pm1 ? null : asDefault(DEFAULT_PM_3),
+    "[PM4]": pm1 ? null : asDefault(DEFAULT_PM_4),
+    "[ข้อเท็จจริง]": val("g_facts") || (data1 && data1.facts) || asDefault(DEFAULT_FACTS),
     "[จำนวนเงินตัวเลข]": formatComma(money1),
     "[จำนวนเงินตัวอักษร]": bahtText(money1),
     "[เดือน]": monthG || (data1 && data1.docMonth) || "",
@@ -1099,11 +916,11 @@ async function buildDoc5(data5, projectName, monthG, yearG) {
   const pm5 = val("g_priorMatter") || (data5 && data5.priorMatter) || "";
   return buildOneDocx(window.TEMPLATE_5_BASE64, {
     ...sharedProjectFields(data5, projectName, monthG, yearG),
-    "[PM1]": pm5 || DEFAULT_PM_1,
-    "[PM2]": pm5 ? null : DEFAULT_PM_2,
-    "[PM3]": pm5 ? null : DEFAULT_PM_3,
-    "[PM4]": pm5 ? null : DEFAULT_PM_4,
-    "[ข้อเท็จจริง]": val("g_facts") || (data5 && data5.facts) || DEFAULT_FACTS,
+    "[PM1]": pm5 || asDefault(DEFAULT_PM_1),
+    "[PM2]": pm5 ? null : asDefault(DEFAULT_PM_2),
+    "[PM3]": pm5 ? null : asDefault(DEFAULT_PM_3),
+    "[PM4]": pm5 ? null : asDefault(DEFAULT_PM_4),
+    "[ข้อเท็จจริง]": val("g_facts") || (data5 && data5.facts) || asDefault(DEFAULT_FACTS),
     "[จำนวนเงินตัวเลข]": formatComma(money5),
     "[จำนวนเงินตัวอักษร]": bahtText(money5),
     "[จำนวนวันแล้วเสร็จ]": val("g_workDays") || (data5 && data5.workDays) || "",
@@ -1133,11 +950,11 @@ async function buildDoc5(data5, projectName, monthG, yearG) {
 }
 
 const DOC_INFO = {
-  1: { path: DOC1_PATH, key: "doc1", build: buildDoc1, filename: "1. ขออนุมัติโครงการก่อสร้าง" },
-  2: { path: DOC2_PATH, key: "doc2", build: buildDoc2, filename: "2. คำสั่งแต่งตั้งคณะกรรมการ" },
-  3: { path: DOC3_PATH, key: "doc3", build: buildDoc3, filename: "3. รายงานการประชุมแบบรูปรายการ" },
-  4: { path: DOC4_PATH, key: "doc4", build: buildDoc4, filename: "4. บันทึกรายงานแบบรูปรายการ" },
-  5: { path: DOC5_PATH, key: "doc5", build: buildDoc5, filename: "5. นำส่งเอกสารการขออนุมัติ" },
+  1: { build: buildDoc1, filename: "1. ขออนุมัติโครงการก่อสร้าง" },
+  2: { build: buildDoc2, filename: "2. คำสั่งแต่งตั้งคณะกรรมการ" },
+  3: { build: buildDoc3, filename: "3. รายงานการประชุมแบบรูปรายการ" },
+  4: { build: buildDoc4, filename: "4. บันทึกรายงานแบบรูปรายการ" },
+  5: { build: buildDoc5, filename: "5. นำส่งเอกสารการขออนุมัติ" },
 };
 
 document.querySelectorAll(".gen-one").forEach((btn) => {
@@ -1150,12 +967,12 @@ document.querySelectorAll(".gen-one").forEach((btn) => {
     const oldText = btn.textContent;
     btn.textContent = "กำลังสร้าง...";
     try {
-      const data = await fetchFormDataFromDoc(info.path, info.key);
-      const projectName = (data && data.projectName) || val("projectName") || "โครงการ";
+      const projectName = val("projectName") || "โครงการ";
       const nameSafe = projectName.replace(/[\\/:*?"<>|]/g, "-").slice(0, 40);
       const monthG = val("g_month");
       const yearG = val("g_year");
-      const bytes = await info.build(data, projectName, monthG, yearG);
+      // ใช้ข้อมูลจากช่องในหน้านี้อย่างเดียว (พารามิเตอร์ data เป็น null) — ไม่ต้องเปิด iframe ไปดึงจากหน้าเอกสารย่อยแล้ว
+      const bytes = await info.build(null, projectName, monthG, yearG);
       const blob = new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -1183,30 +1000,18 @@ document.getElementById("genAll").addEventListener("click", async () => {
   statusEl.className = "status";
   btn.disabled = true;
   try {
-    statusEl.textContent = "กำลังดึงข้อมูลจากแต่ละเอกสาร...";
-    const [data1, data2, data3, data4, data5] = await Promise.all([
-      fetchFormDataFromDoc(DOC1_PATH, "doc1"),
-      fetchFormDataFromDoc(DOC2_PATH, "doc2"),
-      fetchFormDataFromDoc(DOC3_PATH, "doc3"),
-      fetchFormDataFromDoc(DOC4_PATH, "doc4"),
-      fetchFormDataFromDoc(DOC5_PATH, "doc5"),
-    ]);
-
-    if (!data1 || !data2 || !data3 || !data4 || !data5) {
-      statusEl.textContent = "ดึงข้อมูลจากบางเอกสารไม่สำเร็จ — จะใส่เท่าที่มีให้ (ฟิลด์ที่เหลือจะว่าง)";
-    }
-
-    const projectName = (data1 && data1.projectName) || (data2 && data2.projectName) || (data3 && data3.projectName) || (data4 && data4.projectName) || (data5 && data5.projectName) || val("projectName") || "โครงการ";
+    const projectName = val("projectName") || "โครงการ";
     const nameSafe = projectName.replace(/[\\/:*?"<>|]/g, "-").slice(0, 40);
     const monthG = val("g_month");
     const yearG = val("g_year");
 
+    // สร้างจากข้อมูลในหน้านี้อย่างเดียว (พารามิเตอร์ data เป็น null ทุกฉบับ)
     statusEl.textContent = "กำลังสร้างไฟล์...";
-    const doc1 = await buildDoc1(data1, projectName, monthG, yearG);
-    const doc2 = await buildDoc2(data2, projectName, monthG, yearG);
-    const doc3 = await buildDoc3(data3, projectName, monthG, yearG);
-    const doc4 = await buildDoc4(data4, projectName, monthG, yearG);
-    const doc5 = await buildDoc5(data5, projectName, monthG, yearG);
+    const doc1 = await buildDoc1(null, projectName, monthG, yearG);
+    const doc2 = await buildDoc2(null, projectName, monthG, yearG);
+    const doc3 = await buildDoc3(null, projectName, monthG, yearG);
+    const doc4 = await buildDoc4(null, projectName, monthG, yearG);
+    const doc5 = await buildDoc5(null, projectName, monthG, yearG);
 
     const outerZip = new JSZip();
     outerZip.file(`1. ขออนุมัติโครงการก่อสร้าง_${nameSafe}.docx`, doc1);
@@ -1224,7 +1029,7 @@ document.getElementById("genAll").addEventListener("click", async () => {
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-    statusEl.textContent = "สร้างไฟล์สำเร็จ — ดาวน์โหลด .zip แล้ว (ใช้ข้อมูลจริงจากแต่ละเอกสาร)";
+    statusEl.textContent = "สร้างไฟล์สำเร็จ — ดาวน์โหลด .zip แล้ว";
   } catch (err) {
     console.error(err);
     statusEl.textContent = "เกิดข้อผิดพลาด: " + err.message;
@@ -1234,42 +1039,62 @@ document.getElementById("genAll").addEventListener("click", async () => {
   }
 });
 
-// กลับมาจากหน้าเอกสาร (ไม่ใช่เปิดใหม่): ดึงค่าคณะกรรมการที่เคยกรอก/บันทึกไว้ มาแสดงในช่องข้อมูลร่วมด้วย
-// (เติมเฉพาะช่องที่ยังว่าง ไม่ทับสิ่งที่ผู้ใช้พิมพ์ค้างไว้)
-if (cameBackFromDoc) {
-  (async () => {
-    const [d1, d2, d3, d4, d5] = await Promise.all([
-      fetchFormDataFromDoc(DOC1_PATH, "doc1"),
-      fetchFormDataFromDoc(DOC2_PATH, "doc2"),
-      fetchFormDataFromDoc(DOC3_PATH, "doc3"),
-      fetchFormDataFromDoc(DOC4_PATH, "doc4"),
-      fetchFormDataFromDoc(DOC5_PATH, "doc5"),
-    ]);
-    // เอกสาร 1 ก็มีช่องงบประมาณของตัวเองแล้วเหมือนกัน เผื่อกรอกตรงในเอกสาร 1 มาก่อน
-    function fillFrom(map, data) {
-      if (!data) return;
-      for (const [gid, fid] of Object.entries(map)) {
-        const el = document.getElementById(gid);
-        if (!el.value.trim() && data[fid]) el.value = data[fid];
-      }
+// ดึงค่าที่ผู้ใช้เคยกรอกไว้ในหน้าเอกสารย่อย (เวอร์ชันเก่า) ขึ้นมาเติมในช่องของหน้านี้
+// อ่านจาก localStorage ตรงๆ เพราะหน้าเอกสารย่อยไม่มีอยู่แล้ว (เดิมเปิด iframe ไปคุยผ่าน postMessage)
+// เติมเฉพาะช่องที่ยังว่าง ไม่ทับสิ่งที่ผู้ใช้พิมพ์ค้างไว้
+function pullLegacyDocData() {
+  const [d1, d2, d3, d4, d5] = LEGACY_DOC_KEYS.map(readLegacyDocData);
+  if (!d1 && !d2 && !d3 && !d4 && !d5) return false;
+  function fillFrom(map, data) {
+    if (!data) return;
+    for (const [gid, fid] of Object.entries(map)) {
+      const el = document.getElementById(gid);
+      if (!el.value.trim() && data[fid]) el.value = data[fid];
     }
-    // คณะกรรมการจัดทำแบบรูปรายการ: เผื่อผู้ใช้กรอกตรงในเอกสาร 2 หรือ 3 มาก่อน (ไม่ใช่ d4 เพราะ
-    // เอกสาร 4 ตัดยศ "ว่าที่ ร.ต." ออกไปแล้ว จะทำให้ช่องที่ main ขาดยศไปด้วย)
-    fillFrom(SHARED_MAP_234, d2);
-    fillFrom(SHARED_MAP_234, d3);
-    fillFrom(SHARED_MAP_2BUDGET, d2);
-    fillFrom(SHARED_MAP_5, d5);
-    fillFrom(SHARED_MAP_3REC, d3);
-    fillFrom(SHARED_MAP_5EXTRA, d5);
+  }
+  // ชื่อโครงการ/เดือน-ปี/เรื่องเดิม/เลขที่-วันที่หนังสือ: เอกสารไหนมีค่าก็ใช้ตัวนั้น (ตัวแรกที่เจอชนะ)
+  [d1, d2, d3, d4, d5].forEach(d => fillFrom(SHARED_MAP_TEXTS, d));
+  // คณะกรรมการจัดทำแบบรูปรายการ: เผื่อผู้ใช้กรอกตรงในเอกสาร 2 หรือ 3 มาก่อน (ไม่ใช่ d4 เพราะ
+  // เอกสาร 4 ตัดยศ "ว่าที่ ร.ต." ออกไปแล้ว จะทำให้ช่องที่ main ขาดยศไปด้วย)
+  fillFrom(SHARED_MAP_234, d2);
+  fillFrom(SHARED_MAP_234, d3);
+  fillFrom(SHARED_MAP_2BUDGET, d2);
+  fillFrom(SHARED_MAP_2BUDGET, d3);
+  fillFrom(SHARED_MAP_5, d5);
+  fillFrom(SHARED_MAP_3REC, d3);
+  fillFrom(SHARED_MAP_5EXTRA, d5);
 
-    // งบประมาณ: เอาจากเอกสาร 3, 4 หรือ 5 (ตัวไหนมีค่าก็ใช้ตัวนั้น) เติมเฉพาะถ้าช่องยังว่าง
-    const moneyEl = document.getElementById("g_moneyNum");
-    if (!moneyEl.value.trim()) {
-      const m = (d1 && d1.moneyNum) || (d3 && d3.moneyNum) || (d4 && d4.moneyNum) || (d5 && d5.moneyNum);
-      if (m) { moneyEl.value = m; updateGMoneyText(); }
+  // งบประมาณ: เอาจากเอกสาร 3, 4 หรือ 5 (ตัวไหนมีค่าก็ใช้ตัวนั้น) เติมเฉพาะถ้าช่องยังว่าง
+  const moneyEl = document.getElementById("g_moneyNum");
+  if (!moneyEl.value.trim()) {
+    const m = (d1 && d1.moneyNum) || (d3 && d3.moneyNum) || (d4 && d4.moneyNum) || (d5 && d5.moneyNum);
+    if (m) { moneyEl.value = m; updateGMoneyText(); }
+  }
+
+  // เดือน/ปี เป็น <select> ที่ตั้งค่าเริ่มต้นเป็นเดือน/ปีปัจจุบันไว้แล้ว จึงไม่เข้าเงื่อนไข "ช่องยังว่าง"
+  // ข้างบน — ถ้าเครื่องนี้ยังไม่เคยมีข้อมูลของหน้านี้เลย ให้ใช้เดือน/ปีที่บันทึกไว้ในเอกสารเก่าแทน
+  if (!HAD_MAIN_AUTOSAVE) {
+    function setSelect(id, v) {
+      if (!v) return;
+      const el = document.getElementById(id);
+      if ([...el.options].some(o => o.value === v)) el.value = v;
     }
-    saveAutosave();
-  })();
+    const docs = [d1, d2, d3, d4, d5];
+    setSelect("g_month", (docs.find(d => d && d.docMonth) || {}).docMonth);
+    setSelect("g_year", (docs.find(d => d && d.docYear) || {}).docYear);
+    setSelect("g_budgetYear", (docs.find(d => d && d.budgetYear) || {}).budgetYear);
+  }
+  saveAutosave();
+  return true;
+}
+
+// ---- migration ครั้งเดียว ----
+// หน้าเอกสารย่อย 1-5 ถูกยุบมารวมที่หน้านี้แล้ว ผู้ใช้เดิมที่ข้อมูลยังค้างอยู่ใน localStorage ของหน้าพวกนั้น
+// จึงต้องย้ายขึ้นมารอบเดียว ไม่งั้นจะเปิดมาเจอฟอร์มว่าง (ข้อมูลเดิมยังอยู่ครบ แค่ไม่มีหน้าไหนอ่านมันแล้ว)
+const MIGRATED_KEY = "consdocx_main_owns_data_v1";
+if (!localStorage.getItem(MIGRATED_KEY)) {
+  try { pullLegacyDocData(); } catch (e) { console.error(e); }
+  try { localStorage.setItem(MIGRATED_KEY, "1"); } catch (e) {}
 }
 
 // ---------------- รายชื่อที่ใช้บ่อย (roster) — เลือกจาก dropdown แทนการพิมพ์ ----------------
